@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Pi.Replicate.Schema
+namespace Pi.Replicate.Data
 {
     public class Class1
     {

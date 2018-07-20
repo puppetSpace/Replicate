@@ -1,0 +1,6 @@
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netcoreapp2.0\Pi.Replicate.Data.deps.json
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netcoreapp2.0\Pi.Replicate.Data.dll
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netcoreapp2.0\Pi.Replicate.Data.csproj.CoreCompileInputs.cache
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netcoreapp2.0\Pi.Replicate.Data.AssemblyInfoInputs.cache
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netcoreapp2.0\Pi.Replicate.Data.AssemblyInfo.cs
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netcoreapp2.0\Pi.Replicate.Data.csprojAssemblyReference.cache
