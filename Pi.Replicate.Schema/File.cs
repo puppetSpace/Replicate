@@ -14,6 +14,15 @@ namespace Pi.Replicate.Schema
 
         public long AmountOfChunks { get; set; }
 
+        public string Hash { get; set; }
+
         public FileStatus Status { get; set; }
+
+        public DateTimeOffset LastModifiedDate { get; set; }
+
+        public string GetPath()
+        {
+            return System.IO.Path.Combine(Folder.GetPath(), Name); //TODO null check, also with Folder
+        }
     }
 }

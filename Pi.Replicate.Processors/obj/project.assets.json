@@ -25,6 +25,16 @@
         "build": {
           "build/netstandard2.0/NETStandard.Library.targets": {}
         }
+      },
+      "Pi.Replicate.Schema/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Pi.Replicate.Schema.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Pi.Replicate.Schema.dll": {}
+        }
       }
     }
   },
@@ -169,11 +179,17 @@
         "netstandard.library.2.0.1.nupkg.sha512",
         "netstandard.library.nuspec"
       ]
+    },
+    "Pi.Replicate.Schema/1.0.0": {
+      "type": "project",
+      "path": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj",
+      "msbuildProject": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
-      "NETStandard.Library >= 2.0.1"
+      "NETStandard.Library >= 2.0.1",
+      "Pi.Replicate.Schema >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -205,7 +221,11 @@
       },
       "frameworks": {
         "netstandard2.0": {
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
