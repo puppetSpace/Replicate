@@ -34,29 +34,6 @@
         "runtime": {
           "lib/netstandard2.0/NLog.dll": {}
         }
-      },
-      "Pi.Replicate.Schema/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v2.0",
-        "compile": {
-          "bin/placeholder/Pi.Replicate.Schema.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Pi.Replicate.Schema.dll": {}
-        }
-      },
-      "Pi.Replicate.Shared/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v2.0",
-        "dependencies": {
-          "NLog": "4.5.7"
-        },
-        "compile": {
-          "bin/placeholder/Pi.Replicate.Shared.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Pi.Replicate.Shared.dll": {}
-        }
       }
     }
   },
@@ -232,23 +209,12 @@
         "nlog.4.5.7.nupkg.sha512",
         "nlog.nuspec"
       ]
-    },
-    "Pi.Replicate.Schema/1.0.0": {
-      "type": "project",
-      "path": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj",
-      "msbuildProject": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj"
-    },
-    "Pi.Replicate.Shared/1.0.0": {
-      "type": "project",
-      "path": "../Pi.Replicate.Shared/Pi.Replicate.Shared.csproj",
-      "msbuildProject": "../Pi.Replicate.Shared/Pi.Replicate.Shared.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
       "NETStandard.Library >= 2.0.1",
-      "Pi.Replicate.Schema >= 1.0.0",
-      "Pi.Replicate.Shared >= 1.0.0"
+      "NLog >= 4.5.7"
     ]
   },
   "packageFolders": {
@@ -258,11 +224,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
-      "projectName": "Pi.Replicate.Processors",
-      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj",
+      "projectName": "Pi.Replicate.Shared",
+      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj",
       "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
+      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -280,14 +246,7 @@
       },
       "frameworks": {
         "netstandard2.0": {
-          "projectReferences": {
-            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
-              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
-            },
-            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
-              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
-            }
-          }
+          "projectReferences": {}
         }
       },
       "warningProperties": {
@@ -304,6 +263,10 @@
             "target": "Package",
             "version": "[2.0.1, )",
             "autoReferenced": true
+          },
+          "NLog": {
+            "target": "Package",
+            "version": "[4.5.7, )"
           }
         },
         "imports": [

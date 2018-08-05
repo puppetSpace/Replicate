@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pi.Replicate.Schema;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,7 @@ namespace Pi.Replicate.Processors
 {
     public interface IFileRepository
     {
-        
+        IEnumerable<File> Get(Guid folderId);
+
     }
 }
