@@ -35,11 +35,13 @@ namespace Pi.Replicate.Processors
                 if (_folder == null || !_fileSystem.DoesDirectoryExist(_folder.GetPath()))
                     return;
 
+                var fileObservable = new FileObservableBuilder(_repository)
+                                    .Build(_folder);
+
                 while (!_tokenSource.IsCancellationRequested)
                 {
-                    var fileCollector = new FileCollector(_folder, _repository);
-                    //fileCollector.Subscribe();
-                    fileCollector.ProcessFiles();
+                    fileObservable.ProcessFiles();
+
                     var waitTime = _configuration["FolderWatcherPollDelay"] ?? "00:05:00";
                     await Task.Delay(TimeSpan.Parse(waitTime));
                 }

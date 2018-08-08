@@ -7,3 +7,12 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstan
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfo.cs
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.dll
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.deps.json
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csprojAssemblyReference.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csproj.CoreCompileInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfoInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfo.cs
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.pdb

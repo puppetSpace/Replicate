@@ -8,9 +8,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors
 {
-    public partial class FileSplitter : Observable<FileChunk>
+    internal class FileSplitter : Observable<FileChunk>
     {
-        private readonly List<IObserver<FileChunk>> _observers = new List<IObserver<FileChunk>>();
         private readonly File _file;
 
         public FileSplitter(File file)
@@ -34,6 +33,7 @@ namespace Pi.Replicate.Processors
             int bytesRead = 0;
             int chunksCreated = 0;
             MD5 hashCreator = MD5.Create();
+            //todo compression
             while ((bytesRead = await stream.ReadAsync(buffer,0,buffer.Length)) > 0)
             {
                 chunksCreated++;
@@ -41,6 +41,7 @@ namespace Pi.Replicate.Processors
                 Notify(FileChunkBuilder.Build(_file,chunksCreated, buffer));
             }
             NotifyComplete();
+
             hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
             _file.Hash = Convert.ToBase64String(hashCreator.Hash);
             _file.AmountOfChunks = chunksCreated;

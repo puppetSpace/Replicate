@@ -1,0 +1,9 @@
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.deps.json
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csproj.CoreCompileInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.AssemblyInfoInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.AssemblyInfo.cs
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csprojAssemblyReference.cache

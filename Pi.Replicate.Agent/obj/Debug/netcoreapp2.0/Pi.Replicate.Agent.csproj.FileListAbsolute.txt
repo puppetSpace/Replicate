@@ -9,3 +9,13 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcorea
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfo.cs
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.deps.json
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.runtimeconfig.json
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.runtimeconfig.dev.json
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.csproj.CoreCompileInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfoInputs.cache
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfo.cs
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
+D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb

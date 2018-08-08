@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors
 {
-    public class FileCollector : Observable<File>
+    internal class FileCollector : Observable<File>
     {
         private readonly Folder _folder;
         private readonly IRepository _repository;
@@ -68,6 +68,7 @@ namespace Pi.Replicate.Processors
                 if (fileInfo.Exists)
                 {
                     var fileObject = FileBuilder.Build(_folder, fileInfo);
+                    //todo save
                     Notify(fileObject);
                 }
             }
