@@ -5,26 +5,28 @@ using Pi.Replicate.Shared.System;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if DEBUG
+[assembly: InternalsVisibleTo("Pi.Replicate.Test")]
+#endif
 namespace Pi.Replicate.Processors
 {
     public class FolderWatcher
     {
         private readonly Folder _folder;
         private readonly IRepository _repository;
-        private readonly IFileSystem _fileSystem;
         private readonly IConfiguration _configuration;
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public FolderWatcher(Folder folder, IRepository repository, IFileSystem fileSystem, IConfiguration configuration)
+        public FolderWatcher(Folder folder, IRepository repository, IConfiguration configuration)
         {
             _folder = folder;
             _repository = repository;
-            _fileSystem = fileSystem;
             _configuration = configuration;
         }
 
@@ -32,7 +34,7 @@ namespace Pi.Replicate.Processors
         {
             return Task.Run(async () =>
             {
-                if (_folder == null || !_fileSystem.DoesDirectoryExist(_folder.GetPath()))
+                if (_folder == null || !System.IO.Directory.Exists(_folder.GetPath()))
                     return;
 
                 var fileObservable = new FileObservableBuilder(_repository)

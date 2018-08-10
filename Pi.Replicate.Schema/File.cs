@@ -4,6 +4,7 @@ namespace Pi.Replicate.Schema
 {
     public class File
     {
+
         public Guid Id { get; set; }
 
         public Folder Folder { get; set; }
@@ -18,7 +19,7 @@ namespace Pi.Replicate.Schema
 
         public FileStatus Status { get; set; }
 
-        public DateTimeOffset LastModifiedDate { get; set; }
+        public DateTime LastModifiedDate { get; set; }
 
         public string GetPath()
         {

@@ -8,7 +8,7 @@ namespace Pi.Replicate.Processors.Helpers
 {
     public class Observable<TE> : IObservable<TE>
     {
-        private List<IObserver<TE>> Observers { get; set; }
+        private List<IObserver<TE>> Observers { get; set; } = new List<IObserver<TE>>();
 
         public IDisposable Subscribe(IObserver<TE> observer)
         {

@@ -26,14 +26,15 @@ namespace Pi.Replicate.Processors
 
         public void ProcessFiles()
         {
-                var files = new List<Schema.File>();
-                if (_folder == null || !System.IO.Directory.Exists(_folder.GetPath()))
-                {
-                    _logger.Info($"Unable to get files. Given Folder path is null or does not exists. Value:'{_folder?.GetPath()}'.");
-                }
-                var newOrChanged = GetNewOrChanged();
+            var files = new List<Schema.File>();
+            if (_folder == null || !System.IO.Directory.Exists(_folder.GetPath()))
+            {
+                _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{_folder?.GetPath()}'.");
+                throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{_folder?.GetPath()}'.");
+            }
+            var newOrChanged = GetNewOrChanged();
 
-                SaveAndSplitFiles(newOrChanged);
+            SaveAndSplitFiles(newOrChanged);
         }
 
         private IList<string> GetNewOrChanged()

@@ -21,7 +21,7 @@ namespace Pi.Replicate.Processors
             var observable = new FileCollector(folder, _repository);
             observable.Subscribe(async file=> 
             {
-                var fileSplitter = new FileSplitter(file);
+                var fileSplitter = new FileSplitter(file,512); //todo get from config
                 fileSplitter.Subscribe(new FileChunkObserver(_repository));
 
                 await fileSplitter.Split();
