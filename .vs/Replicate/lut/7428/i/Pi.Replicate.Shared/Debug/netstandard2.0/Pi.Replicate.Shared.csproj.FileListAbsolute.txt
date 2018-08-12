@@ -1,0 +1,9 @@
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.deps.json
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.csprojResolveAssemblyReference.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfo.cs
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Shared\Debug\netstandard2.0\Pi.Replicate.Shared.pdb

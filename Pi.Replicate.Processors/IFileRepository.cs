@@ -11,5 +11,7 @@ namespace Pi.Replicate.Processors
     {
         IEnumerable<File> Get(Guid folderId);
 
+        void Save(File file);
+
     }
 }

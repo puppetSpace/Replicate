@@ -109,7 +109,7 @@ namespace Pi.Replicate.Test.Processors
         }
 
         [TestMethod]
-        public async Task Split_ChunkedFileIsTheSameAsOrginal()
+        public async Task Split_ChunkFile_IsSameAsOrginal()
         {
             //assign
             var folder = new Folder
@@ -149,7 +149,7 @@ namespace Pi.Replicate.Test.Processors
         }
 
         [TestMethod]
-        public async Task Split_NullFileShouldNotCallNotify()
+        public async Task Split_NullFile_ShouldNotCallNotify()
         {
             //assign
             uint chunkSize = 1 * 1024;
@@ -163,6 +163,38 @@ namespace Pi.Replicate.Test.Processors
 
             //assert
             Assert.AreEqual(notifyCalledCount, 0);
+
+        }
+
+        [TestMethod]
+        public async Task Split_FileInUse_NotBeingProcessed()
+        {
+            //assign
+            var folder = new Folder
+            {
+                Id = Guid.NewGuid(),
+                Name = "FileFolder"
+            };
+
+            var file = new File
+            {
+                Folder = folder,
+                Name = "test1.txt",
+                Status = FileStatus.Sent
+            };
+            uint chunkSize = 1 * 1024;
+            int notifyCalledCount = 0;
+
+            var writeStream = System.IO.File.OpenWrite(file.GetPath());
+
+            //act
+            var splitter = new FileSplitter(file, chunkSize);
+            splitter.Subscribe(x => { notifyCalledCount++; });
+            await splitter.Split();
+
+
+            //assert
+            Assert.AreEqual(0, notifyCalledCount);
 
         }
     }

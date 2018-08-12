@@ -1,0 +1,9 @@
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.deps.json
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.pdb
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.csprojResolveAssemblyReference.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.AssemblyInfo.cs
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Processors\Debug\netstandard2.0\Pi.Replicate.Processors.pdb

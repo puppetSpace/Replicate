@@ -664,31 +664,36 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\inf103ss\\.nuget\\packages\\": {},
+    "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
+    "restoreSettings": {
+      "hideWarningsAndErrors": true
+    },
     "restore": {
-      "projectUniqueName": "D:\\Source\\Replicate\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
       "projectName": "Pi.Replicate.Agent",
-      "projectPath": "D:\\Source\\Replicate\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
-      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
-      "outputPath": "D:\\Source\\Replicate\\Replicate\\Pi.Replicate.Agent\\obj\\",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
+      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\inf103ss\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "http://vm-aspprd05/nuget/api/v2": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

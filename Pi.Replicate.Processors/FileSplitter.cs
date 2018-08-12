@@ -22,10 +22,12 @@ namespace Pi.Replicate.Processors
 
         public async Task<File> Split()
         {
-            if (_file != null && System.IO.File.Exists(_file.GetPath()))
+            var path = _file?.GetPath();
+            if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
             {
-                using (var stream = System.IO.File.OpenRead(_file.GetPath()))
+                using (var stream = System.IO.File.OpenRead(path))
                 {
+                    
                     await SplitStream(stream);
                 }
             }

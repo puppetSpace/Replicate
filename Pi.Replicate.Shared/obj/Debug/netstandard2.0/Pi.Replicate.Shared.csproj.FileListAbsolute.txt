@@ -13,3 +13,12 @@ D:\Source\Replicate\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Re
 D:\Source\Replicate\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfo.cs
 D:\Source\Replicate\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.dll
 D:\Source\Replicate\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Shared\bin\Debug\netstandard2.0\Pi.Replicate.Shared.deps.json
+D:\Workspaces\Replicate\Pi.Replicate.Shared\bin\Debug\netstandard2.0\Pi.Replicate.Shared.dll
+D:\Workspaces\Replicate\Pi.Replicate.Shared\bin\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.csprojResolveAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfo.cs
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.dll
+D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.pdb

@@ -7,3 +7,11 @@ D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Repl
 D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.dll
 D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.pdb
 D:\Source\Replicate\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csprojAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.deps.json
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.dll
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Data.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.AssemblyInfo.cs
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.dll
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.pdb

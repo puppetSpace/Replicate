@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "89c6959d263f28e327b4684543a1d267e08de867"
+    "signature": "781018b06662068d32fb304ccdaabe83df59df57"
   },
   "compilationOptions": {},
   "targets": {
@@ -9,7 +9,7 @@
     ".NETStandard,Version=v2.0/": {
       "Pi.Replicate.Processors/1.0.0": {
         "dependencies": {
-          "NETStandard.Library": "2.0.3",
+          "NETStandard.Library": "2.0.1",
           "Pi.Replicate.Schema": "1.0.0",
           "Pi.Replicate.Shared": "1.0.0",
           "System.Reactive.Linq": "4.0.0",
@@ -21,17 +21,14 @@
       },
       "Microsoft.NETCore.Platforms/1.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
-      "NETStandard.Library/2.0.3": {
+      "NETStandard.Library/2.0.1": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0"
         }
       },
       "NLog/4.5.7": {
         "runtime": {
-          "lib/netstandard2.0/NLog.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.5.7.7958"
-          }
+          "lib/netstandard2.0/NLog.dll": {}
         }
       },
       "System.Reactive/4.0.0": {
@@ -39,10 +36,7 @@
           "System.Runtime.InteropServices.WindowsRuntime": "4.3.0"
         },
         "runtime": {
-          "lib/netstandard2.0/System.Reactive.dll": {
-            "assemblyVersion": "4.0.0.0",
-            "fileVersion": "4.0.0.398"
-          }
+          "lib/netstandard2.0/System.Reactive.dll": {}
         }
       },
       "System.Reactive.Linq/4.0.0": {
@@ -50,10 +44,7 @@
           "System.Reactive": "4.0.0"
         },
         "runtime": {
-          "lib/netstandard2.0/System.Reactive.Linq.dll": {
-            "assemblyVersion": "3.0.6000.0",
-            "fileVersion": "3.0.6000.0"
-          }
+          "lib/netstandard2.0/System.Reactive.Linq.dll": {}
         }
       },
       "System.Runtime/4.3.0": {
@@ -67,10 +58,7 @@
           "System.Runtime": "4.3.0"
         },
         "runtime": {
-          "lib/netstandard1.3/System.Runtime.InteropServices.WindowsRuntime.dll": {
-            "assemblyVersion": "4.0.2.0",
-            "fileVersion": "4.6.24705.1"
-          }
+          "lib/netstandard1.3/System.Runtime.InteropServices.WindowsRuntime.dll": {}
         }
       },
       "Pi.Replicate.Schema/1.0.0": {
@@ -88,10 +76,7 @@
       },
       "Microsoft.Extensions.Configuration.Abstractions/2.0.0.0": {
         "runtime": {
-          "Microsoft.Extensions.Configuration.Abstractions.dll": {
-            "assemblyVersion": "2.0.0.0",
-            "fileVersion": "2.0.0.17205"
-          }
+          "Microsoft.Extensions.Configuration.Abstractions.dll": {}
         }
       }
     }
@@ -116,12 +101,12 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
-    "NETStandard.Library/2.0.3": {
+    "NETStandard.Library/2.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-st47PosZSHrjECdjeIzZQbzivYBJFv6P2nv4cj2ypdI204DO+vZ7l5raGMiX4eXMJ53RfOIg+/s4DHVZ54Nu2A==",
-      "path": "netstandard.library/2.0.3",
-      "hashPath": "netstandard.library.2.0.3.nupkg.sha512"
+      "sha512": "sha512-oA6nwv9MhEKYvLpjZ0ggSpb1g4CQViDVQjLUcDWg598jtvJbpfeP2reqwI1GLW2TbxC/Ml7xL6BBR1HmKPXlTg==",
+      "path": "netstandard.library/2.0.1",
+      "hashPath": "netstandard.library.2.0.1.nupkg.sha512"
     },
     "NLog/4.5.7": {
       "type": "package",

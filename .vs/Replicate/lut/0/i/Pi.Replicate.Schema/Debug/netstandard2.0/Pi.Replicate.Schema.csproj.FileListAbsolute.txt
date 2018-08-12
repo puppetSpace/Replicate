@@ -1,0 +1,8 @@
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.deps.json
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfo.cs
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.dll
+D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Schema\Debug\netstandard2.0\Pi.Replicate.Schema.pdb

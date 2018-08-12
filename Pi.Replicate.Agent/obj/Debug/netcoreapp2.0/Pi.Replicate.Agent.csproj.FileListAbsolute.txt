@@ -19,3 +19,14 @@ D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Repl
 D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfo.cs
 D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
 D:\Source\Replicate\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.deps.json
+D:\Workspaces\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.runtimeconfig.json
+D:\Workspaces\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.runtimeconfig.dev.json
+D:\Workspaces\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
+D:\Workspaces\Replicate\Pi.Replicate.Agent\bin\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.csprojResolveAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.csproj.CoreCompileInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfoInputs.cache
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.AssemblyInfo.cs
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.dll
+D:\Workspaces\Replicate\Pi.Replicate.Agent\obj\Debug\netcoreapp2.0\Pi.Replicate.Agent.pdb

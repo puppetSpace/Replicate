@@ -35,6 +35,7 @@ namespace Pi.Replicate.Processors
             var newOrChanged = GetNewOrChanged();
 
             SaveAndSplitFiles(newOrChanged);
+            
         }
 
         private IList<string> GetNewOrChanged()
@@ -66,10 +67,10 @@ namespace Pi.Replicate.Processors
             foreach (var file in newOrChanged)
             {
                 var fileInfo = new System.IO.FileInfo(file);
-                if (fileInfo.Exists)
+                if (fileInfo.Exists && !FileLock.IsLocked(fileInfo.FullName))
                 {
                     var fileObject = FileBuilder.Build(_folder, fileInfo);
-                    //todo save
+                    _repository.FileRepository.Save(fileObject);
                     Notify(fileObject);
                 }
             }
