@@ -6155,30 +6155,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
-    "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
-    "restoreSettings": {
-      "hideWarningsAndErrors": true
-    },
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
       "projectName": "Pi.Replicate.Test",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackagesFallback\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.Fallback.config"
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
@@ -6190,8 +6184,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
             }
           }
         }
