@@ -8,6 +8,6 @@ namespace Pi.Replicate.Processors.Upload
 {
     public interface IUploadLink<Tin,Tout>
     {
-        Task<UploadResult<Tout>> UploadData(Tin input);
+        Task<UploadResponse<Tout>> UploadData(Uri baseAddress,Tin input);
     }
 }

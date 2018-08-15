@@ -18,12 +18,12 @@ namespace Pi.Replicate.Processors
     public class FolderWatcher
     {
         private readonly Folder _folder;
-        private readonly IRepository _repository;
+        private readonly IRepositoryFactory _repository;
         private readonly IConfiguration _configuration;
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
         private readonly CancellationTokenSource _tokenSource = new CancellationTokenSource();
 
-        public FolderWatcher(Folder folder, IRepository repository, IConfiguration configuration)
+        public FolderWatcher(Folder folder, IRepositoryFactory repository, IConfiguration configuration)
         {
             _folder = folder;
             _repository = repository;

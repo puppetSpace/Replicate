@@ -32,9 +32,10 @@ D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Repl
 D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.xml
-D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.csprojResolveAssemblyReference.cache
 D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.csproj.CoreCompileInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.AssemblyInfoInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.AssemblyInfo.cs
 D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.dll
 D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.csprojAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.csproj.CopyComplete

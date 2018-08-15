@@ -19,9 +19,10 @@ D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.P
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Schema.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Shared.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Microsoft.Extensions.Configuration.Abstractions.xml
-D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csprojResolveAssemblyReference.cache
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csproj.CoreCompileInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.AssemblyInfoInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.AssemblyInfo.cs
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.dll
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csprojAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csproj.CopyComplete

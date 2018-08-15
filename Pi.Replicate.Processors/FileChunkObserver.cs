@@ -12,9 +12,9 @@ namespace Pi.Replicate.Processors
     internal class FileChunkObserver : IObserver<FileChunk>
     {
         private static readonly ILogger _logger = LoggerFactory.Get<FileChunkObserver>();
-        private IRepository _repository;
+        private IRepositoryFactory _repository;
 
-        public FileChunkObserver(IRepository repository)
+        public FileChunkObserver(IRepositoryFactory repository)
         {
             _repository = repository;
         }

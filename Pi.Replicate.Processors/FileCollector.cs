@@ -14,14 +14,14 @@ namespace Pi.Replicate.Processors
     internal class FileCollector : Observable<File>
     {
         private readonly Folder _folder;
-        private readonly IRepository _repository;
+        private readonly IFileRepository _repository;
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
 
-        public FileCollector(Folder folder, IRepository repository)
+        public FileCollector(Folder folder, IRepositoryFactory repository)
         {
             _folder = folder;
-            _repository = repository;
+            _repository = repository.CreateFileRepository();
         }
 
         public void ProcessFiles()
@@ -43,7 +43,7 @@ namespace Pi.Replicate.Processors
             var previousFilesInFolder = new List<File>();
             if (!_folder.DeleteFilesAfterSend)
             {
-                previousFilesInFolder = _repository.FileRepository.Get(_folder.Id).Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
+                previousFilesInFolder = _repository.Get(_folder.Id).Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
                 _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{_folder.GetPath()}'.");
             }
             var folderCrawler = new FolderCrawler();
@@ -70,7 +70,7 @@ namespace Pi.Replicate.Processors
                 if (fileInfo.Exists && !FileLock.IsLocked(fileInfo.FullName))
                 {
                     var fileObject = FileBuilder.Build(_folder, fileInfo);
-                    _repository.FileRepository.Save(fileObject);
+                    _repository.Save(fileObject);
                     Notify(fileObject);
                 }
             }

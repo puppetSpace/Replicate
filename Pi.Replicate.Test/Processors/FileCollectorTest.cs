@@ -23,8 +23,8 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(fr => fr.Get(folder.Id)).Returns(new List<File>());
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(mr => mr.FileRepository).Returns(mockFileRepository.Object);
+            var mockRepository = new Mock<IRepositoryFactory>();
+            mockRepository.Setup(mr => mr.CreateFileRepository()).Returns(mockFileRepository.Object);
 
             //act
             var collector = new FileCollector(folder, mockRepository.Object);
@@ -68,8 +68,8 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(fr => fr.Get(folder.Id)).Returns(new List<File> { oldFile1, oldFile2 });
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(mr => mr.FileRepository).Returns(mockFileRepository.Object);
+            var mockRepository = new Mock<IRepositoryFactory>();
+            mockRepository.Setup(mr => mr.CreateFileRepository()).Returns(mockFileRepository.Object);
 
             //act
             var collector = new FileCollector(folder, mockRepository.Object);
@@ -115,8 +115,8 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(fr => fr.Get(folder.Id)).Returns(new List<File> { oldFile1, oldFile2 });
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(mr => mr.FileRepository).Returns(mockFileRepository.Object);
+            var mockRepository = new Mock<IRepositoryFactory>();
+            mockRepository.Setup(mr => mr.CreateFileRepository()).Returns(mockFileRepository.Object);
 
             //act
             var collector = new FileCollector(folder, mockRepository.Object);
@@ -145,8 +145,8 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(fr => fr.Get(folder.Id)).Returns(new List<File>());
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(mr => mr.FileRepository).Returns(mockFileRepository.Object);
+            var mockRepository = new Mock<IRepositoryFactory>();
+            mockRepository.Setup(mr => mr.CreateFileRepository()).Returns(mockFileRepository.Object);
 
             //act
             var collector = new FileCollector(folder, mockRepository.Object);

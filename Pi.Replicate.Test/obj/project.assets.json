@@ -6155,23 +6155,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
+    "C:\\Users\\puppet\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
       "projectName": "Pi.Replicate.Test",
-      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
-      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6184,8 +6184,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
-              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
+            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
+              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
             }
           }
         }

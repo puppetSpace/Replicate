@@ -9,9 +9,9 @@ namespace Pi.Replicate.Processors
 {
     internal class FileObservableBuilder
     {
-        private readonly IRepository _repository;
+        private readonly IRepositoryFactory _repository;
 
-        public FileObservableBuilder(IRepository repository)
+        public FileObservableBuilder(IRepositoryFactory repository)
         {
             _repository = repository;
         }
