@@ -176,23 +176,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj",
       "projectName": "Pi.Replicate.Queues",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Queues\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -200,6 +200,7 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nuget.syncfusion.com/nuget_xamarin/nuget/getsyncfusionpackages/xamarin/": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {

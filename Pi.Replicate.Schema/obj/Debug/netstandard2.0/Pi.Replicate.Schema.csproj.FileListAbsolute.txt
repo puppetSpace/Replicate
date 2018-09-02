@@ -1,7 +1,6 @@
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.deps.json
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.dll
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
-C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.csprojAssemblyReference.cache
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.csproj.CoreCompileInputs.cache
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfoInputs.cache
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfo.cs

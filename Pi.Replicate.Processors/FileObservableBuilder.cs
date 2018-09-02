@@ -1,4 +1,6 @@
-﻿using Pi.Replicate.Schema;
+﻿using Pi.Replicate.Processors.FileChunks;
+using Pi.Replicate.Processors.Files;
+using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;

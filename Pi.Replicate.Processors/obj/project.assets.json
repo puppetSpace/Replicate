@@ -90,6 +90,16 @@
           "lib/netstandard1.3/System.Runtime.InteropServices.WindowsRuntime.dll": {}
         }
       },
+      "Pi.Replicate.Queues/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Pi.Replicate.Queues.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Pi.Replicate.Queues.dll": {}
+        }
+      },
       "Pi.Replicate.Schema/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -486,6 +496,11 @@
         "system.runtime.interopservices.windowsruntime.nuspec"
       ]
     },
+    "Pi.Replicate.Queues/1.0.0": {
+      "type": "project",
+      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj",
+      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj"
+    },
     "Pi.Replicate.Schema/1.0.0": {
       "type": "project",
       "path": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj",
@@ -500,29 +515,30 @@
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
       "NETStandard.Library >= 2.0.3",
+      "Pi.Replicate.Queues >= 1.0.0",
       "Pi.Replicate.Schema >= 1.0.0",
       "Pi.Replicate.Shared >= 1.0.0",
       "System.Reactive.Linq >= 4.0.0"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
       "projectName": "Pi.Replicate.Processors",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -530,16 +546,20 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nuget.syncfusion.com/nuget_xamarin/nuget/getsyncfusionpackages/xamarin/": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj"
             },
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
+            },
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
             }
           }
         }

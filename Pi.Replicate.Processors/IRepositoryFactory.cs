@@ -9,5 +9,6 @@ namespace Pi.Replicate.Processors
     public interface IRepositoryFactory
     {
         IFileRepository CreateFileRepository();
+        IFolderRepository CreateFolderRepository();
     }
 }

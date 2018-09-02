@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Pi.Replicate.Processors;
+using Pi.Replicate.Processors.Files;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;

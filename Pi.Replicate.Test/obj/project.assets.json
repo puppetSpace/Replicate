@@ -1722,6 +1722,7 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
+          "Pi.Replicate.Queues": "1.0.0",
           "Pi.Replicate.Schema": "1.0.0",
           "Pi.Replicate.Shared": "1.0.0",
           "System.Reactive.Linq": "4.0.0"
@@ -1731,6 +1732,16 @@
         },
         "runtime": {
           "bin/placeholder/Pi.Replicate.Processors.dll": {}
+        }
+      },
+      "Pi.Replicate.Queues/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/Pi.Replicate.Queues.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Pi.Replicate.Queues.dll": {}
         }
       },
       "Pi.Replicate.Schema/1.0.0": {
@@ -6132,6 +6143,11 @@
       "path": "../Pi.Replicate.Processors/Pi.Replicate.Processors.csproj",
       "msbuildProject": "../Pi.Replicate.Processors/Pi.Replicate.Processors.csproj"
     },
+    "Pi.Replicate.Queues/1.0.0": {
+      "type": "project",
+      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj",
+      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj"
+    },
     "Pi.Replicate.Schema/1.0.0": {
       "type": "project",
       "path": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj",
@@ -6155,23 +6171,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
       "projectName": "Pi.Replicate.Test",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6179,13 +6195,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://nuget.syncfusion.com/nuget_xamarin/nuget/getsyncfusionpackages/xamarin/": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
+            "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Source\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
             }
           }
         }
