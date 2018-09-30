@@ -1,8 +1,0 @@
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.deps.json
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.dll
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\b\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.csproj.CoreCompileInputs.cache
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfoInputs.cache
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfo.cs
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.dll
-D:\Workspaces\Replicate\.vs\Replicate\lut\0\i\Pi.Replicate.Queues\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
