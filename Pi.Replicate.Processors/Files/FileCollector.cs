@@ -1,4 +1,5 @@
-﻿using Pi.Replicate.Processors.Folders;
+﻿using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Processors.Folders;
 using Pi.Replicate.Processors.Helpers;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared;
@@ -17,12 +18,15 @@ namespace Pi.Replicate.Processors.Files
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
 
-        public FileCollector(IRepositoryFactory repository)
+        //todo place sizeOfChunkInBytes and waitTimeBetweenCycles in configuration and inject a configurationmanager to get the settings
+
+        public FileCollector(IRepositoryFactory repository, IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
+            : base(TimeSpan.Parse(configuration["FileCollectorPollDelay"]), workItemQueueFactory)
         {
             _repository = repository.CreateFileRepository();
         }
 
-        protected override void DoWork(Folder folder)
+        protected async override Task DoWork(Folder folder)
         {
             var files = new List<Schema.File>();
             if (folder == null || !System.IO.Directory.Exists(folder.GetPath()))
@@ -32,7 +36,7 @@ namespace Pi.Replicate.Processors.Files
             }
             var newOrChanged = GetNewOrChanged(folder);
 
-            SaveAndSplitFiles(folder, newOrChanged);
+            await SaveAndSplitFiles(folder, newOrChanged);
         }
 
         private IList<string> GetNewOrChanged(Folder folder)
@@ -59,7 +63,7 @@ namespace Pi.Replicate.Processors.Files
             return newFiles.Union(changed).ToList();
         }
 
-        private void SaveAndSplitFiles(Folder folder, IList<string> newOrChanged)
+        private async Task SaveAndSplitFiles(Folder folder, IList<string> newOrChanged)
         {
             foreach (var file in newOrChanged)
             {
@@ -68,7 +72,7 @@ namespace Pi.Replicate.Processors.Files
                 {
                     var fileObject = FileBuilder.Build(folder, fileInfo);
                     _repository.Save(fileObject);
-                    AddItem(fileObject);
+                    await AddItem(fileObject);
                 }
             }
         }

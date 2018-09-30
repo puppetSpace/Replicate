@@ -1,4 +1,5 @@
-﻿using Pi.Replicate.Processors.FileChunks;
+﻿using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Processors.FileChunks;
 using Pi.Replicate.Processors.Helpers;
 using Pi.Replicate.Schema;
 using System;
@@ -12,12 +13,14 @@ namespace Pi.Replicate.Processors.Files
     {
         private readonly uint _sizeofChunkInBytes;
 
-        public FileSplitter(uint sizeofChunkInBytes)
+        //todo place sizeOfChunkInBytes and waitTimeBetweenCycles in configuration and inject a configurationmanager to get the settings
+        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
+            :base(TimeSpan.Parse(configuration["FileSplitterPollDelay"]), workItemQueueFactory)
         {
-            _sizeofChunkInBytes = sizeofChunkInBytes;
+            _sizeofChunkInBytes = uint.Parse(configuration["FileSplitSizeOfChunksInBytes"]);
         }
 
-        protected override async void DoWork(File file)
+        protected override async Task DoWork(File file)
         {
             var path = file?.GetPath();
             if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
@@ -43,7 +46,7 @@ namespace Pi.Replicate.Processors.Files
                 var toWriteBytes = new byte[bytesRead];
                 Buffer.BlockCopy(buffer, 0, toWriteBytes, 0, bytesRead);
 
-                AddItem(FileChunkBuilder.Build(file, ++chunksCreated, toWriteBytes));
+                await AddItem(FileChunkBuilder.Build(file, ++chunksCreated, toWriteBytes));
             }
 
             hashCreator.TransformFinalBlock(buffer, 0, bytesRead);

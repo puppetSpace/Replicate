@@ -1,6 +1,4 @@
-﻿using Pi.Replicate.Queues;
-using System;
-using System.Collections.Concurrent;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,69 +23,70 @@ namespace Pi.Replicate.Processors
         }
     }
 
-    public abstract class Worker<Tin> : Worker
+    public abstract class Worker<Tout> : Worker
     {
-        private readonly BlockingCollection<Tin> _workLoadInputQueue;
         private readonly TimeSpan _waitTimeBetweenCycles;
+        private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(TimeSpan waitTimeBetweenCycles)
+        public Worker(TimeSpan waitTimeBetweenCycles, IWorkItemQueueFactory workItemQueueFactory)
         {
-            _workLoadInputQueue = WorkLoadQueueCache.CreateIfNotExist<Tin>();
+            _outQueue = workItemQueueFactory.GetQueue<Tout>();
             _waitTimeBetweenCycles = waitTimeBetweenCycles;
         }
 
         public override Task WorkAsync()
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 while (!CancellationToken.IsCancellationRequested)
                 {
-                    DoWork();
+                    await DoWork();
                     CancellationToken.ThrowIfCancellationRequested();
-                    Task.Delay(_waitTimeBetweenCycles);
+                    await Task.Delay(_waitTimeBetweenCycles);
                 }
             });
         }
 
-        protected void AddItem(Tin workItem)
+        protected async Task AddItem(Tout workItem)
         {
-            _workLoadInputQueue.TryAdd(workItem);
+            await _outQueue.Enqueue(workItem);
         }
 
-        protected abstract void DoWork();
+        protected abstract Task DoWork();
     }
 
     public abstract class Worker<Tin, Tout> : Worker
     {
-        private readonly BlockingCollection<Tin> _workLoadInputQueue;
-        private readonly BlockingCollection<Tout> _workLoadOutputQueue;
+        private readonly IWorkItemQueue<Tin> _inQueue;
+        private readonly IWorkItemQueue<Tout> _outQueue;
+        private readonly TimeSpan _waitTimeBetweenCycles;
 
-        public Worker()
+        public Worker(TimeSpan waitTimeBetweenCycles, IWorkItemQueueFactory workItemQueueFactory)
         {
-            _workLoadInputQueue = WorkLoadQueueCache.CreateIfNotExist<Tin>();
-            _workLoadOutputQueue = WorkLoadQueueCache.CreateIfNotExist<Tout>();
+            _inQueue = workItemQueueFactory.GetQueue<Tin>();
+            _outQueue = workItemQueueFactory.GetQueue<Tout>();
+            _waitTimeBetweenCycles = waitTimeBetweenCycles;
         }
 
         public override Task WorkAsync()
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
-                while (!CancellationToken.IsCancellationRequested && !_workLoadInputQueue.IsCompleted)
+                while (!CancellationToken.IsCancellationRequested)
                 {
-                    if (_workLoadInputQueue.TryTake(out var value))
-                    {
-                        DoWork(value);
-                    }
+                    var value = await _inQueue.Dequeue();
+                    await DoWork(value);
                     CancellationToken.ThrowIfCancellationRequested();
+                    await Task.Delay(_waitTimeBetweenCycles);
                 }
             });
         }
 
-        protected void AddItem(Tout workItem)
+        protected async Task AddItem(Tout workItem)
         {
-            _workLoadOutputQueue.TryAdd(workItem);
+            await _outQueue.Enqueue(workItem);
         }
 
-        protected abstract void DoWork(Tin workItem);
+        protected abstract Task DoWork(Tin workItem);
     }
 }

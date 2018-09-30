@@ -18,22 +18,20 @@ namespace Pi.Replicate.Processors.Folders
     public class FolderWatcher : Worker<Folder>
     {
         private readonly IFolderRepository _repository;
-        private readonly IConfiguration _configuration;
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
 
-        public FolderWatcher(IRepositoryFactory repository, IConfiguration configuration)
-            :base(TimeSpan.Parse(configuration["FolderWatcherPollDelay"] ?? "00:05:00"))
+        public FolderWatcher(IRepositoryFactory repository, IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
+            :base(TimeSpan.Parse(configuration["FolderWatcherPollDelay"] ?? "00:05:00"), workItemQueueFactory)
         {
             _repository = repository.CreateFolderRepository();
-            _configuration = configuration;
         }
 
-        protected override void DoWork()
+        protected async override Task DoWork()
         {
             var folders = _repository.Get();
             foreach(var folder in folders)
             {
-                WorkLoadInputQueue.Add(folder);
+                await AddItem(folder);
             }
         }
     }
