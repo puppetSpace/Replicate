@@ -11,43 +11,40 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors.Files
 {
-    internal class FileCollector : Observable<File>
+    internal class FileCollector : Worker<Folder,File>
     {
-        private readonly Folder _folder;
         private readonly IFileRepository _repository;
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
 
-        public FileCollector(Folder folder, IRepositoryFactory repository)
+        public FileCollector(IRepositoryFactory repository)
         {
-            _folder = folder;
             _repository = repository.CreateFileRepository();
         }
 
-        public void ProcessFiles()
+        protected override void DoWork(Folder folder)
         {
             var files = new List<Schema.File>();
-            if (_folder == null || !System.IO.Directory.Exists(_folder.GetPath()))
+            if (folder == null || !System.IO.Directory.Exists(folder.GetPath()))
             {
-                _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{_folder?.GetPath()}'.");
-                throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{_folder?.GetPath()}'.");
+                _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
+                throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
             }
-            var newOrChanged = GetNewOrChanged();
+            var newOrChanged = GetNewOrChanged(folder);
 
-            SaveAndSplitFiles(newOrChanged);
-            
+            SaveAndSplitFiles(folder, newOrChanged);
         }
 
-        private IList<string> GetNewOrChanged()
+        private IList<string> GetNewOrChanged(Folder folder)
         {
             var previousFilesInFolder = new List<File>();
-            if (!_folder.DeleteFilesAfterSend)
+            if (!folder.DeleteFilesAfterSend)
             {
-                previousFilesInFolder = _repository.Get(_folder.Id).Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
-                _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{_folder.GetPath()}'.");
+                previousFilesInFolder = _repository.Get(folder.Id).Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
+                _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{folder.GetPath()}'.");
             }
             var folderCrawler = new FolderCrawler();
-            var rawFiles = folderCrawler.GetFiles(_folder.GetPath());
+            var rawFiles = folderCrawler.GetFiles(folder.GetPath());
             var newFiles = rawFiles.Except(previousFilesInFolder.Select(x => x.GetPath())).ToList();
 
             var changed = rawFiles
@@ -57,24 +54,25 @@ namespace Pi.Replicate.Processors.Files
                     .Select(x => x.FullName)
                 .ToList();
 
-            _logger.Trace($"{newFiles.Count} new files found and {changed.Count} files were changed for folder '{_folder.GetPath()}'");
+            _logger.Trace($"{newFiles.Count} new files found and {changed.Count} files were changed for folder '{folder.GetPath()}'");
 
             return newFiles.Union(changed).ToList();
         }
 
-        private void SaveAndSplitFiles(IList<string> newOrChanged)
+        private void SaveAndSplitFiles(Folder folder, IList<string> newOrChanged)
         {
             foreach (var file in newOrChanged)
             {
                 var fileInfo = new System.IO.FileInfo(file);
                 if (fileInfo.Exists && !FileLock.IsLocked(fileInfo.FullName))
                 {
-                    var fileObject = FileBuilder.Build(_folder, fileInfo);
+                    var fileObject = FileBuilder.Build(folder, fileInfo);
                     _repository.Save(fileObject);
-                    Notify(fileObject);
+                    AddItem(fileObject);
                 }
             }
-            NotifyComplete();
         }
+
+
     }
 }

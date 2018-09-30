@@ -6,22 +6,37 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors
 {
-    public abstract class Worker<Tin>
+    public abstract class Worker
     {
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
-        public Worker(TimeSpan waitTimeBetweenCycles)
+        public Worker()
         {
-            WorkLoadInputQueue = WorkLoadQueueCache.CreateIfNotExist<Tin>();
-            WaitTimeBetweenCycles = waitTimeBetweenCycles;
             CancellationToken = _cts.Token;
         }
 
-        protected TimeSpan WaitTimeBetweenCycles { get; }
         protected CancellationToken CancellationToken { get; }
-        protected BlockingCollection<Tin> WorkLoadInputQueue { get; set; }
 
-        public virtual Task WorkAsync()
+        public abstract Task WorkAsync();
+
+        public virtual void Stop()
+        {
+            _cts.Cancel();
+        }
+    }
+
+    public abstract class Worker<Tin> : Worker
+    {
+        private readonly BlockingCollection<Tin> _workLoadInputQueue;
+        private readonly TimeSpan _waitTimeBetweenCycles;
+
+        public Worker(TimeSpan waitTimeBetweenCycles)
+        {
+            _workLoadInputQueue = WorkLoadQueueCache.CreateIfNotExist<Tin>();
+            _waitTimeBetweenCycles = waitTimeBetweenCycles;
+        }
+
+        public override Task WorkAsync()
         {
             return Task.Run(() =>
             {
@@ -29,41 +44,50 @@ namespace Pi.Replicate.Processors
                 {
                     DoWork();
                     CancellationToken.ThrowIfCancellationRequested();
-                    Task.Delay(WaitTimeBetweenCycles);
+                    Task.Delay(_waitTimeBetweenCycles);
                 }
             });
         }
 
-        public void StopWork()
+        protected void AddItem(Tin workItem)
         {
-            _cts.Cancel();
+            _workLoadInputQueue.TryAdd(workItem);
         }
 
         protected abstract void DoWork();
     }
 
-    public abstract class Worker<Tin, Tout> : Worker<Tin>
+    public abstract class Worker<Tin, Tout> : Worker
     {
-        public Worker(TimeSpan waitTimeBetweenCycles, CancellationToken cancellationToken) : base(waitTimeBetweenCycles)
+        private readonly BlockingCollection<Tin> _workLoadInputQueue;
+        private readonly BlockingCollection<Tout> _workLoadOutputQueue;
+
+        public Worker()
         {
-            WorkLoadOutputQueue = WorkLoadQueueCache.CreateIfNotExist<Tout>();
+            _workLoadInputQueue = WorkLoadQueueCache.CreateIfNotExist<Tin>();
+            _workLoadOutputQueue = WorkLoadQueueCache.CreateIfNotExist<Tout>();
         }
-
-        protected BlockingCollection<Tout> WorkLoadOutputQueue { get; set; }
-
 
         public override Task WorkAsync()
         {
             return Task.Run(() =>
             {
-                while (!CancellationToken.IsCancellationRequested && !WorkLoadInputQueue.IsCompleted)
+                while (!CancellationToken.IsCancellationRequested && !_workLoadInputQueue.IsCompleted)
                 {
-                    DoWork();
+                    if (_workLoadInputQueue.TryTake(out var value))
+                    {
+                        DoWork(value);
+                    }
                     CancellationToken.ThrowIfCancellationRequested();
-                    //not necessay to wait here. In this scenario the thread will wait as long as there are no item in the blockingcollection. Take blocks the thread
-                    //Task.Delay(WaitTimeBetweenCycles);
                 }
             });
         }
+
+        protected void AddItem(Tout workItem)
+        {
+            _workLoadOutputQueue.TryAdd(workItem);
+        }
+
+        protected abstract void DoWork(Tin workItem);
     }
 }

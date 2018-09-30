@@ -2,61 +2,53 @@
 using Pi.Replicate.Processors.Helpers;
 using Pi.Replicate.Schema;
 using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 
 namespace Pi.Replicate.Processors.Files
 {
-    internal class FileSplitter : Observable<FileChunk>
+    internal class FileSplitter : Worker<File, FileChunk>
     {
-        private readonly File _file;
         private readonly uint _sizeofChunkInBytes;
 
-        public FileSplitter(File file, uint sizeofChunkInBytes)
+        public FileSplitter(uint sizeofChunkInBytes)
         {
-            _file = file;
             _sizeofChunkInBytes = sizeofChunkInBytes;
         }
 
-        public async Task<File> Split()
+        protected override async void DoWork(File file)
         {
-            var path = _file?.GetPath();
+            var path = file?.GetPath();
             if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
             {
                 using (var stream = System.IO.File.OpenRead(path))
                 {
-                    
-                    await SplitStream(stream);
+                    await SplitStream(file, stream);
                 }
             }
-
-            return _file;
         }
 
-        private async Task SplitStream(System.IO.Stream stream)
+        private async Task SplitStream(File file, System.IO.Stream stream)
         {
             var buffer = new byte[_sizeofChunkInBytes];
             int bytesRead = 0;
             int chunksCreated = 0;
             MD5 hashCreator = MD5.Create();
             //todo compression
-            while ((bytesRead = await stream.ReadAsync(buffer,0,buffer.Length)) > 0)
+            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
             {
                 hashCreator.TransformBlock(buffer, 0, bytesRead, null, 0);
 
                 var toWriteBytes = new byte[bytesRead];
                 Buffer.BlockCopy(buffer, 0, toWriteBytes, 0, bytesRead);
-                
-                Notify(FileChunkBuilder.Build(_file,++chunksCreated, toWriteBytes));
+
+                AddItem(FileChunkBuilder.Build(file, ++chunksCreated, toWriteBytes));
             }
 
-            NotifyComplete();
-
             hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
-            _file.Hash = Convert.ToBase64String(hashCreator.Hash);
-            _file.AmountOfChunks = chunksCreated;
+            file.Hash = Convert.ToBase64String(hashCreator.Hash);
+            file.AmountOfChunks = chunksCreated;
         }
 
     }

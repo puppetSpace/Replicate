@@ -24,3 +24,4 @@ D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicat
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfo.cs
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.dll
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
+C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csprojAssemblyReference.cache
