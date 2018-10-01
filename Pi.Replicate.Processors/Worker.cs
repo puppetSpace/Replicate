@@ -25,26 +25,16 @@ namespace Pi.Replicate.Processors
 
     public abstract class Worker<Tout> : Worker
     {
-        private readonly TimeSpan _waitTimeBetweenCycles;
         private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(TimeSpan waitTimeBetweenCycles, IWorkItemQueueFactory workItemQueueFactory)
+        public Worker(IWorkItemQueueFactory workItemQueueFactory)
         {
             _outQueue = workItemQueueFactory.GetQueue<Tout>();
-            _waitTimeBetweenCycles = waitTimeBetweenCycles;
         }
 
-        public override Task WorkAsync()
+        public override async Task WorkAsync()
         {
-            return Task.Run(async () =>
-            {
-                while (!CancellationToken.IsCancellationRequested)
-                {
-                    await DoWork();
-                    CancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(_waitTimeBetweenCycles);
-                }
-            });
+            await DoWork();
         }
 
         protected async Task AddItem(Tout workItem)
@@ -59,27 +49,21 @@ namespace Pi.Replicate.Processors
     {
         private readonly IWorkItemQueue<Tin> _inQueue;
         private readonly IWorkItemQueue<Tout> _outQueue;
-        private readonly TimeSpan _waitTimeBetweenCycles;
 
-        public Worker(TimeSpan waitTimeBetweenCycles, IWorkItemQueueFactory workItemQueueFactory)
+        public Worker(IWorkItemQueueFactory workItemQueueFactory)
         {
             _inQueue = workItemQueueFactory.GetQueue<Tin>();
             _outQueue = workItemQueueFactory.GetQueue<Tout>();
-            _waitTimeBetweenCycles = waitTimeBetweenCycles;
         }
 
-        public override Task WorkAsync()
+        public override async Task WorkAsync()
         {
-            return Task.Run(async () =>
+            while (_inQueue.HasItems())
             {
-                while (!CancellationToken.IsCancellationRequested)
-                {
-                    var value = await _inQueue.Dequeue();
-                    await DoWork(value);
-                    CancellationToken.ThrowIfCancellationRequested();
-                    await Task.Delay(_waitTimeBetweenCycles);
-                }
-            });
+                var value = await _inQueue.Dequeue();
+                await DoWork(value);
+                CancellationToken.ThrowIfCancellationRequested();
+            }
         }
 
         protected async Task AddItem(Tout workItem)

@@ -21,7 +21,7 @@ namespace Pi.Replicate.Processors.Folders
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
 
         public FolderWatcher(IRepositoryFactory repository, IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
-            :base(TimeSpan.Parse(configuration["FolderWatcherPollDelay"] ?? "00:05:00"), workItemQueueFactory)
+            :base(workItemQueueFactory)
         {
             _repository = repository.CreateFolderRepository();
         }

@@ -20,8 +20,8 @@ namespace Pi.Replicate.Processors.Files
 
         //todo place sizeOfChunkInBytes and waitTimeBetweenCycles in configuration and inject a configurationmanager to get the settings
 
-        public FileCollector(IRepositoryFactory repository, IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
-            : base(TimeSpan.Parse(configuration["FileCollectorPollDelay"]), workItemQueueFactory)
+        public FileCollector(IRepositoryFactory repository, IWorkItemQueueFactory workItemQueueFactory)
+            : base(workItemQueueFactory)
         {
             _repository = repository.CreateFileRepository();
         }

@@ -18,9 +18,9 @@ D:\Source\Replicate\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Re
 D:\Workspaces\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.deps.json
 D:\Workspaces\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.dll
 D:\Workspaces\Replicate\Pi.Replicate.Queues\bin\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
-D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csprojResolveAssemblyReference.cache
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csproj.CoreCompileInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfoInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.AssemblyInfo.cs
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.dll
 D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Queues\obj\Debug\netstandard2.0\Pi.Replicate.Queues.csprojAssemblyReference.cache

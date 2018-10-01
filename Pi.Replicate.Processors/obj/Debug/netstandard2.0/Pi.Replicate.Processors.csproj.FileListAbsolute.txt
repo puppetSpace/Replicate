@@ -48,3 +48,5 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\net
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Microsoft.Extensions.Configuration.Abstractions.xml
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Processors\obj\Debug\netstandard2.0\Pi.Replicate.Processors.csproj.CopyComplete
+D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Replicate.Queues.dll
+D:\Workspaces\Replicate\Pi.Replicate.Processors\bin\Debug\netstandard2.0\Pi.Replicate.Queues.pdb

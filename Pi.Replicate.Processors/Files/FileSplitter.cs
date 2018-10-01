@@ -13,11 +13,11 @@ namespace Pi.Replicate.Processors.Files
     {
         private readonly uint _sizeofChunkInBytes;
 
-        //todo place sizeOfChunkInBytes and waitTimeBetweenCycles in configuration and inject a configurationmanager to get the settings
+        //todo place sizeOfChunkInBytes in configuration and inject a configurationmanager to get the settings
         public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
-            :base(TimeSpan.Parse(configuration["FileSplitterPollDelay"]), workItemQueueFactory)
+            :base(workItemQueueFactory)
         {
-            _sizeofChunkInBytes = uint.Parse(configuration["FileSplitSizeOfChunksInBytes"]);
+            _sizeofChunkInBytes = uint.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
         }
 
         protected override async Task DoWork(File file)

@@ -11,5 +11,7 @@ namespace Pi.Replicate.Processors
         Task Enqueue(TE item);
 
         Task<TE> Dequeue();
+
+        bool HasItems();
     }
 }

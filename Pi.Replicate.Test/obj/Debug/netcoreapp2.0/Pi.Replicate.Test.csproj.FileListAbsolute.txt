@@ -14,11 +14,9 @@ D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.T
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Processors.dll
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Schema.dll
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Shared.dll
-D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Microsoft.Extensions.Configuration.Abstractions.dll
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Processors.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Schema.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Shared.pdb
-D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Microsoft.Extensions.Configuration.Abstractions.xml
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csproj.CoreCompileInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.AssemblyInfoInputs.cache
 D:\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.AssemblyInfo.cs
@@ -56,3 +54,5 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreap
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Shared.pdb
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Microsoft.Extensions.Configuration.Abstractions.xml
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csproj.CopyComplete
+D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Queues.dll
+D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Queues.pdb
