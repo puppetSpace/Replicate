@@ -52,6 +52,7 @@ namespace Pi.Replicate.Processors.Files
             hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
             file.Hash = Convert.ToBase64String(hashCreator.Hash);
             file.AmountOfChunks = chunksCreated;
+            //todo save
         }
 
     }
