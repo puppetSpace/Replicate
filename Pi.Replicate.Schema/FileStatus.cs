@@ -4,7 +4,7 @@ namespace Pi.Replicate.Schema
     {
         New = 0,
         Sent = 1,
-        Incomplete = 2,
-        Complete = 3
+        ReceivedIncomplete = 2,
+        ReceivedComplete = 3
     }
 }

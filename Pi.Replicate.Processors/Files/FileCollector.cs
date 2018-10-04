@@ -18,12 +18,10 @@ namespace Pi.Replicate.Processors.Files
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
 
-        //todo place sizeOfChunkInBytes and waitTimeBetweenCycles in configuration and inject a configurationmanager to get the settings
-
-        public FileCollector(IRepositoryFactory repository, IWorkItemQueueFactory workItemQueueFactory)
-            : base(workItemQueueFactory)
+        public FileCollector(IFileRepository repository, IWorkItemQueueFactory workItemQueueFactory)
+            : base(workItemQueueFactory, QueueKind.Outgoing)
         {
-            _repository = repository.CreateFileRepository();
+            _repository = repository;
         }
 
         protected async override Task DoWork(Folder folder)
@@ -34,17 +32,18 @@ namespace Pi.Replicate.Processors.Files
                 _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
                 throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
             }
-            var newOrChanged = GetNewOrChanged(folder);
+            var newOrChanged = await GetNewOrChanged(folder);
 
             await SaveAndSplitFiles(folder, newOrChanged);
         }
 
-        private IList<string> GetNewOrChanged(Folder folder)
+        private async Task<IList<string>> GetNewOrChanged(Folder folder)
         {
             var previousFilesInFolder = new List<File>();
             if (!folder.DeleteFilesAfterSend)
             {
-                previousFilesInFolder = _repository.Get(folder.Id).Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
+                var files = await _repository.GetSent(folder.Id);
+                previousFilesInFolder = files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
                 _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{folder.GetPath()}'.");
             }
             var folderCrawler = new FolderCrawler();
@@ -70,11 +69,23 @@ namespace Pi.Replicate.Processors.Files
                 var fileInfo = new System.IO.FileInfo(file);
                 if (fileInfo.Exists && !FileLock.IsLocked(fileInfo.FullName))
                 {
-                    var fileObject = FileBuilder.Build(folder, fileInfo);
-                    _repository.Save(fileObject);
+                    var fileObject = CreateFileObject(folder, fileInfo);
+                    await _repository.Save(fileObject);
                     await AddItem(fileObject);
                 }
             }
+        }
+
+        private File CreateFileObject(Folder folder, System.IO.FileInfo fileInfo)
+        {
+            return new Schema.File
+            {
+                Id = Guid.NewGuid(),
+                Folder = folder,
+                Name = fileInfo.Name,
+                Size = fileInfo.Length,
+                Status = FileStatus.New
+            };
         }
 
 

@@ -1,10 +1,11 @@
 ﻿using Pi.Replicate.Schema;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors
 {
     public interface IFolderRepository
     {
-        IEnumerable<Folder> Get();
+        Task<IEnumerable<Folder>> Get();
     }
 }

@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors.Upload
 {
-    public class UploadResponse<TE>
+    public class UploadResponse
     {
-        public TE Data { get; set; }
-
         public bool IsSuccessful { get; set; }
 
         public string ErrorMessage { get; set; }

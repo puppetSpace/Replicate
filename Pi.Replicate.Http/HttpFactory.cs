@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 namespace Pi.Replicate.Http
 {
     //todo mayne also make IUploadLink interface with only in
-    public class HttpUploadLink : IUploadLink<FileChunk, object>
+    public class HttpUploadLink : IUploadLink<FileChunk>
     {
         private static ILogger _logger = LoggerFactory.Get<HttpUploadLink>();
 
-        public async Task<UploadResponse<object>> UploadData(Uri baseAddress,FileChunk input)
+        public async Task<UploadResponse> UploadData(Uri baseAddress,FileChunk input)
         {
             _logger.Info($"Uploading data to {baseAddress}");
             _logger.Debug($"Data: {input}");
@@ -24,10 +24,9 @@ namespace Pi.Replicate.Http
             if (!response.IsSuccessStatusCode)
                 _logger.Warn($"Failed to upload data to {baseAddress}. Status: {response.StatusCode}, Reason: {response.ReasonPhrase}");
 
-            return new UploadResponse<object>
+            return new UploadResponse
             {
                 IsSuccessful = response.IsSuccessStatusCode,
-                Data = response.IsSuccessStatusCode ? JsonConvert.DeserializeObject<object>(await response.Content.ReadAsStringAsync()) : null,
                 ErrorMessage = response.IsSuccessStatusCode ? String.Empty : $"Status: {response.StatusCode}, Reason: {response.ReasonPhrase}"
             };
         }

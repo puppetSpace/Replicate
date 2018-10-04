@@ -13,9 +13,8 @@ namespace Pi.Replicate.Processors.Files
     {
         private readonly uint _sizeofChunkInBytes;
 
-        //todo place sizeOfChunkInBytes in configuration and inject a configurationmanager to get the settings
         public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
-            :base(workItemQueueFactory)
+            :base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _sizeofChunkInBytes = uint.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
         }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pi.Replicate.Shared.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Pi.Replicate.Processors.Files
 {
     internal class FolderCrawler
     {
-        //private static Logger _logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger _logger = LoggerFactory.Get<FolderCrawler>();
 
 
         public IList<string> GetFiles(string path)
@@ -16,11 +17,11 @@ namespace Pi.Replicate.Processors.Files
             var files = new List<string>();
             if (!System.IO.Directory.Exists(path))
             {
-                //_logger.Warn($"Given path, '{path}' is not a directory. Returning empty list");
+                _logger.Warn($"Given path, '{path}' is not a directory. Returning empty list");
                 return files;
             }
 
-            //_logger.Trace($"Traversing '{path}'");
+            _logger.Trace($"Traversing '{path}'");
 
             foreach (var file in System.IO.Directory.GetFiles(path))
                 files.Add(file);

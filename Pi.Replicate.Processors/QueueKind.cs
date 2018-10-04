@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors
 {
-    public interface IWorkItemQueueFactory
+    public enum QueueKind
     {
-        IWorkItemQueue<TE> GetQueue<TE>(QueueKind queueKind);
+        Incoming,
+        Outgoing
+        
     }
 }

@@ -20,15 +20,15 @@ namespace Pi.Replicate.Processors.Folders
         private readonly IFolderRepository _repository;
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
 
-        public FolderWatcher(IRepositoryFactory repository, IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
-            :base(workItemQueueFactory)
+        public FolderWatcher(IFolderRepository repository, IWorkItemQueueFactory workItemQueueFactory)
+            :base(workItemQueueFactory, QueueKind.Outgoing)
         {
-            _repository = repository.CreateFolderRepository();
+            _repository = repository;
         }
 
         protected async override Task DoWork()
         {
-            var folders = _repository.Get();
+            var folders = await _repository.Get();
             foreach(var folder in folders)
             {
                 await AddItem(folder);

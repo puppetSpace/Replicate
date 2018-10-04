@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors.Upload
 {
-    public interface IUploadLink<Tin,Tout>
+    public interface IUploadLink<Tin>
     {
-        Task<UploadResponse<Tout>> UploadData(Uri baseAddress,Tin input);
+        Task<UploadResponse> UploadData(Uri baseAddress,Tin input);
     }
 }

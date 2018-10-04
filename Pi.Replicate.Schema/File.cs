@@ -21,6 +21,8 @@ namespace Pi.Replicate.Schema
 
         public DateTime LastModifiedDate { get; set; }
 
+        public string Extension { get; set; }
+
         public string GetPath()
         {
             return System.IO.Path.Combine(Folder.GetPath(), Name); //TODO null check, also with Folder

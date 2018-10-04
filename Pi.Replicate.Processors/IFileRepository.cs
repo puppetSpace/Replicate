@@ -9,9 +9,11 @@ namespace Pi.Replicate.Processors
 {
     public interface IFileRepository
     {
-        IEnumerable<File> Get(Guid folderId);
+        Task<IEnumerable<File>> GetSent(Guid folderId);
 
-        void Save(File file);
+        Task<IEnumerable<File>> GetReceived();
 
+        Task Save(File file);
+        void Update(File file);
     }
 }

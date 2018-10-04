@@ -27,9 +27,9 @@ namespace Pi.Replicate.Processors
     {
         private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(IWorkItemQueueFactory workItemQueueFactory)
+        public Worker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueType)
         {
-            _outQueue = workItemQueueFactory.GetQueue<Tout>();
+            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueType);
         }
 
         public override async Task WorkAsync()
@@ -50,10 +50,10 @@ namespace Pi.Replicate.Processors
         private readonly IWorkItemQueue<Tin> _inQueue;
         private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(IWorkItemQueueFactory workItemQueueFactory)
+        public Worker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueType)
         {
-            _inQueue = workItemQueueFactory.GetQueue<Tin>();
-            _outQueue = workItemQueueFactory.GetQueue<Tout>();
+            _inQueue = workItemQueueFactory.GetQueue<Tin>(queueType);
+            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueType);
         }
 
         public override async Task WorkAsync()
