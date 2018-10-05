@@ -23,6 +23,8 @@ namespace Pi.Replicate.Schema
 
         public string Extension { get; set; }
 
+        public Uri Source { get; set; }
+
         public string GetPath()
         {
             return System.IO.Path.Combine(Folder.GetPath(), Name); //TODO null check, also with Folder

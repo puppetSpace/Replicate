@@ -14,6 +14,11 @@ namespace Pi.Replicate.Processors
         Task<IEnumerable<File>> GetReceived();
 
         Task Save(File file);
-        void Update(File file);
+        Task Update(File file);
+        Task SaveTemp(TempFile file);
+        Task<TempFile> GetTempFileIfExists(File file);
+        Task DeleteTempFile(Guid fileId);
+        Task<IEnumerable<File>> GetCompletedReceivedFiles();
+        Task Delete(Guid id);
     }
 }

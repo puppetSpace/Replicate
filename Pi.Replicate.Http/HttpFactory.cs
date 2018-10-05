@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Pi.Replicate.Processors.Upload;
+using Pi.Replicate.Processors.Communication;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System;
@@ -8,10 +8,19 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Http
 {
-    //todo mayne also make IUploadLink interface with only in
-    public class HttpUploadLink : IUploadLink<FileChunk>
+    public class HttpUploadLink : IUploadLink
     {
         private static ILogger _logger = LoggerFactory.Get<HttpUploadLink>();
+
+        public Task<UploadResponse> FileReceived(Uri baseAddress, Guid fileId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<UploadResponse> RequestResendOfFile(Uri baseAddress, Guid fileId)
+        {
+            throw new NotImplementedException();
+        }
 
         public async Task<UploadResponse> UploadData(Uri baseAddress,FileChunk input)
         {

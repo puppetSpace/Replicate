@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Upload
+namespace Pi.Replicate.Processors.Communication
 {
     public class UploadResponse
     {

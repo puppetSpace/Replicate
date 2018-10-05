@@ -670,9 +670,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
-      "projectName": "Pi.Replicate.Agent",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
+      "projectName": "Pi.Replicate.Agent.Send",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
       "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
       "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\obj\\",
       "projectStyle": "PackageReference",

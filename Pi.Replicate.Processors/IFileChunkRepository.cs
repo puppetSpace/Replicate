@@ -12,6 +12,6 @@ namespace Pi.Replicate.Processors
         Task<IEnumerable<FileChunk>> Get(Guid fileId);
 
         Task Save(FileChunk fileChunk);
-        void Delete(Guid fileId);
+        Task DeleteForFile(Guid fileId);
     }
 }

@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Agent", "Pi.Replicate.Agent\Pi.Replicate.Agent.csproj", "{FC0EE694-300F-4E93-A602-1619C31674A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Agent.Send", "Pi.Replicate.Agent\Pi.Replicate.Agent.Send.csproj", "{FC0EE694-300F-4E93-A602-1619C31674A9}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Processors", "Pi.Replicate.Processors\Pi.Replicate.Processors.csproj", "{A041BDDC-E623-44A9-AF45-4BB6273F4577}"
 EndProject
@@ -18,7 +18,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Shared", "Pi.R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Test", "Pi.Replicate.Test\Pi.Replicate.Test.csproj", "{8A784A4C-1CAE-477F-8EB1-95ED56B9619F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pi.Replicate.Http", "Pi.Replicate.Http\Pi.Replicate.Http.csproj", "{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Http", "Pi.Replicate.Http\Pi.Replicate.Http.csproj", "{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pi.Replicate.Agent.Receive", "Pi.Replicate.Agent.Receive\Pi.Replicate.Agent.Receive.csproj", "{7318EE94-CD77-4779-BED7-12A929D80C6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -138,6 +140,18 @@ Global
 		{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}.Release|x64.Build.0 = Release|Any CPU
 		{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}.Release|x86.ActiveCfg = Release|Any CPU
 		{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}.Release|x86.Build.0 = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|x64.Build.0 = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Debug|x86.Build.0 = Debug|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|x64.ActiveCfg = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|x64.Build.0 = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|x86.ActiveCfg = Release|Any CPU
+		{7318EE94-CD77-4779-BED7-12A929D80C6B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
