@@ -88,10 +88,10 @@ namespace Pi.Replicate.Test
             return fileChunks;
         }
 
-        public static string CreateHashForFile(File file)
+        public static string CreateHashForFile(File file, string alternateFolderPath = "")
         {
             MD5 hashCreator = MD5.Create();
-            var hash = hashCreator.ComputeHash(System.IO.File.ReadAllBytes(file.GetPath()));
+            var hash = hashCreator.ComputeHash(System.IO.File.ReadAllBytes(alternateFolderPath == "" ? file.GetPath() : System.IO.Path.Combine(alternateFolderPath, file.Name)));
             return Convert.ToBase64String(hash);
         }
     }

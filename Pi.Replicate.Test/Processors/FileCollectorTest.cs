@@ -97,11 +97,11 @@ namespace Pi.Replicate.Test.Processors
             var folder = EntityBuilder.BuildFolder();
             var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var oldFile1 = files[0];
+            var oldFile1 = files[2];
             oldFile1.Status = FileStatus.Sent;
 
 
-            var oldFile2 = files[1];
+            var oldFile2 = files[3];
             oldFile2.Status = FileStatus.New;
 
             var fileCount = 0;
@@ -117,7 +117,7 @@ namespace Pi.Replicate.Test.Processors
             mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
             var mockOutQueue = new Mock<IWorkItemQueue<File>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
+            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(Task.CompletedTask).Callback(()=> fileCount++);
 
             var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
             mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);

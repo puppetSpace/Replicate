@@ -67,7 +67,7 @@ namespace Pi.Replicate.Processors.Files
             foreach (var file in newOrChanged)
             {
                 var fileInfo = new System.IO.FileInfo(file);
-                if (fileInfo.Exists && !FileLock.IsLocked(fileInfo.FullName))
+                if (fileInfo.Exists)
                 {
                     var fileObject = CreateFileObject(folder, fileInfo);
                     await _repository.Save(fileObject);

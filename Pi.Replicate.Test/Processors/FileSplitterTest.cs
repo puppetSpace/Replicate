@@ -24,7 +24,7 @@ namespace Pi.Replicate.Test.Processors
             var folder = EntityBuilder.BuildFolder();
             var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var file = files[0];
+            var file = files[4];
             file.Status = FileStatus.Sent;
 
             uint chunkSize = 1 * 1024;
@@ -69,7 +69,7 @@ namespace Pi.Replicate.Test.Processors
             var folder = EntityBuilder.BuildFolder();
             var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var file = files[0];
+            var file = files[3];
             file.Status = FileStatus.Sent;
 
             uint chunkSize = 1 * 1024;

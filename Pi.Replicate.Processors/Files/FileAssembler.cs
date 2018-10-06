@@ -67,20 +67,15 @@ namespace Pi.Replicate.Processors.Files
         {
             //todo uncompress if needed
             var tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
-            var fileStream = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write); ;
-
-            try
+            using (var fileStream = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write))
             {
+
                 foreach (var chunk in rawBytes)
                 {
                     await fileStream.WriteAsync(chunk, 0, chunk.Length);
                     await fileStream.FlushAsync();
                 }
                 await fileStream.FlushAsync();
-            }
-            finally
-            {
-                fileStream?.Close();
             }
 
             return tempFile;
