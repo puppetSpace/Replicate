@@ -56,3 +56,4 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreap
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Test\obj\Debug\netcoreapp2.0\Pi.Replicate.Test.csproj.CopyComplete
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Queues.dll
 D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\Pi.Replicate.Queues.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Test\bin\Debug\netcoreapp2.0\DropLocation\readme.txt

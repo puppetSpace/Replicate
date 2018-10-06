@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 #endif
 namespace Pi.Replicate.Processors.Folders
 {
-    public class FolderWatcher : Worker<Folder>
+    internal class FolderWatcher : Worker<Folder>
     {
         private readonly IFolderRepository _repository;
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();

@@ -23,7 +23,7 @@ namespace Pi.Replicate.Processors
         }
     }
 
-    public abstract class Worker<Tout> : Worker
+    internal abstract class Worker<Tout> : Worker
     {
         private readonly IWorkItemQueue<Tout> _outQueue;
 
@@ -45,7 +45,7 @@ namespace Pi.Replicate.Processors
         protected abstract Task DoWork();
     }
 
-    public abstract class Worker<Tin, Tout> : Worker
+    internal abstract class Worker<Tin, Tout> : Worker
     {
         private readonly IWorkItemQueue<Tin> _inQueue;
         private readonly IWorkItemQueue<Tout> _outQueue;

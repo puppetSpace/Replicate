@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors.Files
 {
-    //todo check hash
+    //todo maybe place droplocation in config
     internal class FileAssembler : Worker<File,object>
     {
         private readonly IFileChunkRepository _fileChunkRepository;
@@ -25,7 +25,6 @@ namespace Pi.Replicate.Processors.Files
             _uploadLink = uploadLink;
         }
 
-        //todo use this or another worker that just calls the database for complete files and pushes them on a queue
 
         protected override async Task DoWork(File file)
         {
@@ -39,7 +38,7 @@ namespace Pi.Replicate.Processors.Files
                 var receivedChunks = await _fileChunkRepository.Get(file.Id);
                 _logger.Debug($"File '{file.Name}' has {receivedChunks.Count()} chunks of bytes");
                 var rawBytes = AssembleChunks(receivedChunks);
-                tempFilePath = await WriteToTemp(rawBytes, file.Extension);
+                tempFilePath = await WriteToTemp(rawBytes);
             }
             else
             {
@@ -64,18 +63,25 @@ namespace Pi.Replicate.Processors.Files
 
         }
 
-        private async Task<string> WriteToTemp(IEnumerable<byte[]> rawBytes, string extension)
+        private async Task<string> WriteToTemp(IEnumerable<byte[]> rawBytes)
         {
             //todo uncompress if needed
-            var tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName(), extension);
+            var tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetRandomFileName());
             var fileStream = new System.IO.FileStream(tempFile, System.IO.FileMode.Create, System.IO.FileAccess.Write); ;
 
-            foreach (var chunk in rawBytes)
+            try
             {
-                await fileStream.WriteAsync(chunk, 0, chunk.Length);
+                foreach (var chunk in rawBytes)
+                {
+                    await fileStream.WriteAsync(chunk, 0, chunk.Length);
+                    await fileStream.FlushAsync();
+                }
                 await fileStream.FlushAsync();
             }
-            await fileStream.FlushAsync();
+            finally
+            {
+                fileStream?.Close();
+            }
 
             return tempFile;
         }

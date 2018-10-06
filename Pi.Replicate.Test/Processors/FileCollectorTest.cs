@@ -6,6 +6,7 @@ using Pi.Replicate.Processors.Files;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Test.Processors
@@ -16,14 +17,10 @@ namespace Pi.Replicate.Test.Processors
 
 
         [TestMethod]
-        public async Task ProcessFiles_NewFiles_5New()
+        public async Task Work_NewFiles_5New()
         {
             //assign
-            var folder = new Folder
-            {
-                Id = Guid.NewGuid(),
-                Name = "FileFolder"
-            };
+            var folder = EntityBuilder.BuildFolder();
 
             var fileCount = 0;
 
@@ -38,8 +35,8 @@ namespace Pi.Replicate.Test.Processors
             mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
 
             var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<Folder>()).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<File>()).Returns(mockOutQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
             //act
             var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
@@ -50,28 +47,18 @@ namespace Pi.Replicate.Test.Processors
         }
 
         [TestMethod]
-        public async Task ProcessFiles_NewFiles_3New2Old()
+        public async Task Work_NewFiles_3New2Old()
         {
             //assign
-            var folder = new Folder
-            {
-                Id = Guid.NewGuid(),
-                Name = "FileFolder"
-            };
+            var folder = EntityBuilder.BuildFolder();
+            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var oldFile1 = new File
-            {
-                Folder = folder,
-                Name = "test1.txt",
-                Status = FileStatus.Sent
-            };
+            var oldFile1 = files[0];
+            oldFile1.Status = FileStatus.Sent;
 
-            var oldFile2 = new File
-            {
-                Folder = folder,
-                Name = "test2.txt",
-                Status = FileStatus.New
-            };
+
+            var oldFile2 = files[1];
+            oldFile2.Status = FileStatus.New;
 
             var fileCount = 0;
 
@@ -91,8 +78,8 @@ namespace Pi.Replicate.Test.Processors
             mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
 
             var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<Folder>()).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<File>()).Returns(mockOutQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
             //act
             var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
@@ -104,30 +91,18 @@ namespace Pi.Replicate.Test.Processors
         }
 
         [TestMethod]
-        public async Task ProcessFiles_NewFiles_3New1Changed()
+        public async Task Work_NewFiles_3New1Changed()
         {
 
-            var currentDir = System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
-            //assign
-            var folder = new Folder(currentDir)
-            {
-                Id = Guid.NewGuid(),
-                Name = "FileFolder"
-            };
+            var folder = EntityBuilder.BuildFolder();
+            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var oldFile1 = new File
-            {
-                Folder = folder,
-                Name = "test1.txt",
-                Status = FileStatus.Sent
-            };
+            var oldFile1 = files[0];
+            oldFile1.Status = FileStatus.Sent;
 
-            var oldFile2 = new File
-            {
-                Folder = folder,
-                Name = "test2.txt",
-                Status = FileStatus.New
-            };
+
+            var oldFile2 = files[1];
+            oldFile2.Status = FileStatus.New;
 
             var fileCount = 0;
             oldFile1.LastModifiedDate = new System.IO.FileInfo(oldFile1.GetPath()).LastWriteTimeUtc.AddHours(1);
@@ -145,8 +120,8 @@ namespace Pi.Replicate.Test.Processors
             mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
 
             var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<Folder>()).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<File>()).Returns(mockOutQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
             //act
             var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
@@ -158,16 +133,12 @@ namespace Pi.Replicate.Test.Processors
 
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task ProcessFiles_InvalidFolder_ThrowInvalidOperationException()
+        public async Task Work_InvalidFolder_ThrowInvalidOperationException()
         {
 
-            var currentDir = System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
             //assign
-            var folder = new Folder(currentDir)
-            {
-                Id = Guid.NewGuid(),
-                Name = "DoesNotExist"
-            };
+            var folder = EntityBuilder.BuildFolder();
+            folder.Name = "DoesNotExist";
 
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(fr => fr.GetSent(folder.Id)).Returns(Task.FromResult<IEnumerable<File>>(new List<File>()));
@@ -180,8 +151,8 @@ namespace Pi.Replicate.Test.Processors
             mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(Task.CompletedTask);
 
             var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<Folder>()).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<File>()).Returns(mockOutQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
             //act
             var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);

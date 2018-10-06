@@ -21,8 +21,6 @@ namespace Pi.Replicate.Schema
 
         public DateTime LastModifiedDate { get; set; }
 
-        public string Extension { get; set; }
-
         public Uri Source { get; set; }
 
         public string GetPath()

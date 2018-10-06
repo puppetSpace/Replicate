@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Processors.FileChunks;
 using Pi.Replicate.Processors.Helpers;
 using Pi.Replicate.Schema;
 using System;
@@ -12,11 +11,13 @@ namespace Pi.Replicate.Processors.Files
     internal class FileSplitter : Worker<File, FileChunk>
     {
         private readonly uint _sizeofChunkInBytes;
+        private readonly IFileRepository _fileRepository;
 
-        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory)
+        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory, IFileRepository fileRepository)
             :base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _sizeofChunkInBytes = uint.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
+            _fileRepository = fileRepository;
         }
 
         protected override async Task DoWork(File file)
@@ -45,13 +46,21 @@ namespace Pi.Replicate.Processors.Files
                 var toWriteBytes = new byte[bytesRead];
                 Buffer.BlockCopy(buffer, 0, toWriteBytes, 0, bytesRead);
 
-                await AddItem(FileChunkBuilder.Build(file, ++chunksCreated, toWriteBytes));
+                await AddItem(new FileChunk
+                {
+                    Id = Guid.NewGuid(),
+                    File = file,
+                    SequenceNo = ++chunksCreated,
+                    Value = Convert.ToBase64String(toWriteBytes),
+                    Status = ChunkStatus.New
+                });
             }
 
             hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
             file.Hash = Convert.ToBase64String(hashCreator.Hash);
             file.AmountOfChunks = chunksCreated;
-            //todo save
+            file.Status = FileStatus.Sent;
+            await _fileRepository.Update(file);
         }
 
     }

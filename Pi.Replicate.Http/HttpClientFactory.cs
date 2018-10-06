@@ -7,31 +7,23 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Http
 {
-    internal static class HttpClientCache
+    internal static class HttpClientFactory
     {
-        private static Dictionary<Uri, HttpClient> _clients = new Dictionary<Uri, HttpClient>();
-        private static object _lockObject = new object();
+        //private static Dictionary<Uri, HttpClient> _clients = new Dictionary<Uri, HttpClient>();
+        //private static object _lockObject = new object();
+        private static HttpClient _httpClient = CreateHttpClient();
 
-        public static HttpClient GetHttpClient(Uri uri)
+        public static HttpClient Get()
         {
-            lock (_lockObject)
-            {
-                if (!_clients.ContainsKey(uri))
-                {
-                    _clients.Add(uri, CreateHttpClient(uri));
-                }
-
-                return _clients[uri];
-            }
+            return _httpClient;
         }
 
 
         //todo best practices tells that only one instance of HttpClient should be used.
         //but I  don't know what todo with security yet, so it could be that the headers per baseadress differ due to securitytoken of something else
-        private static HttpClient CreateHttpClient(Uri uri)
+        private static HttpClient CreateHttpClient()
         {
             var httpClient = new HttpClient();
-            httpClient.BaseAddress = uri;
             httpClient.DefaultRequestHeaders.Accept.Clear();
             httpClient.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
