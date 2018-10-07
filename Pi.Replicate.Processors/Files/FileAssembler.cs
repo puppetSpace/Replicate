@@ -1,5 +1,6 @@
 ﻿using Pi.Replicate.Processors.Communication;
 using Pi.Replicate.Processors.Helpers;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System;
@@ -9,19 +10,16 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processors.Files
 {
-    //todo maybe place droplocation in config
     internal class FileAssembler : Worker<File,object>
     {
-        private readonly IFileChunkRepository _fileChunkRepository;
-        private readonly IFileRepository _fileRepository;
+        private readonly IRepository _repository;
         private readonly IUploadLink _uploadLink;
         private readonly ILogger _logger = LoggerFactory.Get<FileAssembler>();
 
-        public FileAssembler(IWorkItemQueueFactory workItemQueueFactory, IFileChunkRepository fileChunkRepository, IFileRepository fileRepository, IUploadLink uploadLink)
+        public FileAssembler(IWorkItemQueueFactory workItemQueueFactory, IRepository repository , IUploadLink uploadLink)
             : base(workItemQueueFactory, QueueKind.Incoming)
         {
-            _fileChunkRepository = fileChunkRepository;
-            _fileRepository = fileRepository;
+            _repository = repository;
             _uploadLink = uploadLink;
         }
 
@@ -29,13 +27,13 @@ namespace Pi.Replicate.Processors.Files
         protected override async Task DoWork(File file)
         {
             _logger.Info($"Assembling file '{file.Name}'");
-            var possibleTemp = await _fileRepository.GetTempFileIfExists(file);
+            var possibleTemp = await _repository.FileRepository.GetTempFileIfExists(file);
             var tempFilePath = string.Empty;
 
             if (!IsTempFileStillValid(possibleTemp, file))
             {
                 DeletePossibleTempFile(possibleTemp);
-                var receivedChunks = await _fileChunkRepository.Get(file.Id);
+                var receivedChunks = await _repository.FileChunkRepository.Get(file.Id);
                 _logger.Debug($"File '{file.Name}' has {receivedChunks.Count()} chunks of bytes");
                 var rawBytes = AssembleChunks(receivedChunks);
                 tempFilePath = await WriteToTemp(rawBytes);
@@ -86,7 +84,7 @@ namespace Pi.Replicate.Processors.Files
             if (System.IO.File.Exists(file.GetPath()) && FileLock.IsLocked(file.GetPath()))
             {
                 _logger.Warn($"File {file.GetPath()} exist and cannot be overriden because it is locked");
-                _fileRepository.SaveTemp(new TempFile { FileId = file.Id, Hash = file.Hash, Path = tempFile });
+                _repository.FileRepository.SaveTemp(new TempFile { FileId = file.Id, Hash = file.Hash, Path = tempFile });
                 return false;
             }
             _logger.Info($"Moving tempfile '{tempFile}' to destination '{file.GetPath()}'");
@@ -97,15 +95,15 @@ namespace Pi.Replicate.Processors.Files
         private async Task RemoveChunks(Guid fileId)
         {
             _logger.Info($"Deleting the chunks of file with id {fileId}");
-            await _fileChunkRepository.DeleteForFile(fileId);
+            await _repository.FileChunkRepository.DeleteForFile(fileId);
         }
 
         private async Task SaveFileAsReceivedComplete(File file)
         {
             _logger.Info($"Updating status of file {file.Name} in database");
             file.Status = FileStatus.ReceivedComplete;
-            await _fileRepository.Update(file);
-            await _fileRepository.DeleteTempFile(file.Id);
+            await _repository.FileRepository.Update(file);
+            await _repository.FileRepository.DeleteTempFile(file.Id);
             await _uploadLink.FileReceived(file.Source, file.Id);
         }
 

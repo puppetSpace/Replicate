@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Processors.Folders;
 using Pi.Replicate.Processors.Helpers;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Logging;
@@ -14,11 +15,11 @@ namespace Pi.Replicate.Processors.Files
 {
     internal class FileCollector : Worker<Folder,File>
     {
-        private readonly IFileRepository _repository;
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
+        private readonly IRepository _repository;
 
-        public FileCollector(IFileRepository repository, IWorkItemQueueFactory workItemQueueFactory)
+        public FileCollector(IRepository repository, IWorkItemQueueFactory workItemQueueFactory)
             : base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _repository = repository;
@@ -42,7 +43,7 @@ namespace Pi.Replicate.Processors.Files
             var previousFilesInFolder = new List<File>();
             if (!folder.DeleteFilesAfterSend)
             {
-                var files = await _repository.GetSent(folder.Id);
+                var files = await _repository.FileRepository.GetSent(folder.Id);
                 previousFilesInFolder = files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
                 _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{folder.GetPath()}'.");
             }
@@ -70,7 +71,7 @@ namespace Pi.Replicate.Processors.Files
                 if (fileInfo.Exists)
                 {
                     var fileObject = CreateFileObject(folder, fileInfo);
-                    await _repository.Save(fileObject);
+                    await _repository.FileRepository.Save(fileObject);
                     await AddItem(fileObject);
                 }
             }

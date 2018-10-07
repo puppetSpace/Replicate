@@ -1,4 +1,5 @@
 ﻿using Pi.Replicate.Processors.Communication;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System.Linq;
@@ -9,23 +10,21 @@ namespace Pi.Replicate.Processors.Files
 {
     internal class FileChecker : Worker<File>
     {
-        private readonly IFileChunkRepository _fileChunkRepository;
-        private readonly IFileRepository _fileRepository;
+        private readonly IRepository _repository;
         private readonly IUploadLink _uploadLink;
         private readonly ILogger _logger = LoggerFactory.Get<FileChecker>();
 
-        public FileChecker(IWorkItemQueueFactory workItemQueueFactory, IFileChunkRepository fileChunkRepository, IFileRepository fileRepository, IUploadLink uploadLink)
+        public FileChecker(IWorkItemQueueFactory workItemQueueFactory, IRepository repository, IUploadLink uploadLink)
             : base(workItemQueueFactory, QueueKind.Incoming)
 
         {
-            _fileChunkRepository = fileChunkRepository;
-            _fileRepository = fileRepository;
+            _repository = repository;
             _uploadLink = uploadLink;
         }
 
         protected override async Task DoWork()
         {
-            var files = await _fileRepository.GetCompletedReceivedFiles();
+            var files = await _repository.FileRepository.GetCompletedReceivedFiles();
             _logger.Info($"Checking hash of {files.Count()} received files");
             foreach (var file in files)
             {
@@ -39,8 +38,8 @@ namespace Pi.Replicate.Processors.Files
                 {
                     _logger.Info($"Hash of file {file.Name} is bad. Requesting a resend");
                     _logger.Debug($"Requesting resend of host {file.Source}");
-                    await _fileRepository.Delete(file.Id);
-                    await _fileChunkRepository.DeleteForFile(file.Id);
+                    await _repository.FileRepository.Delete(file.Id);
+                    await _repository.FileChunkRepository.DeleteForFile(file.Id);
                     await _uploadLink.RequestResendOfFile(file.Source, file.Id);
                 }
             }
@@ -48,7 +47,7 @@ namespace Pi.Replicate.Processors.Files
 
         private async Task<string> CreateHashFromChunks(File file)
         {
-            var chunks = await _fileChunkRepository.Get(file.Id);
+            var chunks = await _repository.FileChunkRepository.Get(file.Id);
             var rawBytes = chunks.OrderBy(x => x.SequenceNo)
                 .SelectMany(x => System.Convert.FromBase64String(x.Value))
                 .ToArray();

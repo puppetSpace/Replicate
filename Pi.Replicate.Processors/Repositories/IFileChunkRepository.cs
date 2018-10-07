@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors
+namespace Pi.Replicate.Processors.Repositories
 {
     public interface IFileChunkRepository
     {
@@ -13,5 +13,6 @@ namespace Pi.Replicate.Processors
 
         Task Save(FileChunk fileChunk);
         Task DeleteForFile(Guid fileId);
+        Task SaveFailed(FailedUploadFileChunk failedUploadFileChunk);
     }
 }

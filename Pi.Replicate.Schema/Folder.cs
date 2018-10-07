@@ -21,8 +21,6 @@ namespace Pi.Replicate.Schema
 
         public string Name { get; set; }
 
-        public IEnumerable<Host> Receivers { get; set; }
-
         public FolderType FolderType { get; set; }
 
         public bool DeleteFilesAfterSend { get; set; }

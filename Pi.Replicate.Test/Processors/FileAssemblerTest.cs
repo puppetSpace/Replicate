@@ -3,6 +3,7 @@ using Moq;
 using Pi.Replicate.Processors;
 using Pi.Replicate.Processors.Communication;
 using Pi.Replicate.Processors.Files;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Linq;
@@ -58,7 +59,11 @@ namespace Pi.Replicate.Test.Processors
             var mockUploadLink = new Mock<IUploadLink>();
             mockUploadLink.Setup(x => x.FileReceived(It.IsAny<Uri>(), It.IsAny<Guid>())).Returns(Task.FromResult(new UploadResponse())).Callback(() => isFileReceived = true);
 
-            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, mockUploadLink.Object);
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
+
+            var fileAssembler = new FileAssembler(mockFactoryQueue.Object,mockRepository.Object, mockUploadLink.Object);
             await fileAssembler.WorkAsync();
 
             Assert.IsTrue(System.IO.File.Exists(file.GetPath()));
@@ -107,11 +112,15 @@ namespace Pi.Replicate.Test.Processors
             var mockUploadLink = new Mock<IUploadLink>();
             mockUploadLink.Setup(x => x.FileReceived(It.IsAny<Uri>(), It.IsAny<Guid>())).Returns(Task.FromResult(new UploadResponse())).Callback(() => isFileReceived = true);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
+
             //act
             System.IO.File.Copy(System.IO.Path.Combine(inputFolder.GetPath(), file.Name), file.GetPath());
             var tempStream = System.IO.File.OpenWrite(file.GetPath());
 
-            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, mockUploadLink.Object);
+            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockRepository.Object, mockUploadLink.Object);
             await fileAssembler.WorkAsync();
 
             tempStream.Close();
@@ -164,7 +173,11 @@ namespace Pi.Replicate.Test.Processors
             var mockUploadLink = new Mock<IUploadLink>();
             mockUploadLink.Setup(x => x.FileReceived(It.IsAny<Uri>(), It.IsAny<Guid>())).Returns(Task.FromResult(new UploadResponse())).Callback(() => isFileReceived = true);
 
-            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, mockUploadLink.Object);
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
+
+            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockRepository.Object, mockUploadLink.Object);
             await fileAssembler.WorkAsync();
 
             Assert.IsTrue(System.IO.File.Exists(file.GetPath()));
@@ -216,7 +229,11 @@ namespace Pi.Replicate.Test.Processors
             var mockUploadLink = new Mock<IUploadLink>();
             mockUploadLink.Setup(x => x.FileReceived(It.IsAny<Uri>(), It.IsAny<Guid>())).Returns(Task.FromResult(new UploadResponse())).Callback(() => isFileReceived = true);
 
-            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, mockUploadLink.Object);
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
+
+            var fileAssembler = new FileAssembler(mockFactoryQueue.Object, mockRepository.Object, mockUploadLink.Object);
             await fileAssembler.WorkAsync();
 
             Assert.IsTrue(System.IO.File.Exists(file.GetPath()));

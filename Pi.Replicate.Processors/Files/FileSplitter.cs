@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Processors.Helpers;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Security.Cryptography;
@@ -11,13 +12,13 @@ namespace Pi.Replicate.Processors.Files
     internal class FileSplitter : Worker<File, FileChunk>
     {
         private readonly uint _sizeofChunkInBytes;
-        private readonly IFileRepository _fileRepository;
+        private readonly IRepository _repository;
 
-        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory, IFileRepository fileRepository)
+        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory, IRepository repository)
             :base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _sizeofChunkInBytes = uint.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
-            _fileRepository = fileRepository;
+            _repository = repository;
         }
 
         protected override async Task DoWork(File file)
@@ -60,7 +61,7 @@ namespace Pi.Replicate.Processors.Files
             file.Hash = Convert.ToBase64String(hashCreator.Hash);
             file.AmountOfChunks = chunksCreated;
             file.Status = FileStatus.Sent;
-            await _fileRepository.Update(file);
+            await _repository.FileRepository.Update(file);
         }
 
     }

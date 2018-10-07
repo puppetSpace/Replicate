@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Pi.Replicate.Processors;
 using Pi.Replicate.Processors.Files;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
@@ -48,8 +49,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object,mockFactoryQueue.Object, mockFileRepository.Object);
+            var splitter = new FileSplitter(mockConfiguration.Object,mockFactoryQueue.Object, mockRepository.Object);
             await splitter.WorkAsync();
 
 
@@ -92,8 +96,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockFileRepository.Object);
+            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
             await splitter.WorkAsync();
 
             //assert
@@ -140,8 +147,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockFileRepository.Object);
+            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
             await splitter.WorkAsync();
 
 
@@ -180,8 +190,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockFileRepository.Object);
+            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
             await splitter.WorkAsync();
 
 
@@ -222,8 +235,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileRepository = new Mock<IFileRepository>();
             mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockFileRepository.Object);
+            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
             await splitter.WorkAsync();
 
 

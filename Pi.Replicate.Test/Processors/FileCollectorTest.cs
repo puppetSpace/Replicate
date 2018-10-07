@@ -3,6 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Pi.Replicate.Processors;
 using Pi.Replicate.Processors.Files;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,11 @@ namespace Pi.Replicate.Test.Processors
             mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
             mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
             await collector.WorkAsync();
 
             //asert
@@ -81,8 +85,11 @@ namespace Pi.Replicate.Test.Processors
             mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
             mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
 
             await collector.WorkAsync();
 
@@ -123,8 +130,11 @@ namespace Pi.Replicate.Test.Processors
             mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
             mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
             await collector.WorkAsync();
 
             //asert
@@ -154,8 +164,11 @@ namespace Pi.Replicate.Test.Processors
             mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
             mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
             //act
-            var collector = new FileCollector(mockFileRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
             await collector.WorkAsync();
 
             //asert

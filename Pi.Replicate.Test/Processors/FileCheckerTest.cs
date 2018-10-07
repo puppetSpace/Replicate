@@ -3,6 +3,7 @@ using Moq;
 using Pi.Replicate.Processors;
 using Pi.Replicate.Processors.Communication;
 using Pi.Replicate.Processors.Files;
+using Pi.Replicate.Processors.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,11 @@ namespace Pi.Replicate.Test.Processors
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
             mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file));
 
-            var fileChecker = new FileChecker(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, null);
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
+
+            var fileChecker = new FileChecker(mockFactoryQueue.Object, mockRepository.Object, null);
             await fileChecker.WorkAsync();
 
             Assert.AreEqual(1, fileCount);
@@ -79,8 +84,12 @@ namespace Pi.Replicate.Test.Processors
             var mockUploadLink = new Mock<IUploadLink>();
             mockUploadLink.Setup(x => x.RequestResendOfFile(It.IsAny<Uri>(), It.IsAny<Guid>())).Returns(Task.FromResult(new UploadResponse())).Callback(() => isResendRequested = true);
 
+            var mockRepository = new Mock<IRepository>();
+            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            mockRepository.SetupGet(x => x.FileChunkRepository).Returns(mockFileChunkRepository.Object);
 
-            var fileChecker = new FileChecker(mockFactoryQueue.Object, mockFileChunkRepository.Object, mockFileRepository.Object, mockUploadLink.Object);
+
+            var fileChecker = new FileChecker(mockFactoryQueue.Object, mockRepository.Object, mockUploadLink.Object);
             await fileChecker.WorkAsync();
 
             Assert.AreEqual(0, fileCount);

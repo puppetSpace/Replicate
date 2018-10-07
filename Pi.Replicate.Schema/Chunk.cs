@@ -21,9 +21,16 @@ namespace Pi.Replicate.Schema
     }
 
 
-    public class UploadChunk : FileChunk
+    //public class UploadChunk : FileChunk
+    //{
+    //    public string Destination { get; set; }
+    //}
+
+    public class FailedUploadFileChunk
     {
-        public string Destination { get; set; }
+        public FileChunk FileChunk { get; set; }
+
+        public Host Host { get; set; }
     }
 
 }
