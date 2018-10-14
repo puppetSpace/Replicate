@@ -20,7 +20,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Test", "Pi.Rep
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Http", "Pi.Replicate.Http\Pi.Replicate.Http.csproj", "{E79BCD2D-61DF-49F5-8DED-FBFE9641478F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pi.Replicate.Agent.Receive", "Pi.Replicate.Agent.Receive\Pi.Replicate.Agent.Receive.csproj", "{7318EE94-CD77-4779-BED7-12A929D80C6B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Agent.Api", "Pi.Replicate.Agent.Receive\Pi.Replicate.Agent.Api.csproj", "{7318EE94-CD77-4779-BED7-12A929D80C6B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

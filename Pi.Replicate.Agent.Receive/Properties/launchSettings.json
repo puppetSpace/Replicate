@@ -17,7 +17,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Pi.Replicate.Agent.Receive": {
+    "Pi.Replicate.Agent.Api": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "api/values",

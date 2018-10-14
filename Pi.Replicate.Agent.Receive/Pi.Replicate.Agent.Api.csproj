@@ -10,6 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processors.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Schema\Pi.Replicate.Schema.csproj" />
   </ItemGroup>
 
 </Project>

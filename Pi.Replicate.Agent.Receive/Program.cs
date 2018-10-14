@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Pi.Replicate.Agent.Receive
+namespace Pi.Replicate.Agent.Api
 {
     public class Program
     {
