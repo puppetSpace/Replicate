@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Pi.Replicate.Processors;
+using Pi.Replicate.Processors.Repositories;
+using Pi.Replicate.Schema;
 using System;
+using System.Threading.Tasks;
 
 namespace Pi.Replicate.Agent.Api.Controllers
 {
@@ -7,16 +11,35 @@ namespace Pi.Replicate.Agent.Api.Controllers
     [ApiController]
     public class FileController : ControllerBase
     {
-        [HttpGet("received")]
-        public IActionResult Received(Guid fileid)
+        private readonly IFileRepository _fileRepository;
+        private readonly IWorkItemQueue<File> _workItemQueue;
+
+        public FileController(IFileRepository fileRepository, IWorkItemQueueFactory workItemQueueFactory)
         {
-            return Ok(fileid);
+            _fileRepository = fileRepository;
+            _workItemQueue = workItemQueueFactory.GetQueue<File>(QueueKind.Outgoing);
+        }
+
+        [HttpGet("received")]
+        public async Task<IActionResult> Received(Guid fileId)
+        {
+            var file = await _fileRepository.Get(fileId);
+            if (file != null)
+            {
+                file.Status = FileStatus.UploadSucessful;
+                await _fileRepository.Update(file);
+            }
+
+            return Ok();
         }
 
         [HttpGet("resend")]
-        public IActionResult Resend(Guid fileid)
+        public async Task<IActionResult> Resend(Guid fileId)
         {
-            return Ok("resend");
+            var file = await _fileRepository.Get(fileId);
+            if (file != null)
+                await _workItemQueue.Enqueue(file);
+            return Ok();
         }
     }
 }

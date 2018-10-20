@@ -5,6 +5,7 @@ namespace Pi.Replicate.Schema
         New = 0,
         Sent = 1,
         ReceivedIncomplete = 2,
-        ReceivedComplete = 3
+        ReceivedComplete = 3,
+        UploadSucessful = 4
     }
 }

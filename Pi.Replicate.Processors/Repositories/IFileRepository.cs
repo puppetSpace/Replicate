@@ -20,5 +20,6 @@ namespace Pi.Replicate.Processors.Repositories
         Task DeleteTempFile(Guid fileId);
         Task<IEnumerable<File>> GetCompletedReceivedFiles();
         Task Delete(Guid id);
+        Task<File> Get(Guid fileId);
     }
 }
