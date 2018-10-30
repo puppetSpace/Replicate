@@ -3,7 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Queuing
+namespace Pi.Replicate.Queueing
 {
     internal sealed class WorkItemQueue<TE> : ConcurrentQueue<TE>, IWorkItemQueue<TE>
     {

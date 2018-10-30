@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Test.Queue
+namespace Pi.Replicate.Test.Queueing
 {
     [TestClass]
     public class WorkItemQueueFactoryTest

@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 
 
 
-namespace Pi.Replicate.Queuing
+namespace Pi.Replicate.Queueing
 {
     internal sealed class WorkItemQueueStore
     {

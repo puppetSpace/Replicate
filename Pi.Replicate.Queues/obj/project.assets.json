@@ -530,9 +530,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj",
-      "projectName": "Pi.Replicate.Queuing",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
+      "projectName": "Pi.Replicate.Queueing",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
       "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
       "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\obj\\",
       "projectStyle": "PackageReference",

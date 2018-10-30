@@ -1791,17 +1791,17 @@
           "bin/placeholder/Pi.Replicate.Processing.dll": {}
         }
       },
-      "Pi.Replicate.Queuing/1.0.0": {
+      "Pi.Replicate.Queueing/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "Pi.Replicate.Processing": "1.0.0"
         },
         "compile": {
-          "bin/placeholder/Pi.Replicate.Queuing.dll": {}
+          "bin/placeholder/Pi.Replicate.Queueing.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Pi.Replicate.Queuing.dll": {}
+          "bin/placeholder/Pi.Replicate.Queueing.dll": {}
         }
       },
       "Pi.Replicate.Schema/1.0.0": {
@@ -6287,10 +6287,10 @@
       "path": "../Pi.Replicate.Processors/Pi.Replicate.Processing.csproj",
       "msbuildProject": "../Pi.Replicate.Processors/Pi.Replicate.Processing.csproj"
     },
-    "Pi.Replicate.Queuing/1.0.0": {
+    "Pi.Replicate.Queueing/1.0.0": {
       "type": "project",
-      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queuing.csproj",
-      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queuing.csproj"
+      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queueing.csproj",
+      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queueing.csproj"
     },
     "Pi.Replicate.Schema/1.0.0": {
       "type": "project",
@@ -6312,7 +6312,7 @@
       "Microsoft.NETCore.App >= 2.0.0",
       "Moq >= 4.9.0",
       "Pi.Replicate.Processing >= 1.0.0",
-      "Pi.Replicate.Queuing >= 1.0.0",
+      "Pi.Replicate.Queueing >= 1.0.0",
       "System.Reactive.Linq >= 4.0.0"
     ]
   },
@@ -6351,8 +6351,8 @@
             "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
               "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
             },
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj"
+            "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj": {
+              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj"
             }
           }
         }
