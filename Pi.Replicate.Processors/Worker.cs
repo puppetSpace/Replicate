@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors
+namespace Pi.Replicate.Processing
 {
     public abstract class Worker
     {

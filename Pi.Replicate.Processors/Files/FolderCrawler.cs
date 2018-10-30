@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Files
+namespace Pi.Replicate.Processing.Files
 {
     internal class FolderCrawler
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Processors.Folders;
-using Pi.Replicate.Processors.Helpers;
-using Pi.Replicate.Processors.Repositories;
+using Pi.Replicate.Processing.Folders;
+using Pi.Replicate.Processing.Helpers;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Logging;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Files
+namespace Pi.Replicate.Processing.Files
 {
     internal class FileCollector : Worker<Folder,File>
     {

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json;
-using Pi.Replicate.Processors.Communication;
+using Pi.Replicate.Processing.Communication;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Http
 {
-    public class HttpUploadLink : IUploadLink
+    public sealed class HttpUploadLink : IUploadLink
     {
         private static ILogger _logger = LoggerFactory.Get<HttpUploadLink>();
 

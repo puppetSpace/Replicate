@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Processors.Helpers;
-using Pi.Replicate.Processors.Repositories;
+using Pi.Replicate.Processing.Helpers;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 
-namespace Pi.Replicate.Processors.Files
+namespace Pi.Replicate.Processing.Files
 {
     internal class FileSplitter : Worker<File, FileChunk>
     {

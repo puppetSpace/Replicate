@@ -90,16 +90,6 @@
           "lib/netstandard1.3/System.Runtime.InteropServices.WindowsRuntime.dll": {}
         }
       },
-      "Pi.Replicate.Queues/1.0.0": {
-        "type": "project",
-        "framework": ".NETStandard,Version=v2.0",
-        "compile": {
-          "bin/placeholder/Pi.Replicate.Queues.dll": {}
-        },
-        "runtime": {
-          "bin/placeholder/Pi.Replicate.Queues.dll": {}
-        }
-      },
       "Pi.Replicate.Schema/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
@@ -496,11 +486,6 @@
         "system.runtime.interopservices.windowsruntime.nuspec"
       ]
     },
-    "Pi.Replicate.Queues/1.0.0": {
-      "type": "project",
-      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj",
-      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj"
-    },
     "Pi.Replicate.Schema/1.0.0": {
       "type": "project",
       "path": "../Pi.Replicate.Schema/Pi.Replicate.Schema.csproj",
@@ -515,7 +500,6 @@
   "projectFileDependencyGroups": {
     ".NETStandard,Version=v2.0": [
       "NETStandard.Library >= 2.0.3",
-      "Pi.Replicate.Queues >= 1.0.0",
       "Pi.Replicate.Schema >= 1.0.0",
       "Pi.Replicate.Shared >= 1.0.0",
       "System.Reactive.Linq >= 4.0.0"
@@ -528,9 +512,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
-      "projectName": "Pi.Replicate.Processors",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
+      "projectName": "Pi.Replicate.Processing",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
       "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
       "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
       "projectStyle": "PackageReference",
@@ -553,9 +537,6 @@
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queues.csproj"
-            },
             "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
               "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
             },

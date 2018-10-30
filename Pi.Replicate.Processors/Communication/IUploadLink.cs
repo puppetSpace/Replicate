@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Communication
+namespace Pi.Replicate.Processing.Communication
 {
     public interface IUploadLink
     {

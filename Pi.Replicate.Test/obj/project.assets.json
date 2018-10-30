@@ -1776,30 +1776,32 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
-      "Pi.Replicate.Processors/1.0.0": {
+      "Pi.Replicate.Processing/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Pi.Replicate.Queues": "1.0.0",
           "Pi.Replicate.Schema": "1.0.0",
           "Pi.Replicate.Shared": "1.0.0",
           "System.Reactive.Linq": "4.0.0"
         },
         "compile": {
-          "bin/placeholder/Pi.Replicate.Processors.dll": {}
+          "bin/placeholder/Pi.Replicate.Processing.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Pi.Replicate.Processors.dll": {}
+          "bin/placeholder/Pi.Replicate.Processing.dll": {}
         }
       },
-      "Pi.Replicate.Queues/1.0.0": {
+      "Pi.Replicate.Queuing/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
+        "dependencies": {
+          "Pi.Replicate.Processing": "1.0.0"
+        },
         "compile": {
-          "bin/placeholder/Pi.Replicate.Queues.dll": {}
+          "bin/placeholder/Pi.Replicate.Queuing.dll": {}
         },
         "runtime": {
-          "bin/placeholder/Pi.Replicate.Queues.dll": {}
+          "bin/placeholder/Pi.Replicate.Queuing.dll": {}
         }
       },
       "Pi.Replicate.Schema/1.0.0": {
@@ -6280,15 +6282,15 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
-    "Pi.Replicate.Processors/1.0.0": {
+    "Pi.Replicate.Processing/1.0.0": {
       "type": "project",
-      "path": "../Pi.Replicate.Processors/Pi.Replicate.Processors.csproj",
-      "msbuildProject": "../Pi.Replicate.Processors/Pi.Replicate.Processors.csproj"
+      "path": "../Pi.Replicate.Processors/Pi.Replicate.Processing.csproj",
+      "msbuildProject": "../Pi.Replicate.Processors/Pi.Replicate.Processing.csproj"
     },
-    "Pi.Replicate.Queues/1.0.0": {
+    "Pi.Replicate.Queuing/1.0.0": {
       "type": "project",
-      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj",
-      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queues.csproj"
+      "path": "../Pi.Replicate.Queues/Pi.Replicate.Queuing.csproj",
+      "msbuildProject": "../Pi.Replicate.Queues/Pi.Replicate.Queuing.csproj"
     },
     "Pi.Replicate.Schema/1.0.0": {
       "type": "project",
@@ -6309,7 +6311,8 @@
       "Microsoft.NET.Test.Sdk >= 15.7.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "Moq >= 4.9.0",
-      "Pi.Replicate.Processors >= 1.0.0",
+      "Pi.Replicate.Processing >= 1.0.0",
+      "Pi.Replicate.Queuing >= 1.0.0",
       "System.Reactive.Linq >= 4.0.0"
     ]
   },
@@ -6345,8 +6348,11 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processors.csproj"
+            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
+              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
+            },
+            "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj": {
+              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queuing.csproj"
             }
           }
         }

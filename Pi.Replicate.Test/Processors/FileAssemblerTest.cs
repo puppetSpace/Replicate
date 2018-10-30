@@ -1,9 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Processors;
-using Pi.Replicate.Processors.Communication;
-using Pi.Replicate.Processors.Files;
-using Pi.Replicate.Processors.Repositories;
+using Pi.Replicate.Processing;
+using Pi.Replicate.Processing.Communication;
+using Pi.Replicate.Processing.Files;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Linq;

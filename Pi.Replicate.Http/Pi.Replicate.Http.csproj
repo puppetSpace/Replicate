@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processors.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
   </ItemGroup>
 
 </Project>

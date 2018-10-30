@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Repositories
+namespace Pi.Replicate.Processing.Repositories
 {
     public interface IFolderRepository
     {

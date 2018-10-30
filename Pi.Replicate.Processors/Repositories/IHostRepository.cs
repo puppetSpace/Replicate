@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Repositories
+namespace Pi.Replicate.Processing.Repositories
 {
     public interface IHostRepository
     {

@@ -9,7 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pi.Replicate.Queues\Pi.Replicate.Queues.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Schema\Pi.Replicate.Schema.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
   </ItemGroup>

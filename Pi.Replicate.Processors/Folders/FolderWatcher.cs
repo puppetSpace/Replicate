@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Processors.Repositories;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using Pi.Replicate.Shared.System;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 #if DEBUG
 [assembly: InternalsVisibleTo("Pi.Replicate.Test")]
 #endif
-namespace Pi.Replicate.Processors.Folders
+namespace Pi.Replicate.Processing.Folders
 {
     internal class FolderWatcher : Worker<Folder>
     {

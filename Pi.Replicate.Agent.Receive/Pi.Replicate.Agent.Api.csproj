@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processors.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Schema\Pi.Replicate.Schema.csproj" />
   </ItemGroup>
 

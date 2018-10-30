@@ -1,5 +1,5 @@
-﻿using Pi.Replicate.Processors.Communication;
-using Pi.Replicate.Processors.Repositories;
+﻿using Pi.Replicate.Processing.Communication;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.FileChunks
+namespace Pi.Replicate.Processing.FileChunks
 {
     internal class FileChunkDownload : Worker<FileChunk, object>
     {
@@ -23,6 +23,7 @@ namespace Pi.Replicate.Processors.FileChunks
 
         protected async override Task DoWork(FileChunk workItem)
         {
+            workItem.Status = ChunkStatus.Received;
             await _repository.FileChunkRepository.Save(workItem);
         }
     }

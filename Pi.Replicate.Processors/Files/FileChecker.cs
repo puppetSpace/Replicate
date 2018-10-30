@@ -1,12 +1,12 @@
-﻿using Pi.Replicate.Processors.Communication;
-using Pi.Replicate.Processors.Repositories;
+﻿using Pi.Replicate.Processing.Communication;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Files
+namespace Pi.Replicate.Processing.Files
 {
     internal class FileChecker : Worker<File>
     {

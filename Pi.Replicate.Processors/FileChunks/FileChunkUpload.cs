@@ -1,5 +1,5 @@
-﻿using Pi.Replicate.Processors.Communication;
-using Pi.Replicate.Processors.Repositories;
+﻿using Pi.Replicate.Processing.Communication;
+using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
 using System;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.FileChunks
+namespace Pi.Replicate.Processing.FileChunks
 {
     internal class FileChunkUpload : Worker<FileChunk, object>
     {
@@ -25,6 +25,7 @@ namespace Pi.Replicate.Processors.FileChunks
 
         protected async override Task DoWork(FileChunk workItem)
         {
+            //todo check if FileChunk can be casted to ResendFileChunk so that that destination can be used
             _logger.Info($"Uploading chunk '{workItem.SequenceNo}' of file '{workItem.File?.Name}'");
             var hosts = await _repository.HostRepository.GetDestinationHosts(workItem.File.Folder.Id);
             _logger.Debug($"Folder '{workItem.File.Folder.Name}' has '{hosts.Count()}' host to send data to");

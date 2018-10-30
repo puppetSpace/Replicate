@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processors.Helpers
+namespace Pi.Replicate.Processing.Helpers
 {
     internal static class FileLock
     {
