@@ -13,5 +13,7 @@ namespace Pi.Replicate.Processing
         Task<TE> Dequeue();
 
         bool HasItems();
+
+        int Count { get; }
     }
 }

@@ -6,7 +6,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Agent.Send", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Processing", "Pi.Replicate.Processors\Pi.Replicate.Processing.csproj", "{A041BDDC-E623-44A9-AF45-4BB6273F4577}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Queuing", "Pi.Replicate.Queues\Pi.Replicate.Queuing.csproj", "{83603655-966B-46C9-85E0-F8E528BC170D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Queueing", "Pi.Replicate.Queues\Pi.Replicate.Queueing.csproj", "{83603655-966B-46C9-85E0-F8E528BC170D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Pi.Replicate.Schema", "Pi.Replicate.Schema\Pi.Replicate.Schema.csproj", "{9BEEF5EB-3D4B-47C1-A2F6-FCC0226CBF43}"
 EndProject

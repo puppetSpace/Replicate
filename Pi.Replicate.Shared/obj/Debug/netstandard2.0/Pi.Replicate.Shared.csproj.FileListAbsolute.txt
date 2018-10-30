@@ -20,7 +20,6 @@ D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicat
 D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.AssemblyInfo.cs
 D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.dll
 D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
-D:\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.csprojAssemblyReference.cache
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Shared\bin\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.dll
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Shared\obj\Debug\netstandard2.0\Pi.Replicate.Shared.pdb

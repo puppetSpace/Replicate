@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
-    <ProjectReference Include="..\Pi.Replicate.Queues\Pi.Replicate.Queuing.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Queues\Pi.Replicate.Queueing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
