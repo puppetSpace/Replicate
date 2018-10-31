@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
+#if DEBUG
+[assembly: InternalsVisibleTo("Pi.Replicate.Test")]
+#endif
+
 namespace Pi.Replicate.Processing
 {
-    public abstract class Worker
+    internal abstract class Worker
     {
         private CancellationTokenSource _cts = new CancellationTokenSource();
 

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.FileChunks
 {
-    internal class FileChunkDownload : Worker<FileChunk, object>
+    internal sealed class FileChunkDownload : Worker<FileChunk, object>
     {
         private readonly IRepository _repository;
         private readonly IUploadLink _uploadLink;

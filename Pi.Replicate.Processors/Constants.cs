@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing
 {
-    public class Constants
+    internal class Constants
     {
         public const string FileSplitterPollDelay = "FileSplitterPollDelay";
         public const string FileSplitSizeOfChunksInBytes = "FileSplitSizeOfChunksInBytes";

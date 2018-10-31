@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.FileChunks
 {
-    internal class FileChunkUpload : Worker<FileChunk, object>
+    internal sealed class FileChunkUpload : Worker<FileChunk, object>
     {
         private readonly ILogger _logger = LoggerFactory.Get<FileChunkUpload>();
         private readonly IRepository _repository;

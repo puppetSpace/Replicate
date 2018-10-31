@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal class FileSplitter : Worker<File, FileChunk>
+    internal sealed class FileSplitter : Worker<File, FileChunk>
     {
         private readonly uint _sizeofChunkInBytes;
         private readonly IRepository _repository;

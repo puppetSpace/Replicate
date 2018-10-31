@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal class FileChecker : Worker<File>
+    internal sealed class FileChecker : Worker<File>
     {
         private readonly IRepository _repository;
         private readonly IUploadLink _uploadLink;

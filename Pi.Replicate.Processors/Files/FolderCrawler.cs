@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal class FolderCrawler
+    internal sealed class FolderCrawler
     {
         private static readonly ILogger _logger = LoggerFactory.Get<FolderCrawler>();
 

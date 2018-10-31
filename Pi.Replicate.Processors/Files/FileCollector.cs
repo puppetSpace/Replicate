@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal class FileCollector : Worker<Folder,File>
+    internal sealed class FileCollector : Worker<Folder,File>
     {
         private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
