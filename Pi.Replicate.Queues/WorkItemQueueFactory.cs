@@ -9,7 +9,7 @@ namespace Pi.Replicate.Queueing
 {
     public sealed class WorkItemQueueFactory : IWorkItemQueueFactory
     {
-        private static readonly WorkItemQueueStore _workItemQueueStore = new WorkItemQueueStore();
+        private readonly WorkItemQueueStore _workItemQueueStore = new WorkItemQueueStore();
 
         public IWorkItemQueue<TE> GetQueue<TE>(QueueKind queueKind)
         {
