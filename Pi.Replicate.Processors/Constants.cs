@@ -8,9 +8,7 @@ namespace Pi.Replicate.Processing
 {
     internal class Constants
     {
-        public const string FileSplitterPollDelay = "FileSplitterPollDelay";
+        public const string PollDelay = "PollDelay";
         public const string FileSplitSizeOfChunksInBytes = "FileSplitSizeOfChunksInBytes";
-        public const string FileCollectorPollDelay = "FileCollectorPollDelay";
-        public const string FolderWatcherPollDelay = "FolderWatcherPollDelay";
     }
 }

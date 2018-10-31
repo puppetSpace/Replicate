@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 #if DEBUG
 [assembly: InternalsVisibleTo("Pi.Replicate.Test")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 #endif
 
 namespace Pi.Replicate.Processing
