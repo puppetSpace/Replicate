@@ -22,10 +22,10 @@ namespace Pi.Replicate.Processing
 
         //Flow
         // FolderWatcher -> FileCollector -> FileSplitter -> FileChunkUpload #TRANSMISSION# FileChunkDownload -> FileChecker -> FileAssembler
-        //                       IN              IN                IN                                                                IN
-        //                   FolderQueue      FileQueue      FileChunkQueue                                                       FileQueue
-        //      OUT              OUT             OUT                                               OUT              OUT         
-        //  FolderQueue       FileQueue      FileChunkQueue                                    FileChunkQueue    FileQueue
+        //                       IN              IN                IN                              IN                                IN
+        //                   FolderQueue      FileQueue      FileChunkQueue                   FileChunkQueue                      FileQueue
+        //      OUT              OUT             OUT                                                                 OUT         
+        //  FolderQueue       FileQueue      FileChunkQueue                                                       FileQueue
 
 
         //Outgoing queues: FolderQueue,FileQueue & FileChunkQueue
