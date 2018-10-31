@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Folders
 {
-    internal sealed class FolderWatcher : Worker<Folder>
+    internal sealed class FolderWatcher : ProduceWorker<Folder>
     {
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
         private readonly IRepository _repository;

@@ -18,6 +18,10 @@ namespace Pi.Replicate.Processing
             CancellationToken = _cts.Token;
         }
 
+        public Type ConsumeType { get; protected set; }
+
+        public QueueKind ForQueueKind { get; protected set; }
+
         protected CancellationToken CancellationToken { get; }
 
         public abstract Task WorkAsync();
@@ -28,13 +32,14 @@ namespace Pi.Replicate.Processing
         }
     }
 
-    internal abstract class Worker<Tout> : Worker
+    internal abstract class ProduceWorker<Tout> : Worker
     {
         private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueType)
+        public ProduceWorker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueKind)
         {
-            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueType);
+            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueKind);
+            ForQueueKind = queueKind;
         }
 
         public override async Task WorkAsync()
@@ -50,15 +55,42 @@ namespace Pi.Replicate.Processing
         protected abstract Task DoWork();
     }
 
-    internal abstract class Worker<Tin, Tout> : Worker
+    internal abstract class ConsumeWorker<Tin> : Worker
+    {
+        private readonly IWorkItemQueue<Tin> _inQueue;
+
+        public ConsumeWorker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueKind)
+        {
+            _inQueue = workItemQueueFactory.GetQueue<Tin>(queueKind);
+            ConsumeType = typeof(Tin);
+            ForQueueKind = queueKind;
+        }
+
+        public override async Task WorkAsync()
+        {
+            while (_inQueue.HasItems())
+            {
+                var value = await _inQueue.Dequeue();
+                await DoWork(value);
+                CancellationToken.ThrowIfCancellationRequested();
+            }
+        }
+
+        protected abstract Task DoWork(Tin workItem);
+    }
+
+    internal abstract class ProduceConsumeWorker<Tin, Tout> : Worker
     {
         private readonly IWorkItemQueue<Tin> _inQueue;
         private readonly IWorkItemQueue<Tout> _outQueue;
 
-        public Worker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueType)
+        public ProduceConsumeWorker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueKind)
         {
-            _inQueue = workItemQueueFactory.GetQueue<Tin>(queueType);
-            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueType);
+            _inQueue = workItemQueueFactory.GetQueue<Tin>(queueKind);
+            _outQueue = workItemQueueFactory.GetQueue<Tout>(queueKind);
+
+            ConsumeType = typeof(Tin);
+            ForQueueKind = queueKind;
         }
 
         public override async Task WorkAsync()

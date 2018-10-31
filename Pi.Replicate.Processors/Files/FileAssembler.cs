@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal sealed class FileAssembler : Worker<File,object>
+    internal sealed class FileAssembler : ConsumeWorker<File>
     {
         private readonly IRepository _repository;
         private readonly IUploadLink _uploadLink;
