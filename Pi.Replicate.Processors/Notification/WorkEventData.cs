@@ -8,8 +8,6 @@ namespace Pi.Replicate.Processing.Notification
 {
     public class WorkEventData
     {
-        public QueueKind QueueKind { get; set; }
-
         public Type TypeOfData { get; set; }
 
         public int CurrentWorkload { get; set; }

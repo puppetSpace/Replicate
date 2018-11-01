@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Processing.Files;
 using Pi.Replicate.Processing.Folders;
+using Pi.Replicate.Processing.Notification;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Timers;
 
 namespace Pi.Replicate.Processing
 {
-    public sealed class WorkManager
+    public sealed class WorkManager : IWorkSubscriber
     {
         //RECEIVING
         //FileAssembler (Consumer)
@@ -38,9 +39,10 @@ namespace Pi.Replicate.Processing
         private readonly TimeSpan _pollDelay;
         private Timer _timer;
 
-        public WorkManager(IConfiguration configuration)
+        public WorkManager(IConfiguration configuration, IWorkEventAggregator workEventAggregator)
         {
             _pollDelay = TimeSpan.TryParse(configuration[Constants.PollDelay], out var pollDelay) ? pollDelay : TimeSpan.FromMinutes(10);
+            workEventAggregator.Subscribe(this);
             _timer = new Timer(_pollDelay.TotalMilliseconds);
             _timer.AutoReset = true;
             _timer.Elapsed += TimerElapsed;
@@ -51,6 +53,11 @@ namespace Pi.Replicate.Processing
             //todo notified executions for Consumers / Producer-Consumers
 
             _timer.Start();
+        }
+
+        public void WorkCreated(WorkEventData workEventData)
+        {
+            throw new NotImplementedException();
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
