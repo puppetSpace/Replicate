@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Processing.Files;
+using Pi.Replicate.Processing.Folders;
 using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
-using System.Linq;
-using Pi.Replicate.Processing.Folders;
-using Pi.Replicate.Processing.FileChunks;
-using Pi.Replicate.Processing.Files;
 
 namespace Pi.Replicate.Processing
 {
@@ -56,7 +55,7 @@ namespace Pi.Replicate.Processing
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
-            if(!_activeWorkers.ContainsWorker<FolderWatcher>())
+            if (!_activeWorkers.ContainsWorker<FolderWatcher>())
             {
                 //todo inject dependencies
                 var fw = new FolderWatcher(null, null);
@@ -66,7 +65,7 @@ namespace Pi.Replicate.Processing
             if (!_activeWorkers.ContainsWorker<FileChecker>())
             {
                 //todo inject dependencies
-                var fc = new FileChecker(null, null,null);
+                var fc = new FileChecker(null, null, null);
                 _activeWorkers.Add(new ActiveWorker(fc));
             }
         }
@@ -90,34 +89,28 @@ namespace Pi.Replicate.Processing
         public Guid Id { get; private set; }
     }
 
-    internal sealed class ActiveWorkerCollection : ConcurrentDictionary<Guid,ActiveWorker>
+    internal sealed class ActiveWorkerCollection : List<ActiveWorker>
     {
+        private readonly object _lockContainsWorker = new object();
+        private readonly object _lockAdd = new object();
+
         public bool ContainsWorker<TE>() where TE : Worker
         {
-            return Values.Any(x => x.Worker.GetType() == typeof(TE));
-        }
-
-        public bool Add(ActiveWorker activeWorker)
-        {
-            //todo action when failed
-            if (base.TryAdd(activeWorker.Id, activeWorker))
+            lock (_lockContainsWorker)
             {
-                activeWorker.Task.ContinueWith((t, s) => TryRemove((Guid)s, out var deletedItem), activeWorker.Id, TaskContinuationOptions.ExecuteSynchronously);
-                return true;
+                return this.Any(x => x.Worker.GetType() == typeof(TE));
             }
-
-            return false;
         }
 
-        public new bool TryAdd(Guid key, ActiveWorker value)
-        {
-            return Add(value);
-        }
-
-        public void Remove(Guid activeWorkerId)
+        public new void Add(ActiveWorker activeWorker)
         {
             //todo action when failed
-            TryRemove(activeWorkerId, out var deletedItem);
+            lock (_lockAdd)
+            {
+                base.Add(activeWorker);
+            }
+            activeWorker.Task.ContinueWith((t, s) => base.Remove((ActiveWorker)s), activeWorker, TaskContinuationOptions.ExecuteSynchronously);
         }
+
     }
 }
