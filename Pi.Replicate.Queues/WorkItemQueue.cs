@@ -9,10 +9,12 @@ namespace Pi.Replicate.Queueing
     internal sealed class WorkItemQueue<TE> : ConcurrentQueue<TE>, IWorkItemQueue<TE>
     {
         private readonly IWorkEventAggregator _workEventAggregator;
+        private readonly QueueKind _queueKind;
 
-        public WorkItemQueue(IWorkEventAggregator workEventAggregator)
+        public WorkItemQueue(IWorkEventAggregator workEventAggregator, QueueKind queueKind)
         {
             _workEventAggregator = workEventAggregator;
+            _queueKind = queueKind;
         }
 
         public Task<TE> Dequeue()
@@ -33,7 +35,7 @@ namespace Pi.Replicate.Queueing
                 if (localItem != null)
                 {
                     base.Enqueue(localItem);
-                    _workEventAggregator.Publish(new WorkEventData { CurrentWorkload = base.Count, TypeOfData = typeof(TE) });
+                    _workEventAggregator.Publish(new WorkEventData { CurrentWorkload = base.Count, TypeOfWorkData = typeof(TE), QueueKind = _queueKind });
                 }
             },item);
 

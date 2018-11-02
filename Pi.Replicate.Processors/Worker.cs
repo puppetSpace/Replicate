@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing
 {
-    internal abstract class Worker
+    public abstract class Worker
     {
         private CancellationTokenSource _cts = new CancellationTokenSource();
 
@@ -21,7 +21,7 @@ namespace Pi.Replicate.Processing
 
         public Type ConsumeType { get; protected set; }
 
-        public QueueKind ForQueueKind { get; protected set; }
+        public QueueKind QueueKind { get; protected set; }
 
         protected CancellationToken CancellationToken { get; }
 
@@ -40,7 +40,7 @@ namespace Pi.Replicate.Processing
         public ProduceWorker(IWorkItemQueueFactory workItemQueueFactory, QueueKind queueKind)
         {
             _outQueue = workItemQueueFactory.GetQueue<Tout>(queueKind);
-            ForQueueKind = queueKind;
+            QueueKind = queueKind;
         }
 
         public override async Task WorkAsync()
@@ -64,7 +64,7 @@ namespace Pi.Replicate.Processing
         {
             _inQueue = workItemQueueFactory.GetQueue<Tin>(queueKind);
             ConsumeType = typeof(Tin);
-            ForQueueKind = queueKind;
+            QueueKind = queueKind;
         }
 
         public override async Task WorkAsync()
@@ -91,7 +91,7 @@ namespace Pi.Replicate.Processing
             _outQueue = workItemQueueFactory.GetQueue<Tout>(queueKind);
 
             ConsumeType = typeof(Tin);
-            ForQueueKind = queueKind;
+            QueueKind = queueKind;
         }
 
         public override async Task WorkAsync()

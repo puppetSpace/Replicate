@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Notification
 {
-    public class WorkEventData
+    public struct WorkEventData
     {
-        public Type TypeOfData { get; set; }
+        public Type TypeOfWorkData { get; set; }
 
         public int CurrentWorkload { get; set; }
+
+        public QueueKind QueueKind { get; set; }
     }
 }

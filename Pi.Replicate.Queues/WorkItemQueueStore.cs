@@ -27,7 +27,7 @@ namespace Pi.Replicate.Queueing
                 var item = _store.FirstOrDefault(x => x.Type == typeof(TE) && x.QueueKind == queueKind);
                 if(item == null)
                 {
-                    item = new StoreItem { Type = typeof(TE), QueueKind = queueKind, Queue = new WorkItemQueue<TE>(_workEventAggregator) };
+                    item = new StoreItem { Type = typeof(TE), QueueKind = queueKind, Queue = new WorkItemQueue<TE>(_workEventAggregator, queueKind) };
                     _store.Add(item);
                 }
 
