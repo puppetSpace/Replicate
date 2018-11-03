@@ -54,6 +54,7 @@ namespace Pi.Replicate.Processing
 
         public void Start()
         {
+            CreateProduceWorkers(); //already create before timer elapses
             _timer.Start();
         }
 
@@ -71,6 +72,11 @@ namespace Pi.Replicate.Processing
         }
 
         private void TimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            CreateProduceWorkers();
+        }
+
+        private void CreateProduceWorkers()
         {
             if (_activeWorkers.AmountOfProduceWorkers(QueueKind.Outgoing) == 0)
                 _activeWorkers.Add(new ActiveWorker(_workerFactory.CreateProducerWorker(QueueKind.Outgoing)));

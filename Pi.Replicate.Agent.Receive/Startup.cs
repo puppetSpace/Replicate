@@ -29,10 +29,13 @@ namespace Pi.Replicate.Agent.Api
 
         public IConfiguration Configuration { get; }
 
+        public IServiceProvider Container { get; private set; }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             ConfigureIoc(services);
+            services.AddHostedService<WorkerHostedService>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
@@ -61,6 +64,8 @@ namespace Pi.Replicate.Agent.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Receive Agent API V1");
                 c.RoutePrefix = string.Empty;
             });
+
+            Container = app.ApplicationServices;
         }
 
 
@@ -68,9 +73,11 @@ namespace Pi.Replicate.Agent.Api
         {
             services.AddSingleton<IWorkEventAggregator, WorkEventAggregator>();
             services.AddSingleton<IWorkItemQueueFactory, WorkItemQueueFactory>();
+            services.AddSingleton<IWorkerFactory, WorkerFactory>();
+            services.AddSingleton<WorkManager>();
+
             services.AddTransient<IRepository, Repository>();
             services.AddTransient<IUploadLink, HttpUploadLink>();
-            services.AddSingleton<IWorkerFactory, WorkerFactory>();
         }
     }
 }
