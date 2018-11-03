@@ -10,6 +10,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Pi.Replicate.Data;
+using Pi.Replicate.Http;
+using Pi.Replicate.Processing;
+using Pi.Replicate.Processing.Communication;
+using Pi.Replicate.Processing.Notification;
+using Pi.Replicate.Processing.Repositories;
+using Pi.Replicate.Queueing;
 
 namespace Pi.Replicate.Agent.Api
 {
@@ -59,7 +66,11 @@ namespace Pi.Replicate.Agent.Api
 
         private void ConfigureIoc(IServiceCollection services)
         {
-
+            services.AddSingleton<IWorkEventAggregator, WorkEventAggregator>();
+            services.AddSingleton<IWorkItemQueueFactory, WorkItemQueueFactory>();
+            services.AddTransient<IRepository, Repository>();
+            services.AddTransient<IUploadLink, HttpUploadLink>();
+            services.AddSingleton<IWorkerFactory, WorkerFactory>();
         }
     }
 }
