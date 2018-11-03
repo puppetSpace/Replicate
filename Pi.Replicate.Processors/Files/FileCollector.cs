@@ -19,7 +19,7 @@ namespace Pi.Replicate.Processing.Files
         private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
         private readonly IRepository _repository;
 
-        public FileCollector(IRepository repository, IWorkItemQueueFactory workItemQueueFactory)
+        public FileCollector(IWorkItemQueueFactory workItemQueueFactory,IRepository repository)
             : base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _repository = repository;

@@ -14,7 +14,7 @@ namespace Pi.Replicate.Processing.Files
         private readonly uint _sizeofChunkInBytes;
         private readonly IRepository _repository;
 
-        public FileSplitter(IConfiguration configuration, IWorkItemQueueFactory workItemQueueFactory, IRepository repository)
+        public FileSplitter(IWorkItemQueueFactory workItemQueueFactory, IRepository repository,IConfiguration configuration)
             :base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _sizeofChunkInBytes = uint.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);

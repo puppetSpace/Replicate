@@ -11,7 +11,7 @@ namespace Pi.Replicate.Processing.Folders
         private static readonly ILogger _logger = LoggerFactory.Get<FolderWatcher>();
         private readonly IRepository _repository;
 
-        public FolderWatcher(IRepository repository, IWorkItemQueueFactory workItemQueueFactory)
+        public FolderWatcher(IWorkItemQueueFactory workItemQueueFactory,IRepository repository)
             : base(workItemQueueFactory, QueueKind.Outgoing)
         {
             _repository = repository;

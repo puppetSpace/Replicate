@@ -25,6 +25,7 @@ namespace Pi.Replicate.Agent.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            ConfigureIoc(services);
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {
@@ -53,6 +54,12 @@ namespace Pi.Replicate.Agent.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Receive Agent API V1");
                 c.RoutePrefix = string.Empty;
             });
+        }
+
+
+        private void ConfigureIoc(IServiceCollection services)
+        {
+
         }
     }
 }
