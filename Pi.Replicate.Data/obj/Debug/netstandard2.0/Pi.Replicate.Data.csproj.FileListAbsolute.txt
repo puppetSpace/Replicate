@@ -24,3 +24,10 @@ C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstanda
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.dll
 C:\Users\mobsc\Source\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csprojAssemblyReference.cache
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Processing.dll
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Schema.dll
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Shared.dll
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Processing.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Data\bin\Debug\netstandard2.0\Pi.Replicate.Shared.pdb
+D:\Workspaces\Replicate\Pi.Replicate.Data\obj\Debug\netstandard2.0\Pi.Replicate.Data.csproj.CopyComplete

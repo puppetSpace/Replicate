@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Pi.Replicate.Processing.Notification;
 using Pi.Replicate.Queueing;
 using Pi.Replicate.Schema;
 using System;
@@ -15,7 +17,10 @@ namespace Pi.Replicate.Test.Queueing
         [TestMethod]
         public async Task Enqueue_TwoItems_CountShouldBeTwo()
         {
-            var factory = new WorkItemQueueFactory();
+            var moq = new Mock<IWorkEventAggregator>();
+            moq.Setup(x => x.Publish(It.IsAny<WorkEventData>()));
+
+            var factory = new WorkItemQueueFactory(moq.Object);
             var queue = factory.GetQueue<File>(Processing.QueueKind.Incoming);
 
             await queue.Enqueue(new File());
@@ -28,7 +33,10 @@ namespace Pi.Replicate.Test.Queueing
         [TestMethod]
         public async Task Dequeue_TwoItemsAdded_TwoDequeued_CountShouldBeZero()
         {
-            var factory = new WorkItemQueueFactory();
+            var moq = new Mock<IWorkEventAggregator>();
+            moq.Setup(x => x.Publish(It.IsAny<WorkEventData>()));
+
+            var factory = new WorkItemQueueFactory(moq.Object);
             var queue = factory.GetQueue<File>(Processing.QueueKind.Incoming);
 
             await queue.Enqueue(new File());

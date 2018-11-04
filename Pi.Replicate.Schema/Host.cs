@@ -8,6 +8,6 @@ namespace Pi.Replicate.Schema
 
         public string Name { get; set; }
 
-        public Uri Address { get; set; }
+        public string Address { get; set; }
     }
 }

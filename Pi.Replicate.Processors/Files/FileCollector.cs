@@ -79,6 +79,7 @@ namespace Pi.Replicate.Processing.Files
 
         private File CreateFileObject(Folder folder, System.IO.FileInfo fileInfo)
         {
+            //todo fill in all properties
             return new Schema.File
             {
                 Id = Guid.NewGuid(),

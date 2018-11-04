@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Pi.Replicate.Data;
 using Pi.Replicate.Http;
 using Pi.Replicate.Processing;
@@ -17,6 +11,7 @@ using Pi.Replicate.Processing.Communication;
 using Pi.Replicate.Processing.Notification;
 using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Queueing;
+using System;
 
 namespace Pi.Replicate.Agent.Api
 {
@@ -36,6 +31,10 @@ namespace Pi.Replicate.Agent.Api
         {
             ConfigureIoc(services);
             services.AddHostedService<WorkerHostedService>();
+
+            services.AddDbContext<ReplicateDbContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("ReplicateStorage"),x=>x.MigrationsAssembly("Pi.Replicate.Agent.Api")));
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>
             {

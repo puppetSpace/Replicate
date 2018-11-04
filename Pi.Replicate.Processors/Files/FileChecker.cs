@@ -2,6 +2,7 @@
 using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
 using Pi.Replicate.Shared.Logging;
+using System;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
@@ -37,10 +38,10 @@ namespace Pi.Replicate.Processing.Files
                 else
                 {
                     _logger.Info($"Hash of file {file.Name} is bad. Requesting a resend");
-                    _logger.Debug($"Requesting resend of host {file.Source}");
+                    _logger.Debug($"Requesting resend of host {file.HostSource}");
                     await _repository.FileRepository.Delete(file.Id);
                     await _repository.FileChunkRepository.DeleteForFile(file.Id);
-                    await _uploadLink.RequestResendOfFile(file.Source, file.Id);
+                    await _uploadLink.RequestResendOfFile(new Uri(file.HostSource), file.Id);
                 }
             }
         }

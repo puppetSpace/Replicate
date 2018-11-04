@@ -40,7 +40,7 @@ namespace Pi.Replicate.Processing.FileChunks
 
         private async Task<bool> SendData(Host host, FileChunk workItem)
         {
-            var response = await _uploadLink.UploadData(host.Address, workItem);
+            var response = await _uploadLink.UploadData(new Uri(host.Address), workItem);
             _logger.Info($"Reponse from '{host.Address}': {(response.IsSuccessful ? "OK" : response.ErrorMessage)}");
             return response.IsSuccessful;
         }

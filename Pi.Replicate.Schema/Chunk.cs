@@ -28,6 +28,8 @@ namespace Pi.Replicate.Schema
 
     public class FailedUploadFileChunk
     {
+        public Guid Id { get; set; }
+
         public FileChunk FileChunk { get; set; }
 
         public Host Host { get; set; }

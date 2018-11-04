@@ -1,4 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Pi.Replicate.Processing.Notification;
 using Pi.Replicate.Queueing;
 using Pi.Replicate.Schema;
 using System;
@@ -16,7 +18,10 @@ namespace Pi.Replicate.Test.Queueing
         [TestMethod]
         public void Get_IncomingQueueKind_NewQueueCreated()
         {
-            var factory = new WorkItemQueueFactory();
+            var moq = new Mock<IWorkEventAggregator>();
+            moq.Setup(x => x.Subscribe(It.IsAny<IWorkSubscriber>()));
+
+            var factory = new WorkItemQueueFactory(moq.Object);
             var queue = factory.GetQueue<File>(Processing.QueueKind.Incoming);
 
             Assert.IsNotNull(queue);
@@ -25,7 +30,10 @@ namespace Pi.Replicate.Test.Queueing
         [TestMethod]
         public void Get_IncomingQueueKind_SecondCallGetsSameQueue()
         {
-            var factory = new WorkItemQueueFactory();
+            var moq = new Mock<IWorkEventAggregator>();
+            moq.Setup(x => x.Subscribe(It.IsAny<IWorkSubscriber>()));
+
+            var factory = new WorkItemQueueFactory(moq.Object);
             var queue1 = factory.GetQueue<File>(Processing.QueueKind.Incoming);
             var queue2 = factory.GetQueue<File>(Processing.QueueKind.Incoming);
 
@@ -35,7 +43,10 @@ namespace Pi.Replicate.Test.Queueing
         [TestMethod]
         public void Get_DifferentQueueKind_TwoQueuesAreDifferent()
         {
-            var factory = new WorkItemQueueFactory();
+            var moq = new Mock<IWorkEventAggregator>();
+            moq.Setup(x => x.Subscribe(It.IsAny<IWorkSubscriber>()));
+
+            var factory = new WorkItemQueueFactory(moq.Object);
             var queue1 = factory.GetQueue<File>(Processing.QueueKind.Incoming);
             var queue2 = factory.GetQueue<File>(Processing.QueueKind.Outgoing);
 

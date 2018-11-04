@@ -104,7 +104,7 @@ namespace Pi.Replicate.Processing.Files
             file.Status = FileStatus.ReceivedComplete;
             await _repository.FileRepository.Update(file);
             await _repository.FileRepository.DeleteTempFile(file.Id);
-            await _uploadLink.FileReceived(file.Source, file.Id);
+            await _uploadLink.FileReceived(new Uri(file.HostSource), file.Id);
         }
 
         private bool IsTempFileStillValid(TempFile possibletemp, File file)

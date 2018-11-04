@@ -27,6 +27,8 @@ namespace Pi.Replicate.Schema
 
         public IEnumerable<File> Files { get; set; }
 
+        public string Path { get; set; }
+
         public string GetPath()
         {
             return System.IO.Path.Combine(_rootFolder, Name); 

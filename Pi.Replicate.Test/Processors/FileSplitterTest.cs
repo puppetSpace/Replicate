@@ -53,7 +53,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object,mockFactoryQueue.Object, mockRepository.Object);
+            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
             await splitter.WorkAsync();
 
 
@@ -100,7 +100,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
+            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
             await splitter.WorkAsync();
 
             //assert
@@ -151,7 +151,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
+            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
             await splitter.WorkAsync();
 
 
@@ -194,7 +194,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
+            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
             await splitter.WorkAsync();
 
 
@@ -239,7 +239,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var splitter = new FileSplitter(mockConfiguration.Object, mockFactoryQueue.Object, mockRepository.Object);
+            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
             await splitter.WorkAsync();
 
 

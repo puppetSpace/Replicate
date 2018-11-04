@@ -43,7 +43,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
             await collector.WorkAsync();
 
             //asert
@@ -89,7 +89,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
 
             await collector.WorkAsync();
 
@@ -134,7 +134,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
             await collector.WorkAsync();
 
             //asert
@@ -168,7 +168,7 @@ namespace Pi.Replicate.Test.Processors
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
             //act
-            var collector = new FileCollector(mockRepository.Object, mockFactoryQueue.Object);
+            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
             await collector.WorkAsync();
 
             //asert
