@@ -1,5 +1,6 @@
 namespace Pi.Replicate.Schema
 {
+    //todo check if statuses are set correctly
     public enum FileStatus
     {
         New = 0,

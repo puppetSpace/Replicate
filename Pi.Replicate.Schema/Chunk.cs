@@ -21,11 +21,7 @@ namespace Pi.Replicate.Schema
     }
 
 
-    //public class UploadChunk : FileChunk
-    //{
-    //    public string Destination { get; set; }
-    //}
-
+    //todo get failed chunks from database back on to the queue
     public class FailedUploadFileChunk
     {
         public Guid Id { get; set; }

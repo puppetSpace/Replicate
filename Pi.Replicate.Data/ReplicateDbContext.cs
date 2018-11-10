@@ -25,5 +25,9 @@ namespace Pi.Replicate.Data
 
         public DbSet<Host> Hosts { get; set; }
 
+        public DbSet<TempFile> TempFiles { get; set; }
+
+        public DbSet<SystemSetting> SystemSettings { get; set; }
+
     }
 }

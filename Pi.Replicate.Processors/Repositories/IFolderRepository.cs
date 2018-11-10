@@ -7,5 +7,7 @@ namespace Pi.Replicate.Processing.Repositories
     public interface IFolderRepository
     {
         Task<IEnumerable<Folder>> Get();
+
+        Task Save(Folder folder);
     }
 }

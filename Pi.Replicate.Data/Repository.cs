@@ -5,11 +5,18 @@ namespace Pi.Replicate.Data
 {
     public class Repository : IRepository
     {
+        private readonly ReplicateDbContext _replicateDbContext;
+
+        public Repository(ReplicateDbContext replicateDbContext)
+        {
+            _replicateDbContext = replicateDbContext;
+        }
+        
         public IFileChunkRepository FileChunkRepository
         {
             get
             {
-                throw new NotImplementedException();
+                return new FileChunkRepository(_replicateDbContext);
             }
         }
 
@@ -17,7 +24,7 @@ namespace Pi.Replicate.Data
         {
             get
             {
-                throw new NotImplementedException();
+                return new FileRepository(_replicateDbContext);
             }
         }
 
@@ -25,7 +32,7 @@ namespace Pi.Replicate.Data
         {
             get
             {
-                throw new NotImplementedException();
+                return new FolderRepository(_replicateDbContext);
             }
         }
 
@@ -33,7 +40,7 @@ namespace Pi.Replicate.Data
         {
             get
             {
-                throw new NotImplementedException();
+                return new HostRepository(_replicateDbContext);
             }
         }
     }

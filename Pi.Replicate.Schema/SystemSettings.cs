@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Schema
 {
-    public class SystemSettings
+    public class SystemSetting
     {
         public Guid Id { get; set; }
 

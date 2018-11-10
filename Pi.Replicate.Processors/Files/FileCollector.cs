@@ -43,8 +43,7 @@ namespace Pi.Replicate.Processing.Files
             var previousFilesInFolder = new List<File>();
             if (!folder.DeleteFilesAfterSend)
             {
-                var files = await _repository.FileRepository.GetSent(folder.Id);
-                previousFilesInFolder = files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList(); //_folder.Files.Where(x => x.Status == FileStatus.Sent || x.Status == FileStatus.New).ToList();
+                previousFilesInFolder = (await _repository.FileRepository.GetSent(folder.Id)).ToList();
                 _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{folder.GetPath()}'.");
             }
             var folderCrawler = new FolderCrawler();
