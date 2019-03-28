@@ -24,3 +24,11 @@ D:\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicat
 D:\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.dll
 D:\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
 D:\Workspaces\Replicate\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.csprojAssemblyReference.cache
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.deps.json
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.dll
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\bin\Debug\netstandard2.0\Pi.Replicate.Schema.pdb
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.csproj.CoreCompileInputs.cache
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfoInputs.cache
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.AssemblyInfo.cs
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.dll
+D:\Workspace\Pi.Replication\Pi.Replicate.Schema\obj\Debug\netstandard2.0\Pi.Replicate.Schema.pdb

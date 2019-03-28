@@ -664,33 +664,35 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\Users\\inf103ss\\.nuget\\packages\\": {},
+    "C:\\ProgramData\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
+      "projectUniqueName": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
       "projectName": "Pi.Replicate.Agent.Send",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\obj\\",
+      "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
+      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\ProgramData\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\inf103ss\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.0"
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
+        "http://vm-aspprd05/nuget/api/v2/": {},
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
@@ -707,6 +709,7 @@
       "netcoreapp2.0": {
         "dependencies": {
           "Microsoft.NETCore.App": {
+            "suppressParent": "All",
             "target": "Package",
             "version": "[2.0.0, )",
             "autoReferenced": true
