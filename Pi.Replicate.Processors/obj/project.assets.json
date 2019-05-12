@@ -556,11 +556,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
+      "projectUniqueName": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
       "projectName": "Pi.Replicate.Processing",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
+      "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj",
+      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\ProgramData\\Xamarin\\NuGet\\",
@@ -576,18 +576,17 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
+        "http://vm-aspprd05/nuget/api/v2/": {},
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
+            "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj": {
+              "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj"
             },
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
+            "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
+              "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
             }
           }
         }

@@ -574,11 +574,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
+      "projectUniqueName": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
       "projectName": "Pi.Replicate.Queueing",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\obj\\",
+      "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj",
+      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Queues\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\ProgramData\\Xamarin\\NuGet\\",
@@ -594,15 +594,14 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
-        "https://api.nuget.org/v3/index.json": {},
-        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
+        "http://vm-aspprd05/nuget/api/v2/": {},
+        "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
+            "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
+              "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
             }
           }
         }
