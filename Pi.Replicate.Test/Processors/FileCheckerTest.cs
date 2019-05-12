@@ -15,6 +15,12 @@ namespace Pi.Replicate.Test.Processors
     [TestClass]
     public class FileCheckerTest
     {
+		[TestInitialize]
+		public void InitializeTest()
+		{
+			EntityBuilder.InitializePathBuilder();
+		}
+
         [TestMethod]
         public async Task Work_1CompleteFile_FileShouldBeAddedToQueue()
         {

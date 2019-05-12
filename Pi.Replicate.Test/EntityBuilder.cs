@@ -1,4 +1,5 @@
 ﻿using Pi.Replicate.Schema;
+using Pi.Replicate.Shared.System;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
@@ -8,10 +9,14 @@ namespace Pi.Replicate.Test
 {
     internal static class EntityBuilder
     {
-        public static Folder BuildFolder()
+		public static void InitializePathBuilder()
+		{
+			PathBuilder.Initialize(System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath));
+		}
+
+		public static Folder BuildFolder()
         {
-            var currentDir = System.IO.Path.GetDirectoryName(new Uri(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase).LocalPath);
-            return new Folder(currentDir)
+            return new Folder()
             {
                 Id = Guid.NewGuid(),
                 Name = "FileFolder"
@@ -26,32 +31,37 @@ namespace Pi.Replicate.Test
                 {
                     Folder = folder,
                     Name = "test1.txt",
-                    Status = FileStatus.Sent
+                    Status = FileStatus.Sent,
+					HostSource = "https://127.0.0.1"
                 },
                 new File
                 {
                     Folder = folder,
                     Name = "test2.txt",
-                    Status = FileStatus.Sent
-                },
+                    Status = FileStatus.Sent,
+					HostSource = "https://127.0.0.1"
+				},
                 new File
                 {
                     Folder = folder,
                     Name = "test3.txt",
-                    Status = FileStatus.Sent
-                },
+                    Status = FileStatus.Sent,
+					HostSource = "https://127.0.0.1"
+				},
                 new File
                 {
                     Folder = folder,
                     Name = "test4.txt",
-                    Status = FileStatus.Sent
-                },
+                    Status = FileStatus.Sent,
+					HostSource = "https://127.0.0.1"
+				},
                 new File
                 {
                     Folder = folder,
                     Name = "test5.txt",
-                    Status = FileStatus.Sent
-                },
+                    Status = FileStatus.Sent,
+					HostSource = "https://127.0.0.1"
+				},
             };
         }
 

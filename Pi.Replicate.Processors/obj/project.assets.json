@@ -103,7 +103,8 @@
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Newtonsoft.Json": "11.0.2"
+          "Newtonsoft.Json": "11.0.2",
+          "Pi.Replicate.Shared": "1.0.0"
         },
         "compile": {
           "bin/placeholder/Pi.Replicate.Schema.dll": {}
@@ -341,10 +342,11 @@
       ]
     },
     "System.Reactive/4.0.0": {
-      "sha512": "vv4/fY+iZbMa1fK2mnf5abqbhDUdW0NS5ryMU7sBqZqFWL65DpWHm3GWRYLa5v9WJQRruw1dI99GQWPu4L6sSg==",
+      "sha512": "yaVAxT2Yl28p9+DupGwj2oPbIOYZUQimOQ+n7N7vML2oofIRj9BmcfD7DHc6FLrNah65EigOgG6U9VnwWEyz5g==",
       "type": "package",
       "path": "system.reactive/4.0.0",
       "files": [
+        ".nupkg.metadata",
         ".signature.p7s",
         "lib/net46/System.Reactive.dll",
         "lib/net46/System.Reactive.xml",
@@ -361,10 +363,11 @@
       ]
     },
     "System.Reactive.Linq/4.0.0": {
-      "sha512": "mCRZLWTC56Ya5CvaeE28pH54LqlS4fN2vkJt2T16Tr+6H4BTFo5+B/UOvz5f3jlOVyCuC6PRvsBjp2IY5b8zAw==",
+      "sha512": "LaYTtUoOtQJ7SBb1/tfM/kcIHy0dsA7E+31/739HyTyGg9uSGzP/fV4VFI3/Atg7MQiks+JbEAwcoTDJY0pJoA==",
       "type": "package",
       "path": "system.reactive.linq/4.0.0",
       "files": [
+        ".nupkg.metadata",
         ".signature.p7s",
         "lib/net46/System.Reactive.Linq.dll",
         "lib/net46/System.Reactive.Linq.xml",
@@ -547,6 +550,7 @@
   },
   "packageFolders": {
     "C:\\Users\\puppet\\.nuget\\packages\\": {},
+    "C:\\ProgramData\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
@@ -559,11 +563,13 @@
       "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
+        "C:\\ProgramData\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
         "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netstandard2.0"

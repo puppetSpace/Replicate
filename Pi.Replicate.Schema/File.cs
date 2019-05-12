@@ -24,9 +24,9 @@ namespace Pi.Replicate.Schema
 
         public string Path { get; set; }
 
-        public string GetPath()
-        {
-            return System.IO.Path.Combine(Folder.GetPath(), Name); //TODO null check, also with Folder
-        }
-    }
+		public string GetPath()
+		{
+			return Pi.Replicate.Shared.System.PathBuilder.Build(Folder.Name,Name);
+		}
+	}
 }

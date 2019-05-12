@@ -16,8 +16,14 @@ namespace Pi.Replicate.Test.Processors
     public class FileCollectorTest
     {
 
+		[TestInitialize]
+		public void InitializeTest()
+		{
+			EntityBuilder.InitializePathBuilder();
+		}
 
-        [TestMethod]
+
+		[TestMethod]
         public async Task Work_NewFiles_5New()
         {
             //assign

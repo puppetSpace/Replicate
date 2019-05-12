@@ -17,8 +17,13 @@ namespace Pi.Replicate.Test.Processors
     [TestClass]
     public class FileSplitterTest
     {
+		[TestInitialize]
+		public void InitializeTest()
+		{
+			EntityBuilder.InitializePathBuilder();
+		}
 
-        [TestMethod]
+		[TestMethod]
         public async Task Work_CorrectAmountOfChunksCreated()
         {
             //assign

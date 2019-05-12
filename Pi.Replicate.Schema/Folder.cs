@@ -5,17 +5,6 @@ namespace Pi.Replicate.Schema
 {
     public class Folder
     {
-        private string _rootFolder;
-        public Folder()
-        {
-            //TODO Get root path from config
-            _rootFolder = String.Empty;
-        }
-
-        public Folder(string rootFolder)
-        {
-            _rootFolder = rootFolder;
-        }
 
         public Guid Id { get; set; }
 
@@ -33,7 +22,7 @@ namespace Pi.Replicate.Schema
 
         public string GetPath()
         {
-            return System.IO.Path.Combine(_rootFolder, Name); 
+            return Pi.Replicate.Shared.System.PathBuilder.Build(Name); 
         }
     }
 }

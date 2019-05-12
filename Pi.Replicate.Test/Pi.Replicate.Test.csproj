@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Queues\Pi.Replicate.Queueing.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

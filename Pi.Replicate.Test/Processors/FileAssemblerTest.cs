@@ -5,6 +5,7 @@ using Pi.Replicate.Processing.Communication;
 using Pi.Replicate.Processing.Files;
 using Pi.Replicate.Processing.Repositories;
 using Pi.Replicate.Schema;
+using Pi.Replicate.Shared.System;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace Pi.Replicate.Test.Processors
         [TestInitialize]
         public void InitializeTest()
         {
+			EntityBuilder.InitializePathBuilder();
             var folder = EntityBuilder.BuildFolder();
             folder.Name = "DropLocation";
 

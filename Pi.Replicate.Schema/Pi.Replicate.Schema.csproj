@@ -8,4 +8,8 @@
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
+  </ItemGroup>
+
 </Project>
