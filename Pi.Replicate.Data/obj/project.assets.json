@@ -2847,11 +2847,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Data\\Pi.Replicate.Data.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Data\\Pi.Replicate.Data.csproj",
       "projectName": "Pi.Replicate.Data",
-      "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Data\\Pi.Replicate.Data.csproj",
-      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Data\\obj\\",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Data\\Pi.Replicate.Data.csproj",
+      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Data\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\ProgramData\\Xamarin\\NuGet\\",
@@ -2867,14 +2867,15 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "http://vm-aspprd05/nuget/api/v2/": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
       },
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
-              "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
+            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
+              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
             }
           }
         }

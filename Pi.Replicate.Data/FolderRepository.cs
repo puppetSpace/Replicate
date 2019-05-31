@@ -21,8 +21,6 @@ namespace Pi.Replicate.Data
         public async Task<IEnumerable<Folder>> Get()
         {
             return await _replicateDbContext.Folders
-                .Include(x => x.Hosts)
-                .Where(x => x.Hosts.Any())
                 .ToListAsync();
         }
 

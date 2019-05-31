@@ -671,11 +671,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
+      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
       "projectName": "Pi.Replicate.Agent.Send",
-      "projectPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
-      "packagesPath": "C:\\Users\\inf103ss\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspace\\Pi.Replication\\Pi.Replicate.Agent\\obj\\",
+      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\Pi.Replicate.Agent.Send.csproj",
+      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
+      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Agent\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\ProgramData\\Xamarin\\NuGet\\",
@@ -691,8 +691,9 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "http://vm-aspprd05/nuget/api/v2/": {},
-        "https://api.nuget.org/v3/index.json": {}
+        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.0": {

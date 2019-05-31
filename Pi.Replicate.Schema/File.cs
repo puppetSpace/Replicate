@@ -6,9 +6,12 @@ namespace Pi.Replicate.Schema
     {
         public Guid Id { get; set; }
 
-        public Folder Folder { get; set; }
 
-        public string Name { get; set; }
+		public Guid FolderId { get; set; }
+
+		public Folder Folder { get; set; }
+
+		public string Name { get; set; }
 
         public long Size { get; set; }
 

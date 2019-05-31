@@ -14,9 +14,11 @@ namespace Pi.Replicate.Schema
 
         public bool DeleteFilesAfterSend { get; set; }
 
-        public IEnumerable<File> Files { get; set; }
+		//todo don't use foreign key mapping. Not performant when retrieving data
 
-        public IEnumerable<Host> Hosts { get; set; }
+        //public IEnumerable<File> Files { get; set; }
+
+        //public IEnumerable<Host> Hosts { get; set; }
 
         public string Path { get; set; }
 
