@@ -9,10 +9,10 @@ namespace Pi.Replicate.Processing.Repositories
 {
     public interface IFileChunkRepository
     {
-        Task<IEnumerable<FileChunk>> Get(Guid fileId);
-
+		Task<FileChunk> Get(Guid fileChunkId);
+		Task<IEnumerable<FileChunk>> GetForFile(Guid fileId);
         Task Save(FileChunk fileChunk);
         Task DeleteForFile(Guid fileId);
-        Task SaveFailed(FailedUploadFileChunk failedUploadFileChunk);
+        Task SaveFailed(HostFileChunk failedUploadFileChunk);
     }
 }

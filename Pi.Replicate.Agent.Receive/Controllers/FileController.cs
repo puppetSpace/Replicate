@@ -12,12 +12,14 @@ namespace Pi.Replicate.Agent.Api.Controllers
     public class FileController : ControllerBase
     {
         private readonly IFileRepository _fileRepository;
-        private readonly IWorkItemQueue<File> _workItemQueue;
+		private readonly IFileChunkRepository _fileChunkRepository;
+		private readonly IWorkItemQueue<FileChunk> _workItemQueue;
 
-        public FileController(IFileRepository fileRepository, IWorkItemQueueFactory workItemQueueFactory)
+        public FileController(IFileRepository fileRepository, IFileChunkRepository fileChunkRepository, IWorkItemQueueFactory workItemQueueFactory)
         {
             _fileRepository = fileRepository;
-            _workItemQueue = workItemQueueFactory.GetQueue<File>(QueueKind.Outgoing);
+			_fileChunkRepository = fileChunkRepository;
+			_workItemQueue = workItemQueueFactory.GetQueue<FileChunk>(QueueKind.Outgoing);
         }
 
         [HttpGet("received")]
@@ -36,12 +38,13 @@ namespace Pi.Replicate.Agent.Api.Controllers
         [HttpGet("resend")]
         public async Task<IActionResult> Resend(Guid fileId)
         {
-            //todo add chunks on the to send queue, do not process file again
-            //todo only send to  endpoint that asked for resend
-            //wrap filechunk in new class ResendFileChunk
-            var file = await _fileRepository.Get(fileId);
-            if (file != null)
-                await _workItemQueue.Enqueue(file);
+			//todo get host
+			var fileChunks = await _fileChunkRepository.GetForFile(fileId);
+			foreach(var fileChunk in fileChunks)
+			{
+				var hostFileChunk = new HostFileChunk(fileChunk) { Host = null };
+				await _workItemQueue.Enqueue(hostFileChunk);
+			}
             return Ok();
         }
     }

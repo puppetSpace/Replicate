@@ -20,7 +20,7 @@ namespace Pi.Replicate.Data
 
         public async Task DeleteForFile(Guid fileId)
         {
-            var foundFileChunks = await Get(fileId);
+            var foundFileChunks = await GetForFile(fileId);
 
             if (foundFileChunks.Any())
             {
@@ -30,7 +30,14 @@ namespace Pi.Replicate.Data
 
         }
 
-        public async Task<IEnumerable<FileChunk>> Get(Guid fileId)
+		public async Task<FileChunk> Get(Guid fileChunkId)
+		{
+			return await _replicateDbContext.FileChunks
+				.FirstOrDefaultAsync(x => x.Id == fileChunkId);
+		}
+
+
+		public async Task<IEnumerable<FileChunk>> GetForFile(Guid fileId)
         {
             return await _replicateDbContext.FileChunks
                .Include(x => x.File)
@@ -38,13 +45,14 @@ namespace Pi.Replicate.Data
                .ToListAsync();
         }
 
-        public async Task Save(FileChunk fileChunk)
+
+		public async Task Save(FileChunk fileChunk)
         {
             _replicateDbContext.FileChunks.Add(fileChunk);
             await _replicateDbContext.SaveChangesAsync();
         }
 
-        public async Task SaveFailed(FailedUploadFileChunk failedUploadFileChunk)
+        public async Task SaveFailed(HostFileChunk failedUploadFileChunk)
         {
             _replicateDbContext.FailedUploadFileChunks.Add(failedUploadFileChunk);
             await _replicateDbContext.SaveChangesAsync();

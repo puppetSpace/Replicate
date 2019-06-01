@@ -55,7 +55,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.DeleteTempFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => isTempFileDeleted = true);
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file,inputFolder.GetPath()));
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file,inputFolder.GetPath()));
             mockFileChunkRepository.Setup(x => x.DeleteForFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => areChunksDeleted = true);
 
             var mockUploadLink = new Mock<IUploadLink>();
@@ -108,7 +108,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.SaveTemp(It.IsAny<TempFile>())).Returns(Task.CompletedTask).Callback(() => isTempFileSaved = true);
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath()));
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath()));
             mockFileChunkRepository.Setup(x => x.DeleteForFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => areChunksDeleted = true);
 
             var mockUploadLink = new Mock<IUploadLink>();
@@ -169,7 +169,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.DeleteTempFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => isTempFileDeleted = true);
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath())).Callback(()=>areChunksRetrieved = true);
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath())).Callback(()=>areChunksRetrieved = true);
             mockFileChunkRepository.Setup(x => x.DeleteForFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => areChunksDeleted = true);
 
             var mockUploadLink = new Mock<IUploadLink>();
@@ -225,7 +225,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.DeleteTempFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => isTempFileDeleted = true);
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath())).Callback(() => areChunksRetrieved = true);
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file, inputFolder.GetPath())).Callback(() => areChunksRetrieved = true);
             mockFileChunkRepository.Setup(x => x.DeleteForFile(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => areChunksDeleted = true);
 
             var mockUploadLink = new Mock<IUploadLink>();

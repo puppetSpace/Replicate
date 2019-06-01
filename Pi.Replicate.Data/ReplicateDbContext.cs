@@ -21,7 +21,7 @@ namespace Pi.Replicate.Data
 
         public DbSet<FileChunk> FileChunks { get; set; }
 
-        public DbSet<FailedUploadFileChunk> FailedUploadFileChunks { get; set; }
+        public DbSet<HostFileChunk> FailedUploadFileChunks { get; set; }
 
         public DbSet<Host> Hosts { get; set; }
 

@@ -33,7 +33,7 @@ namespace Pi.Replicate.Processing.Files
             if (!IsTempFileStillValid(possibleTemp, file))
             {
                 DeletePossibleTempFile(possibleTemp);
-                var receivedChunks = await _repository.FileChunkRepository.Get(file.Id);
+                var receivedChunks = await _repository.FileChunkRepository.GetForFile(file.Id);
                 _logger.Debug($"File '{file.Name}' has {receivedChunks.Count()} chunks of bytes");
                 var rawBytes = AssembleChunks(receivedChunks);
                 tempFilePath = await WriteToTemp(rawBytes);

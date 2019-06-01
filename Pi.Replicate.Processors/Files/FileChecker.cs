@@ -48,7 +48,7 @@ namespace Pi.Replicate.Processing.Files
 
         private async Task<string> CreateHashFromChunks(File file)
         {
-            var chunks = await _repository.FileChunkRepository.Get(file.Id);
+            var chunks = await _repository.FileChunkRepository.GetForFile(file.Id);
             var rawBytes = chunks.OrderBy(x => x.SequenceNo)
                 .SelectMany(x => System.Convert.FromBase64String(x.Value))
                 .ToArray();

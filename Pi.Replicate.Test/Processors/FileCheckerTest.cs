@@ -41,7 +41,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.GetCompletedReceivedFiles()).Returns(Task.FromResult<IEnumerable<File>>(new[] { file }));
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file));
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>())).Returns(EntityBuilder.BuildChunks(file));
 
             var mockRepository = new Mock<IRepository>();
             mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
@@ -78,7 +78,7 @@ namespace Pi.Replicate.Test.Processors
             mockFileRepository.Setup(x => x.Delete(It.IsAny<Guid>())).Returns(Task.CompletedTask).Callback(() => isFileDelete = true);
 
             var mockFileChunkRepository = new Mock<IFileChunkRepository>();
-            mockFileChunkRepository.Setup(x => x.Get(It.IsAny<Guid>()))
+            mockFileChunkRepository.Setup(x => x.GetForFile(It.IsAny<Guid>()))
                 .Returns(async () =>
                 {
                     var chunks = (await EntityBuilder.BuildChunks(file)).ToList();

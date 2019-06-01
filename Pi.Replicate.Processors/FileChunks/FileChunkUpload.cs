@@ -27,18 +27,31 @@ namespace Pi.Replicate.Processing.FileChunks
         {
             //todo check if FileChunk can be casted to ResendFileChunk so that that destination can be used
             _logger.Info($"Uploading chunk '{workItem.SequenceNo}' of file '{workItem.File?.Name}'");
-            var hosts = await _repository.HostRepository.GetDestinationHosts(workItem.File.Folder.Id);
-            _logger.Debug($"Folder '{workItem.File.Folder.Name}' has '{hosts.Count()}' host to send data to");
+			if (workItem is HostFileChunk chunk)
+			{
+				_logger.Debug($"Resending chunk '{workItem.SequenceNo}' of file '{workItem.File?.Name}' to {chunk.Host?.Name}");
+				await SendFileChunk(workItem, chunk.Host);
+			}
+			else
+			{
+				var hosts = await _repository.HostRepository.GetDestinationHosts(workItem.File.Folder.Id);
+				_logger.Debug($"Folder '{workItem.File.Folder.Name}' has '{hosts.Count()}' host to send data to");
 
-            foreach(var host in hosts)
-            {
-                var isSuccesfull = await SendData(host, workItem);
-                if (!isSuccesfull)
-                    await _repository.FileChunkRepository.SaveFailed(new FailedUploadFileChunk { FileChunk = workItem, Host = host });
-            }
-        }
+				foreach (var host in hosts)
+				{
+					await SendFileChunk(workItem, host);
+				}
+			}
+		}
 
-        private async Task<bool> SendData(Host host, FileChunk workItem)
+		private async Task SendFileChunk(FileChunk workItem, Host host)
+		{
+			var isSuccesfull = await SendData(host, workItem);
+			if (!isSuccesfull)
+				await _repository.FileChunkRepository.SaveFailed(new HostFileChunk(workItem) { Host = host });
+		}
+
+		private async Task<bool> SendData(Host host, FileChunk workItem)
         {
             var response = await _uploadLink.UploadData(new Uri(host.Address), workItem);
             _logger.Info($"Reponse from '{host.Address}': {(response.IsSuccessful ? "OK" : response.ErrorMessage)}");

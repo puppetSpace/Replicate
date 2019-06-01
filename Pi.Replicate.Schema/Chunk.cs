@@ -21,12 +21,21 @@ namespace Pi.Replicate.Schema
     }
 
 
-    //todo get failed chunks from database back on to the queue
-    public class FailedUploadFileChunk
+    public class HostFileChunk : FileChunk
     {
-        public Guid Id { get; set; }
+		public HostFileChunk()
+		{
 
-        public FileChunk FileChunk { get; set; }
+		}
+
+		public HostFileChunk(FileChunk fileChunk)
+		{
+			Id = fileChunk.Id;
+			File = fileChunk.File;
+			SequenceNo = fileChunk.SequenceNo;
+			Value = fileChunk.Value;
+			Status = fileChunk.Status;
+		}
 
         public Host Host { get; set; }
     }
