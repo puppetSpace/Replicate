@@ -33,7 +33,7 @@ namespace Pi.Replicate.Agent.Api
             services.AddHostedService<WorkerHostedService>();
 
             services.AddDbContext<ReplicateDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("ReplicateStorage"),x=>x.MigrationsAssembly("Pi.Replicate.Agent.Api")));
+                options.UseSqlServer(Configuration.GetConnectionString("ReplicateStorage")));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
             services.AddSwaggerGen(c =>

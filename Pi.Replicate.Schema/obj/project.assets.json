@@ -274,25 +274,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
-    "C:\\ProgramData\\Xamarin\\NuGet\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj",
       "projectName": "Pi.Replicate.Schema",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Schema\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Schema\\Pi.Replicate.Schema.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Schema\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\ProgramData\\Xamarin\\NuGet\\",
+        "C:\\Microsoft\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -301,15 +301,19 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
+        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-entityframeworkcore/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-extensions/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/dotnet-windowsdesktop/index.json": {}
       },
       "frameworks": {
         "netstandard2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
+            "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
             }
           }
         }

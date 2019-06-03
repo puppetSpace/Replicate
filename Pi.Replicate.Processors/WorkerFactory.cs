@@ -38,7 +38,7 @@ namespace Pi.Replicate.Processing
             if (_consumers.ContainsKey(tuple))
                 return _consumers[tuple].Invoke();
 
-            throw new InvalidOperationException($"There is no working that consumes type {typeOfWorkData} for an {queueKind} queue");
+            throw new InvalidOperationException($"There is no worker that consumes type {typeOfWorkData} for an {queueKind} queue");
         }
 
         public Worker CreateProducerWorker(QueueKind queueKind)

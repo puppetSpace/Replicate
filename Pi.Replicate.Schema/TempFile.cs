@@ -8,7 +8,9 @@ namespace Pi.Replicate.Schema
 {
     public class TempFile
     {
-        public string Path { get; set; }
+		public Guid Id { get; set; }
+
+		public string Path { get; set; }
 
         public string Hash { get; set; }
 

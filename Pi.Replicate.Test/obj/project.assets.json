@@ -3091,10 +3091,11 @@
       ]
     },
     "System.Collections.Specialized/4.3.0": {
-      "sha512": "Epx8PoVZR0iuOnJJDzp7pWvdfMMOAvpUo95pC4ScH2mJuXkKA2Y4aR3cG9qt2klHgSons1WFh4kcGW7cSXvrxg==",
+      "sha512": "NoPBj0ykejqAWW4p4gGtrrL+3c84ZLSvGnHgq422ew1Rj4WKj1FA8/BCybqC111EtgcqUl6ZJNFYYS22HLgbjA==",
       "type": "package",
       "path": "system.collections.specialized/4.3.0",
       "files": [
+        ".nupkg.metadata",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "lib/MonoAndroid10/_._",
@@ -4161,7 +4162,7 @@
       ]
     },
     "System.Memory/4.5.1": {
-      "sha512": "oonnLQPZAGD21qtNMG4EtVmbYOInk2jV7M+g108B6OHOb67ZOaWnA/K8P5oQ6uK9wxKzB1iEXSChQOi2scKOqA==",
+      "sha512": "sDJYJpGtTgx+23Ayu5euxG5mAXWdkDb4+b0rD0Cab0M1oQS9H0HXGPriKcqpXuiJDTV7fTp/d+fMDJmnr6sNvA==",
       "type": "package",
       "path": "system.memory/4.5.1",
       "files": [
@@ -4828,7 +4829,7 @@
       ]
     },
     "System.Runtime.CompilerServices.Unsafe/4.5.1": {
-      "sha512": "9r+hFzL5qRJfAzR6AuccmYYtxTneKJTr+9aSf+A2G5EZloSG3FsAUZBOJMAAhNnhfP6mwCGpUwzTjaOjv4b5FA==",
+      "sha512": "Zh8t8oqolRaFa9vmOZfdQm/qKejdqz0J9kr7o2Fu0vPeoH3BL1EOXipKWwkWtLT1JPzjByrF19fGuFlNbmPpiw==",
       "type": "package",
       "path": "system.runtime.compilerservices.unsafe/4.5.1",
       "files": [
@@ -6068,25 +6069,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\puppet\\.nuget\\packages\\": {},
-    "C:\\ProgramData\\Xamarin\\NuGet\\": {},
+    "C:\\Users\\mobsc\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "projectUniqueName": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
       "projectName": "Pi.Replicate.Test",
-      "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
-      "packagesPath": "C:\\Users\\puppet\\.nuget\\packages\\",
-      "outputPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Test\\obj\\",
+      "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Test\\Pi.Replicate.Test.csproj",
+      "packagesPath": "C:\\Users\\mobsc\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Test\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\ProgramData\\Xamarin\\NuGet\\",
+        "C:\\Microsoft\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\puppet\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mobsc\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
@@ -6095,21 +6096,25 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Users\\Public\\Documents\\Infragistics\\NuGet\\": {},
         "https://api.nuget.org/v3/index.json": {},
-        "https://nugetized.blob.core.windows.net/live-reload/index.json": {}
+        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore-tooling/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-aspnetcore/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-entityframeworkcore/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/aspnet-extensions/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/dotnet-core/index.json": {},
+        "https://dotnetfeed.blob.core.windows.net/dotnet-windowsdesktop/index.json": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
+            "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Processors\\Pi.Replicate.Processing.csproj"
             },
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj"
+            "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Queues\\Pi.Replicate.Queueing.csproj"
             },
-            "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
-              "projectPath": "D:\\Workspaces\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
+            "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj": {
+              "projectPath": "C:\\Users\\mobsc\\Documents\\Workspace\\Replicate\\Pi.Replicate.Shared\\Pi.Replicate.Shared.csproj"
             }
           }
         }
