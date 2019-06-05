@@ -24,10 +24,23 @@ namespace Pi.Replicate.Data
                 .ToListAsync();
         }
 
-        public async Task Save(Folder folder)
+		public async Task<IEnumerable<FolderOption>> GetFolderOptions(Guid folderId)
+		{
+			return await _replicateDbContext.FolderOptions
+				.Where(x => x.FolderId == folderId)
+				.ToListAsync();
+		}
+
+		public async Task Save(Folder folder)
         {
             _replicateDbContext.Folders.Add(folder);
             await _replicateDbContext.SaveChangesAsync();
         }
-    }
+
+		public async Task SaveFolderOptions(IEnumerable<FolderOption> folderOptions)
+		{
+			_replicateDbContext.FolderOptions.AddRange(folderOptions);
+			await _replicateDbContext.SaveChangesAsync();
+		}
+	}
 }

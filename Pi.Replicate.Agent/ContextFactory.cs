@@ -20,7 +20,7 @@ namespace Pi.Replicate.Agent.Send
 				.Build();
 
 			var builder = new DbContextOptionsBuilder<ReplicateDbContext>()
-				.UseSqlServer(configuration.GetConnectionString("ReplicateStorage"));
+				.UseSqlServer(configuration.GetConnectionString("ReplicateStorage"),b=>b.MigrationsAssembly("Pi.Replicate.Agent.Send"));
 
 			return new ReplicateDbContext(builder.Options);
 

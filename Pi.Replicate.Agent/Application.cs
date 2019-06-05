@@ -1,4 +1,5 @@
-﻿using Pi.Replicate.Processing.Repositories;
+﻿using Pi.Replicate.Processing;
+using Pi.Replicate.Processing.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,16 +10,17 @@ namespace Pi.Replicate.Agent.Send
 {
     public class Application
     {
-		private readonly IRepository _repository;
+		private readonly IWorkerFactory _workerFactory;
 
-		public Application(IRepository repository)
+		public Application(IWorkerFactory workerFactory)
 		{
-			_repository = repository;
+			_workerFactory = workerFactory;
 		}
 
 		public async Task Run()
 		{
-			var folders = await _repository.FolderRepository.Get();
+			var worker = _workerFactory.CreateProducerWorker(QueueKind.Outgoing);
+			await worker.WorkAsync();
 		}
     }
 }

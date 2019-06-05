@@ -43,5 +43,13 @@ namespace Pi.Replicate.Data
                 return new HostRepository(_replicateDbContext);
             }
         }
-    }
+
+		public ISystemSettingRepository SystemSettingRepository
+		{
+			get
+			{
+				return new SystemSettingRepository(_replicateDbContext);
+			}
+		}
+	}
 }

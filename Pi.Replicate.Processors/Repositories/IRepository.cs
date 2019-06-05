@@ -15,5 +15,7 @@ namespace Pi.Replicate.Processing.Repositories
         IFolderRepository FolderRepository { get; }
 
         IHostRepository HostRepository { get; }
+
+		ISystemSettingRepository SystemSettingRepository { get; }
     }
 }
