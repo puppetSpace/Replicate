@@ -17,7 +17,9 @@ namespace Pi.Replicate.Data
         }
         public DbSet<Folder> Folders { get; set; }
 
-        public DbSet<File> Files { get; set; }
+		public DbSet<FolderOption> FolderOptions { get; set; }
+
+		public DbSet<File> Files { get; set; }
 
         public DbSet<FileChunk> FileChunks { get; set; }
 

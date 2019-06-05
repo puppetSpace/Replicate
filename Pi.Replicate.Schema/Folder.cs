@@ -12,13 +12,8 @@ namespace Pi.Replicate.Schema
 
         public FolderType FolderType { get; set; }
 
+		//todo remove when FolderOptions are implemented
         public bool DeleteFilesAfterSend { get; set; }
-
-		//todo don't use foreign key mapping. Not performant when retrieving data
-
-        //public IEnumerable<File> Files { get; set; }
-
-        //public IEnumerable<Host> Hosts { get; set; }
 
         public string Path { get; set; }
 

@@ -40,6 +40,7 @@ namespace Pi.Replicate.Processing.Files
         private async Task<IList<string>> GetNewOrChanged(Folder folder)
         {
             var previousFilesInFolder = new List<File>();
+			//todo check with FolderOptions
             if (!folder.DeleteFilesAfterSend)
             {
                 previousFilesInFolder = (await _repository.FileRepository.GetSent(folder.Id)).ToList();
