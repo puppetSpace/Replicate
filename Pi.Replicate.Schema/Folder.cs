@@ -21,5 +21,5 @@ namespace Pi.Replicate.Schema
         {
             return Pi.Replicate.Shared.System.PathBuilder.Build(Name); 
         }
-    }
+	}
 }

@@ -26,7 +26,6 @@ namespace Pi.Replicate.Processing.Files
 
         protected async override Task DoWork(Folder folder)
         {
-            var files = new List<Schema.File>();
             if (folder == null || !System.IO.Directory.Exists(folder.GetPath()))
             {
                 _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
@@ -78,13 +77,16 @@ namespace Pi.Replicate.Processing.Files
 
         private File CreateFileObject(Folder folder, System.IO.FileInfo fileInfo)
         {
-            //todo fill in all properties
-            return new Schema.File
-            {
-                Id = Guid.NewGuid(),
-                Folder = folder,
-                Name = fileInfo.Name,
-                Size = fileInfo.Length,
+			//todo fill in all properties
+			return new Schema.File
+			{
+				Id = Guid.NewGuid(),
+				Folder = folder,
+				FolderId = folder.Id,
+				Name = fileInfo.Name,
+				Size = fileInfo.Length,
+				LastModifiedDate = fileInfo.LastWriteTimeUtc,
+				Path = System.IO.Path.Combine(folder.Path, fileInfo.Name),
                 Status = FileStatus.New
             };
         }

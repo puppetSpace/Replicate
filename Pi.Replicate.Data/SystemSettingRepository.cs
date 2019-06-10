@@ -24,7 +24,11 @@ namespace Pi.Replicate.Data
 
 		public Task<SystemSetting> Get(string key)
 		{
-			throw new NotImplementedException();
+			var systemSetting = _replicateDbContext
+				.SystemSettings
+				.FirstOrDefault(x=>x.Key == key);
+
+			return Task.FromResult(systemSetting);
 		}
 
 		public Task<IEnumerable<SystemSetting>> Get()

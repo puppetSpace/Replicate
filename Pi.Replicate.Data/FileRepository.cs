@@ -28,7 +28,17 @@ namespace Pi.Replicate.Data
             }
         }
 
-        public async Task DeleteTempFile(Guid fileId)
+		public async Task DeleteNewFiles()
+		{
+			var toDeleteFiles = _replicateDbContext.Files
+				.Where(x => x.Status == FileStatus.New);
+			foreach (var file in toDeleteFiles)
+				_replicateDbContext.Remove(file);
+
+			await _replicateDbContext.SaveChangesAsync();
+		}
+
+		public async Task DeleteTempFile(Guid fileId)
         {
             var foundTempFile = await _replicateDbContext.TempFiles.FindAsync(fileId);
             if (foundTempFile != null)
@@ -59,7 +69,10 @@ namespace Pi.Replicate.Data
         public async Task<IEnumerable<File>> GetSent(Guid folderId)
         {
             return await _replicateDbContext.Files
-                .Where(x => x.Status == FileStatus.New || x.Status == FileStatus.Sent || x.Status == FileStatus.UploadSucessful)
+                .Where(x => x.FolderId == folderId 
+				&& (x.Status == FileStatus.New 
+					|| x.Status == FileStatus.Sent 
+					|| x.Status == FileStatus.UploadSucessful))
                 .ToListAsync();
         }
 

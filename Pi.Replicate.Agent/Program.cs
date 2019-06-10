@@ -25,6 +25,7 @@ namespace Pi.Replicate.Agent
 				.Build();
 
 			var services = new ServiceCollection();
+			services.AddSingleton<IConfiguration>(configuration);
 			services.AddSingleton<IWorkEventAggregator, WorkEventAggregator>();
 			services.AddSingleton<IWorkItemQueueFactory, WorkItemQueueFactory>();
 			services.AddSingleton<IWorkerFactory, WorkerFactory>();
@@ -41,6 +42,8 @@ namespace Pi.Replicate.Agent
 			await Init(serviceProvider);
 
 			await serviceProvider.GetService<Application>().Run();
+
+			Console.ReadKey();
 		}
 
 		private static async Task Init(ServiceProvider serviceProvider)

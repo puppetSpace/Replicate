@@ -19,6 +19,7 @@ namespace Pi.Replicate.Processing.Repositories
         Task<TempFile> GetTempFileIfExists(File file);
         Task DeleteTempFile(Guid fileId);
         Task<IEnumerable<File>> GetCompletedReceivedFiles();
+		Task DeleteNewFiles();
         Task Delete(Guid id);
         Task<File> Get(Guid fileId);
     }
