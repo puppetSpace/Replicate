@@ -36,4 +36,8 @@
     <ProjectReference Include="..\Pi.Replicate.Schema\Pi.Replicate.Schema.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Database\" />
+  </ItemGroup>
+
 </Project>

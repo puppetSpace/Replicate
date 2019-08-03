@@ -22,7 +22,6 @@ namespace Pi.Replicate.Agent.Send
 
 		public async Task Run()
 		{
-			//todo delete new files from database on startup.
 			await _repository.FileRepository.DeleteNewFiles();
 
 			var worker = _workerFactory.CreateProducerWorker(QueueKind.Outgoing);
