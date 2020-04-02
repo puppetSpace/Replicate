@@ -1,256 +1,249 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
-using Pi.Replicate.Processing;
-using Pi.Replicate.Processing.Files;
-using Pi.Replicate.Processing.Repositories;
-using Pi.Replicate.Schema;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Pi.Replicate.Test.Processors
-{
-    [TestClass]
-    public class FileSplitterTest
-    {
-		[TestInitialize]
-		public void InitializeTest()
-		{
-			EntityBuilder.InitializePathBuilder();
-		}
-
-		[TestMethod]
-        public async Task Work_CorrectAmountOfChunksCreated()
-        {
-            //assign
-            var folder = EntityBuilder.BuildFolder();
-            var files = EntityBuilder.BuildFiles(folder).ToList();
+﻿//using Microsoft.Extensions.Configuration;
+//using Microsoft.VisualStudio.TestTools.UnitTesting;
+//using Moq;
+//using System;
+//using System.Linq;
+//using System.Threading.Tasks;
 
-            var file = files[4];
-            file.Status = FileStatus.Sent;
-
-            uint chunkSize = 1 * 1024;
-            int fileChunkCount = 0;
-            int fileCount = 0;
-
-            var mockInQueue = new Mock<IWorkItemQueue<File>>();
-            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file)).Callback(()=>fileCount++);
-            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
-
-            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
-
-            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
-
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
+//namespace Pi.Replicate.Test.Processors
+//{
+//    [TestClass]
+//    public class FileSplitterTest
+//    {
+//        [TestInitialize]
+//        public void InitializeTest()
+//        {
+//            EntityBuilder.InitializePathBuilder();
+//        }
 
-            var mockFileRepository = new Mock<IFileRepository>();
-            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+//        [TestMethod]
+//        public async Task Work_CorrectAmountOfChunksCreated()
+//        {
+//            //assign
+//            var folder = EntityBuilder.BuildFolder();
+//            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+//            var file = files[4];
+//            file.Status = FileStatus.Sent;
 
-            //act
-            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
-            await splitter.WorkAsync();
+//            uint chunkSize = 1 * 1024;
+//            int fileChunkCount = 0;
+//            int fileCount = 0;
 
+//            var mockInQueue = new Mock<IWorkItemQueue<File>>();
+//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file)).Callback(() => fileCount++);
+//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
-            //assert
-            var amountOfChunksThatShouldBeCreated =
-                Math.Ceiling((double)new System.IO.FileInfo(file.GetPath()).Length / (double)chunkSize);
+//            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
+//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
 
-            Assert.AreEqual(fileChunkCount, amountOfChunksThatShouldBeCreated);
-            Assert.AreEqual(file.AmountOfChunks, amountOfChunksThatShouldBeCreated);
+//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
+//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+//            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
-        }
+//            var mockConfiguration = new Mock<IConfiguration>();
+//            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
 
-        [TestMethod]
-        public async Task Work_CorrectHashCreated()
-        {
-            //assign
-            var folder = EntityBuilder.BuildFolder();
-            var files = EntityBuilder.BuildFiles(folder).ToList();
+//            var mockFileRepository = new Mock<IFileRepository>();
+//            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
-            var file = files[3];
-            file.Status = FileStatus.Sent;
+//            var mockRepository = new Mock<IRepository>();
+//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
-            uint chunkSize = 1 * 1024;
-            int fileCount = 0;
+//            //act
+//            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
+//            await splitter.WorkAsync();
 
-            var mockInQueue = new Mock<IWorkItemQueue<File>>();
-            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file)).Callback(()=>fileCount++);
-            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
-            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(Task.CompletedTask);
+//            //assert
+//            var amountOfChunksThatShouldBeCreated =
+//                Math.Ceiling((double)new System.IO.FileInfo(file.GetPath()).Length / (double)chunkSize);
 
-            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
+//            Assert.AreEqual(fileChunkCount, amountOfChunksThatShouldBeCreated);
+//            Assert.AreEqual(file.AmountOfChunks, amountOfChunksThatShouldBeCreated);
 
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
+//        }
 
-            var mockFileRepository = new Mock<IFileRepository>();
-            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+//        [TestMethod]
+//        public async Task Work_CorrectHashCreated()
+//        {
+//            //assign
+//            var folder = EntityBuilder.BuildFolder();
+//            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+//            var file = files[3];
+//            file.Status = FileStatus.Sent;
 
-            //act
-            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
-            await splitter.WorkAsync();
+//            uint chunkSize = 1 * 1024;
+//            int fileCount = 0;
 
-            //assert
-            var md5HashOfFile = EntityBuilder.CreateHashForFile(file);
+//            var mockInQueue = new Mock<IWorkItemQueue<File>>();
+//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file)).Callback(() => fileCount++);
+//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
-            Assert.AreEqual(file.Hash, md5HashOfFile);
+//            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
+//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(Task.CompletedTask);
 
-        }
+//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
+//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+//            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
+//            var mockConfiguration = new Mock<IConfiguration>();
+//            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
 
-        [TestMethod]
-        public async Task Work_ChunkFile_IsSameAsOrginal()
-        {
-            //assign
-            var folder = EntityBuilder.BuildFolder();
-            var files = EntityBuilder.BuildFiles(folder).ToList();
+//            var mockFileRepository = new Mock<IFileRepository>();
+//            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
-            var file = files[0];
-            file.Status = FileStatus.Sent;
+//            var mockRepository = new Mock<IRepository>();
+//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
-            uint chunkSize = 1 * 1024;
-            var memoryStream = new System.IO.MemoryStream();
+//            //act
+//            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
+//            await splitter.WorkAsync();
 
-            var mockInQueue = new Mock<IWorkItemQueue<File>>();
-            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file));
-            mockInQueue.Setup(x => x.HasItems()).Returns(() => memoryStream.Length == 0); //only one item . second call should return false
+//            //assert
+//            var md5HashOfFile = EntityBuilder.CreateHashForFile(file);
 
-            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>()))
-                .Callback(new Action<FileChunk>(x =>
-                {
-                    var bytes = Convert.FromBase64String(x.Value);
-                    memoryStream.Write(bytes, 0, bytes.Length);
-                })).Returns(Task.CompletedTask);
+//            Assert.AreEqual(file.Hash, md5HashOfFile);
 
-            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
+//        }
 
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
 
+//        [TestMethod]
+//        public async Task Work_ChunkFile_IsSameAsOrginal()
+//        {
+//            //assign
+//            var folder = EntityBuilder.BuildFolder();
+//            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var mockFileRepository = new Mock<IFileRepository>();
-            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+//            var file = files[0];
+//            file.Status = FileStatus.Sent;
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+//            uint chunkSize = 1 * 1024;
+//            var memoryStream = new System.IO.MemoryStream();
 
-            //act
-            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
-            await splitter.WorkAsync();
+//            var mockInQueue = new Mock<IWorkItemQueue<File>>();
+//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(file));
+//            mockInQueue.Setup(x => x.HasItems()).Returns(() => memoryStream.Length == 0); //only one item . second call should return false
 
+//            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
+//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>()))
+//                .Callback(new Action<FileChunk>(x =>
+//                {
+//                    var bytes = Convert.FromBase64String(x.Value);
+//                    memoryStream.Write(bytes, 0, bytes.Length);
+//                })).Returns(Task.CompletedTask);
 
-            //assert
-            memoryStream.Position = 0;
-            var originalContent = System.IO.File.ReadAllText(file.GetPath());
-            var reassembledContent = new System.IO.StreamReader(memoryStream).ReadToEnd();
-            memoryStream.Close();
+//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
+//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+//            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
-            Assert.AreEqual(originalContent, reassembledContent);
+//            var mockConfiguration = new Mock<IConfiguration>();
+//            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
 
-        }
 
-        [TestMethod]
-        public async Task Work_NullFile_ShouldNotCallNotify()
-        {
-            //assign
-            uint chunkSize = 1 * 1024;
-            int fileChunkCount = 0;
-            int fileCount = 0;
+//            var mockFileRepository = new Mock<IFileRepository>();
+//            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
-            var mockInQueue = new Mock<IWorkItemQueue<File>>();
-            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult<File>(null)).Callback(()=>fileCount++);
-            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
+//            var mockRepository = new Mock<IRepository>();
+//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
-            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
+//            //act
+//            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
+//            await splitter.WorkAsync();
 
-            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
+//            //assert
+//            memoryStream.Position = 0;
+//            var originalContent = System.IO.File.ReadAllText(file.GetPath());
+//            var reassembledContent = new System.IO.StreamReader(memoryStream).ReadToEnd();
+//            memoryStream.Close();
 
-            var mockFileRepository = new Mock<IFileRepository>();
-            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+//            Assert.AreEqual(originalContent, reassembledContent);
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+//        }
 
-            //act
-            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
-            await splitter.WorkAsync();
+//        [TestMethod]
+//        public async Task Work_NullFile_ShouldNotCallNotify()
+//        {
+//            //assign
+//            uint chunkSize = 1 * 1024;
+//            int fileChunkCount = 0;
+//            int fileCount = 0;
 
+//            var mockInQueue = new Mock<IWorkItemQueue<File>>();
+//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult<File>(null)).Callback(() => fileCount++);
+//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
-            //assert
-            Assert.AreEqual(fileChunkCount, 0);
+//            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
+//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
 
-        }
+//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
+//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+//            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
 
-        [TestMethod]
-        public async Task Work_FileInUse_NotBeingProcessed()
-        {
-            //assign
-            var folder = EntityBuilder.BuildFolder();
-            var files = EntityBuilder.BuildFiles(folder).ToList();
+//            var mockConfiguration = new Mock<IConfiguration>();
+//            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
 
-            var file = files[0];
-            file.Status = FileStatus.Sent;
+//            var mockFileRepository = new Mock<IFileRepository>();
+//            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
 
-            var writeStream = System.IO.File.OpenWrite(file.GetPath());
-            uint chunkSize = 1 * 1024;
-            int fileCount = 0;
-            int fileChunkCount = 0;
+//            var mockRepository = new Mock<IRepository>();
+//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
 
-            var mockInQueue = new Mock<IWorkItemQueue<File>>();
-            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult<File>(null)).Callback(() => fileCount++);
-            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
+//            //act
+//            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
+//            await splitter.WorkAsync();
 
-            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
-            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
 
-            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
+//            //assert
+//            Assert.AreEqual(fileChunkCount, 0);
 
-            var mockConfiguration = new Mock<IConfiguration>();
-            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
+//        }
 
-            var mockFileRepository = new Mock<IFileRepository>();
-            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+//        [TestMethod]
+//        public async Task Work_FileInUse_NotBeingProcessed()
+//        {
+//            //assign
+//            var folder = EntityBuilder.BuildFolder();
+//            var files = EntityBuilder.BuildFiles(folder).ToList();
 
-            var mockRepository = new Mock<IRepository>();
-            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+//            var file = files[0];
+//            file.Status = FileStatus.Sent;
 
-            //act
-            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
-            await splitter.WorkAsync();
+//            var writeStream = System.IO.File.OpenWrite(file.GetPath());
+//            uint chunkSize = 1 * 1024;
+//            int fileCount = 0;
+//            int fileChunkCount = 0;
 
+//            var mockInQueue = new Mock<IWorkItemQueue<File>>();
+//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult<File>(null)).Callback(() => fileCount++);
+//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
 
-            //assert
-            Assert.AreEqual(0, fileChunkCount);
+//            var mockOutQueue = new Mock<IWorkItemQueue<FileChunk>>();
+//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<FileChunk>())).Returns(() => { fileChunkCount++; return Task.CompletedTask; });
 
-        }
-    }
-}
+//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
+//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
+//            mockFactoryQueue.Setup(x => x.GetQueue<FileChunk>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
+
+//            var mockConfiguration = new Mock<IConfiguration>();
+//            mockConfiguration.SetupGet(x => x[Constants.FileSplitSizeOfChunksInBytes]).Returns(chunkSize.ToString());
+
+//            var mockFileRepository = new Mock<IFileRepository>();
+//            mockFileRepository.Setup(x => x.Update(It.IsAny<File>())).Returns(Task.CompletedTask);
+
+//            var mockRepository = new Mock<IRepository>();
+//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+
+//            //act
+//            var splitter = new FileSplitter(mockFactoryQueue.Object, mockRepository.Object, mockConfiguration.Object);
+//            await splitter.WorkAsync();
+
+
+//            //assert
+//            Assert.AreEqual(0, fileChunkCount);
+
+//        }
+//    }
+//}

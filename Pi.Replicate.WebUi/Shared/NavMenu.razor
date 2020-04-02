@@ -1,0 +1,37 @@
+﻿@inject MediatR.IMediator _mediator
+@using Application.Folders.Queries.GetFolderList
+
+<div class="sidebar flex-column">
+    <div class="nav-folder">
+        <ul class="nav">
+            <li class="nav-item px-3">
+                <NavLink class="nav-link" href='folder/add'>
+                    <span class="oi oi-plus" aria-hidden="true"></span> Add folder
+                </NavLink>
+            </li>
+            @foreach (var folder in folders)
+            {
+                <li class="nav-item px-3">
+                    <NavLink class="nav-link" href='@("folder/"+ folder.Name)'>
+                        <span class="oi oi-folder" aria-hidden="true"></span> @folder.Name
+                    </NavLink>
+                </li>
+            }
+        </ul>
+    </div>
+    <div class="nav-item px-3 sidebar-bottom">
+        <NavLink class="nav-link" href="settings">
+            <span class="oi oi-cog" aria-hidden="true"></span> Settings
+        </NavLink>
+    </div>
+</div>
+@code {
+
+    List<FolderLookupDto> folders = new List<FolderLookupDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var vm = await _mediator.Send(new GetFolderListQuery());
+        folders = vm.Folders;
+    }
+}

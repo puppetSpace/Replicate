@@ -1,0 +1,22 @@
+﻿[
+  {
+    "outputFile": "wwwroot/css/site.css",
+    "inputFile": "wwwroot/css/site.sass"
+  },
+  {
+    "outputFile": "wwwroot/css/site.css",
+    "inputFile": "wwwroot/css/site.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/darkTheme_colors.css",
+    "inputFile": "wwwroot/css/darkTheme_colors.scss"
+  },
+  {
+    "outputFile": "wwwroot/css/darkTheme_colors.css",
+    "inputFile": "wwwroot/css/darkTheme_colors.less"
+  },
+  {
+    "outputFile": "wwwroot/css/site.css",
+    "inputFile": "wwwroot/css/site.less"
+  }
+]

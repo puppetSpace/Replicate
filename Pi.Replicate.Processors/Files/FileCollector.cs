@@ -1,9 +1,10 @@
-﻿using Pi.Replicate.Processing.Folders;
+﻿using MediatR;
+using Pi.Replicate.Application.Common;
+using Pi.Replicate.Application.Files.Queries.GetProcessedFilesForFolder;
+using Pi.Replicate.Domain;
+using Pi.Replicate.Processing.Folders;
 using Pi.Replicate.Processing.Helpers;
-using Pi.Replicate.Processing.Repositories;
-using Pi.Replicate.Schema;
-using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,85 +13,85 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-    internal sealed class FileCollector : ProduceConsumeWorker<Folder,File>
-    {
-        private readonly List<IObserver<File>> _observers = new List<IObserver<File>>();
-        private static readonly ILogger _logger = LoggerFactory.Get<FileCollector>();
-        private readonly IRepository _repository;
+	public sealed class FileCollector
+	{
+		private readonly PathBuilder _pathBuilder;
+		private readonly IMediator _mediator;
+		private readonly Folder _folder;
 
-        public FileCollector(IWorkItemQueueFactory workItemQueueFactory,IRepository repository)
-            : base(workItemQueueFactory, QueueKind.Outgoing)
-        {
-            _repository = repository;
-        }
+		public FileCollector(PathBuilder pathBuilder, IMediator mediator, Folder folder)
+		{
+			_pathBuilder = pathBuilder;
+			_mediator = mediator;
+			_folder = folder;
+		}
 
-        protected async override Task DoWork(Folder folder)
-        {
-            if (folder == null || !System.IO.Directory.Exists(folder.GetPath()))
-            {
-                _logger.Warn($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
-                throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folder?.GetPath()}'.");
-            }
-            var newOrChanged = await GetNewOrChanged(folder);
+		public async Task<List<System.IO.FileInfo>> GetNewFiles()
+		{
+			(var rawFiles, var previousFilesInFolder) = await GetFiles();
 
-            await SaveAndSplitFiles(folder, newOrChanged);
-        }
+			var newFiles = rawFiles.Where(x=> ! previousFilesInFolder.Any(y => string.Equals(y.Path, x.FullName))).ToList();
 
-        private async Task<IList<string>> GetNewOrChanged(Folder folder)
-        {
-            var previousFilesInFolder = new List<File>();
-			//todo check with FolderOptions
-            if (!folder.DeleteFilesAfterSend)
-            {
-                previousFilesInFolder = (await _repository.FileRepository.GetSent(folder.Id)).ToList();
-                _logger.Trace($"{previousFilesInFolder.Count} files already processed for folder '{folder.GetPath()}'.");
-            }
-            var folderCrawler = new FolderCrawler();
-            var rawFiles = folderCrawler.GetFiles(folder.GetPath());
-            var newFiles = rawFiles.Except(previousFilesInFolder.Select(x => x.GetPath())).ToList();
+			Log.Verbose($"{newFiles.Count} new files found in folder '{_folder.Name}'");
 
-            var changed = rawFiles
-                .Select(x => new System.IO.FileInfo(x))
-                    .Where(x => previousFilesInFolder
-                        .Any(y => x.FullName == y.GetPath() && x.LastWriteTimeUtc != y.LastModifiedDate))
-                    .Select(x => x.FullName)
-                .ToList();
+			return newFiles;
+		}
 
-            _logger.Trace($"{newFiles.Count} new files found and {changed.Count} files were changed for folder '{folder.GetPath()}'");
+		public async Task<List<File>> GetChangedFiles()
+		{
+			(var rawFiles, var previousFilesInFolder) = await GetFiles();
 
-            return newFiles.Union(changed).ToList();
-        }
+			var changed = previousFilesInFolder
+					.Where(x => rawFiles
+						.Any(y => y.FullName == x.Path && y.LastWriteTimeUtc != x.LastModifiedDate))
+					.ToList();
 
-        private async Task SaveAndSplitFiles(Folder folder, IList<string> newOrChanged)
-        {
-            foreach (var file in newOrChanged)
-            {
-                var fileInfo = new System.IO.FileInfo(file);
-                if (fileInfo.Exists)
-                {
-                    var fileObject = CreateFileObject(folder, fileInfo);
-                    await _repository.FileRepository.Save(fileObject);
-                    await AddItem(fileObject);
-                }
-            }
-        }
+			foreach (var change in changed)
+				change.UpdateForChange(rawFiles.Single(x => string.Equals(x.FullName, change.Path)));
 
-        private File CreateFileObject(Folder folder, System.IO.FileInfo fileInfo)
-        {
-			//todo fill in all properties
-			return new Schema.File
+			Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");
+
+			return changed;
+		}
+
+		private async Task<(IList<System.IO.FileInfo> AllFiles, List<File> ProcessedFiles)> GetFiles()
+		{
+			var folderPath = _pathBuilder.BuildPath(_folder);
+			if (_folder is null || !System.IO.Directory.Exists(folderPath))
 			{
-				Id = Guid.NewGuid(),
-				Folder = folder,
-				FolderId = folder.Id,
-				Name = fileInfo.Name,
-				Size = fileInfo.Length,
-				LastModifiedDate = fileInfo.LastWriteTimeUtc,
-				Path = System.IO.Path.Combine(folder.Path, fileInfo.Name),
-                Status = FileStatus.New
-            };
-        }
+				Log.Warning($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
+				throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
+			}
 
+			var previousFilesInFolder = new List<File>();
+			if (!_folder.FolderOptions.DeleteAfterSent)
+			{
+				previousFilesInFolder = await _mediator.Send(new GetProcessedFilesForFolderQuery(_folder.Id));
+				Log.Verbose($"{previousFilesInFolder.Count} files already processed for folder '{_folder.Name}'.");
+			}
 
-    }
+			var folderCrawler = new FolderCrawler();
+			folderCrawler.GetFiles(folderPath);
+
+			return (folderCrawler.GetFiles(folderPath), previousFilesInFolder);
+		}
+
+	}
+
+	public class FileCollectorFactory
+	{
+		private readonly PathBuilder _pathBuilder;
+		private readonly IMediator _mediator;
+
+		public FileCollectorFactory(PathBuilder pathBuilder, IMediator mediator)
+		{
+			_pathBuilder = pathBuilder;
+			_mediator = mediator;
+		}
+
+		public FileCollector Get(Folder folder)
+		{
+			return new FileCollector(_pathBuilder, _mediator, folder);
+		}
+	}
 }
