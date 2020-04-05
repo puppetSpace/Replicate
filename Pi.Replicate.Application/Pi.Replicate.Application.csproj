@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <Folder Include="Folders\Commands\" />
+    <Folder Include="Recipients\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

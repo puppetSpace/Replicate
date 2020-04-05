@@ -16,5 +16,6 @@ namespace Pi.Replicate.Data.Db
 		public DbSet<File> Files { get; set; }
 		public DbSet<FileChunk> FileChunks { get; set; }
 		public DbSet<ChunkPackage> ChunkPackages { get; set; }
+		public DbSet<Recipient> Recipients { get; set; }
 	}
 }

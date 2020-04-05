@@ -38,13 +38,13 @@
         </div>
         <div class="form-group">
             <label for="recipients">Recipients:</label>
-            <select id="recipients" class="form-control">
-                <option>Test</option>
-            </select>
+           <CheckBoxListView CheckItems="" />
         </div>
     </div>
 
-    <input type="button" class="btn btn-primary btn-save-folder" value="Save" />
+    <input type="button" class="btn btn-primary btn-save-folder"
+           @onclick="CreateNewFolder"
+           value="Save" />
 </form>
 
 @code {
@@ -53,10 +53,17 @@
     string selectedFolder;
     FolderCreationOption selectedFolderCreationOption = FolderCreationOption.CreateNew;
 
+    List<CheckItem<Domain.Recipient>> recipients = new List<CheckItem<Domain.Recipient>>();
+
     protected override async Task OnInitializedAsync()
     {
         var vm = await _mediator.Send(new GetAvailableFoldersQuery());
         availableFolders = vm.Folders;
+    }
+
+    async Task CreateNewFolder()
+    {
+        //await _mediator.Send();
     }
 
     public enum FolderCreationOption

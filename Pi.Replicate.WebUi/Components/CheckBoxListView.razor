@@ -1,0 +1,13 @@
+﻿@typeparam TE
+<ul>
+    @foreach(var item in CheckItems)
+    {
+        <li><input type="checkbox" @bind="item.IsChecked" />  @item.DisplayText</li>
+    }
+</ul>
+@code{
+
+    [Parameter]
+    public List<CheckItem<TE>> CheckItems { get; set; }
+
+}
