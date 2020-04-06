@@ -34,6 +34,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
                 .Folders
                 .ProjectTo<FolderLookupDto>(_mapper.ConfigurationProvider)
                 .OrderBy(x=>x.Name)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             return new FolderListViewModel { Folders = folders };

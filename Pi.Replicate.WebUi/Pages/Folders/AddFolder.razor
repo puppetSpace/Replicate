@@ -1,17 +1,29 @@
 ﻿@page "/folder/add"
 @using Application.Folders.Queries.GetAvailableFolders
+@using Application.Folders.Commands.AddNewFolder
+@using Application.Recipients.Queries.GetRecipientList
 @inject MediatR.IMediator _mediator
 
 <h3>Add new folder</h3>
 
 <form class="folder-add-form">
+    @if (validationMessages.Any())
+    {
+    <div class="validation-summary">
+        <ul>
+            @foreach (var message in validationMessages)
+            {
+                <li>@message</li>
+            }
+        </ul>
+    </div>
+    }
     <div class="form-group">
-        <input type="radio" class="form-check-input" id="create" name="creationOption" value="create" 
+        <input type="radio" class="form-check-input" id="create" name="creationOption" value="create"
                @onchange="@(()=> selectedFolderCreationOption = FolderCreationOption.CreateNew)"
-               checked="@(selectedFolderCreationOption == FolderCreationOption.CreateNew)" 
-               />
+               checked="@(selectedFolderCreationOption == FolderCreationOption.CreateNew)" />
         <label for="create">Create:</label>
-        <input type="text" class="form-text" placeholder="folder name" 
+        <input type="text" class="form-text" placeholder="folder name"
                @bind="selectedFolder"
                disabled="@(selectedFolderCreationOption != FolderCreationOption.CreateNew)" />
     </div>
@@ -33,12 +45,12 @@
     <div class="folder-options">
         <h4>Options</h4>
         <div class="form-group">
-            <input type="checkbox" class="" id="deleteAfterSend" />
+            <input type="checkbox" id="deleteAfterSend" @bind="deleteAfterSend" />
             <label for="deleteAfterSend">Delete after send</label>
         </div>
         <div class="form-group">
             <label for="recipients">Recipients:</label>
-           <CheckBoxListView CheckItems="" />
+            <CheckBoxListView CheckItems="recipients" />
         </div>
     </div>
 
@@ -49,21 +61,38 @@
 
 @code {
 
-    List<AvailableFolderDto> availableFolders = new List<AvailableFolderDto>();
-    string selectedFolder;
-    FolderCreationOption selectedFolderCreationOption = FolderCreationOption.CreateNew;
+            List<AvailableFolderDto> availableFolders = new List<AvailableFolderDto>();
+            string selectedFolder;
+            FolderCreationOption selectedFolderCreationOption = FolderCreationOption.CreateNew;
+            bool deleteAfterSend = false;
+            List<CheckItem<Domain.Recipient>> recipients = new List<CheckItem<Domain.Recipient>>();
+            List<string> validationMessages = new List<string>();
 
-    List<CheckItem<Domain.Recipient>> recipients = new List<CheckItem<Domain.Recipient>>();
+            protected override async Task OnInitializedAsync()
+            {
+                var foldersVm = await _mediator.Send(new GetAvailableFoldersQuery());
+                availableFolders = foldersVm.Folders;
+                var recipientsVm = await _mediator.Send(new GetRecipientListQuery());
+                recipients = recipientsVm.Recipients.Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
+            }
 
-    protected override async Task OnInitializedAsync()
-    {
-        var vm = await _mediator.Send(new GetAvailableFoldersQuery());
-        availableFolders = vm.Folders;
+            async Task CreateNewFolder()
+            {
+                var command = new AddNewFolderCommand
+                {
+                    Name = selectedFolder,
+                    DeleteAfterSend = deleteAfterSend,
+                    Recipients = recipients.Where(x => x.IsChecked).Select(x => x.Data).ToList(),
+                    CreateOnDisk = selectedFolderCreationOption == FolderCreationOption.CreateNew
+            };
+        try
+        {
+            await _mediator.Send(command);
+        }
+        catch (ValidationException ex)
+        {
+            validationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
     }
-
-    async Task CreateNewFolder()
-    {
-        //await _mediator.Send();
     }
 
     public enum FolderCreationOption

@@ -25,7 +25,7 @@ namespace Pi.Replicate.Worker.Console
             services.AddSingleton(config);
 
             services.AddApplication();
-            services.AddData(config);
+            services.AddData(config,ServiceLifetime.Transient);
             services.AddProcessing();
 
 

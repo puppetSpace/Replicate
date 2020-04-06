@@ -16,6 +16,8 @@ namespace Pi.Replicate.Application.Common.Interfaces
         DbSet<FileChunk> FileChunks { get; set; }
         DbSet<ChunkPackage> ChunkPackages { get; set; }
 
+        DbSet<Recipient> Recipients { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

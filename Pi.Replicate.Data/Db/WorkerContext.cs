@@ -17,5 +17,18 @@ namespace Pi.Replicate.Data.Db
 		public DbSet<FileChunk> FileChunks { get; set; }
 		public DbSet<ChunkPackage> ChunkPackages { get; set; }
 		public DbSet<Recipient> Recipients { get; set; }
+
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
+		{
+			modelBuilder.Entity<Folder>(x =>
+			{
+				x.OwnsOne(f => f.FolderOptions);
+			});
+
+			modelBuilder.Entity<FolderRecipient>(x =>
+			{
+				x.HasKey(k => new { k.RecipientId, k.FolderId });
+			});
+		}
 	}
 }

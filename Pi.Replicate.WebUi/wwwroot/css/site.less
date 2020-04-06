@@ -3,13 +3,33 @@
 @import 'header.less';
 @import 'sidebar.less';
 @import 'main.less';
+@import "Components/CheckBoxListView.less";
+
+.scrollbar {
+    overflow: auto;
+
+    &::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px @color-dark-fade-30;
+        background-color: @color-white-fade-10;
+    }
+
+    &::-webkit-scrollbar {
+        width: 5px;
+        background-color: @color-white-fade-10;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: @color-dark;
+    }
+}
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height:100vh;
 }
 
 body {
-    background-color: @color-dark-light;
+    background-color: @color-dark-3;
     color: @color-white;
 }
 
@@ -27,16 +47,18 @@ app {
     position: relative;
     display: flex;
     flex-direction: column;
+    height:100%;
 }
 
 .flex-body{
     display:flex;
+    overflow:auto;
 }
 
 #blazor-error-ui {
     background: @color-dark;
     bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 -1px 2px @color-dark-fade-20;
     display: none;
     left: 0;
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;

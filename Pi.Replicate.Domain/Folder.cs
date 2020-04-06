@@ -12,5 +12,15 @@ namespace Pi.Replicate.Domain
 
         public FolderOption FolderOptions { get; set; }
 
+        public List<FolderRecipient> Recipients { get; set; }
+
+    }
+
+    public class FolderRecipient
+    {
+        public Guid FolderId { get; set; }
+        public Folder Folder { get; set; }
+        public Guid RecipientId { get; set; }
+        public Recipient Recipient { get; set; }
     }
 }

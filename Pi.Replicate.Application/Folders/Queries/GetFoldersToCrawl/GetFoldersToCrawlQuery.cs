@@ -29,6 +29,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
         {
             return _workerContext
                 .Folders
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
         }
     }

@@ -11,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application;
 using Pi.Replicate.Data;
+using FluentValidation.AspNetCore;
+using FluentValidation;
+using Pi.Replicate.Application.Common.Interfaces;
 
 namespace Pi.Replicate.WebUi
 {
@@ -27,8 +30,8 @@ namespace Pi.Replicate.WebUi
 		// For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
 		public void ConfigureServices(IServiceCollection services)
 		{
-			//todo set basepath in config file
-			services.AddRazorPages();
+			services.AddRazorPages()
+				.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IWorkerContext>()); ;
 			services.AddServerSideBlazor();
 			services.AddApplication();
 			services.AddData(Configuration, ServiceLifetime.Transient);

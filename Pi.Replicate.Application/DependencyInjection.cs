@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Pi.Replicate.Application.Common;
+using Pi.Replicate.Application.Common.Behaviours;
 using Pi.Replicate.Application.Common.Queues;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Pi.Replicate.Application
         {
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
         }

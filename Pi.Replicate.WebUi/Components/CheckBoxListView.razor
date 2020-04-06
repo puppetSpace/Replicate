@@ -1,10 +1,12 @@
 ﻿@typeparam TE
-<ul>
-    @foreach(var item in CheckItems)
-    {
-        <li><input type="checkbox" @bind="item.IsChecked" />  @item.DisplayText</li>
-    }
-</ul>
+    <div class="checkboxlistview scrollbar">
+        <ul>
+            @foreach (var item in CheckItems)
+            {
+                <li><input type="checkbox" @bind="item.IsChecked" />  @item.DisplayText</li>
+            }
+        </ul>
+    </div>
 @code{
 
     [Parameter]

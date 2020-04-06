@@ -38,7 +38,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
             _pathBuilder = pathBuilder;
         }
 
-        public Task<Unit> Handle(AddNewFilesToQueueCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AddNewFilesToQueueCommand request, CancellationToken cancellationToken)
         {
             foreach (var newFile in request.NewFiles)
             {
@@ -53,8 +53,8 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
                 else
                     queue.Add(file);
             }
-
-            return Unit.Task;
+            await _workerContext.SaveChangesAsync(cancellationToken);
+            return Unit.Value;
         }
     }
 }

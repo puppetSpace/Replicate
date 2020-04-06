@@ -31,6 +31,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetAvailableFolders
         {
             var usedFolders = await _workerContext
                 .Folders
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
             var availableFolders = System.IO.Directory.GetDirectories(_pathBuilder.BasePath)
