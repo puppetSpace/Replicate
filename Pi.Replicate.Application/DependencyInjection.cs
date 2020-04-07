@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Behaviours;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Folders.Commands.AddNewFolder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace Pi.Replicate.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
+            services.AddSingleton<AddNewFolderSubject>();
         }
     }
 }

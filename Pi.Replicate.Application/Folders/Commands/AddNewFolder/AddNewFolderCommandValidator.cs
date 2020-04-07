@@ -18,12 +18,13 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
                 .WithMessage("A folder or name for a folder must be provided");
 
             RuleFor(x => x.Name)
-                .Must(x => !workerContext.Folders.Any(y => string.Equals(y.Name,x,StringComparison.OrdinalIgnoreCase)))
-                .WithMessage(x=>$"Folder '{x.Name}' already exists.");
+                .Must(x => !workerContext.Folders.ToList().Any(y => string.Equals(y.Name, x, StringComparison.OrdinalIgnoreCase)))
+                .WithMessage(x => $"Folder '{x.Name}' already exists.");
 
             RuleFor(x => x.Recipients)
                 .NotNull()
                 .NotEmpty()
                 .WithMessage("I need a place to sync too, Atleast 1 recipient must be selected.");
+        }
     }
 }

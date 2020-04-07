@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using System;
@@ -24,10 +25,14 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
     public class AddNewFolderCommandHandler : IRequestHandler<AddNewFolderCommand>
     {
         private readonly IWorkerContext _workerContext;
+        private readonly PathBuilder _pathBuilder;
+        private readonly AddNewFolderSubject _addNewFolderSubject;
 
-        public AddNewFolderCommandHandler(IWorkerContext workerContext)
+        public AddNewFolderCommandHandler(IWorkerContext workerContext, PathBuilder pathBuilder, AddNewFolderSubject addNewFolderSubject)
         {
             _workerContext = workerContext;
+            _pathBuilder = pathBuilder;
+            _addNewFolderSubject = addNewFolderSubject;
         }
 
         public async Task<Unit> Handle(AddNewFolderCommand request, CancellationToken cancellationToken)
@@ -39,11 +44,17 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
                 FolderOptions = new FolderOption { DeleteAfterSent = request.DeleteAfterSend },
             };
 
-            folder.Recipients = request.Recipients.Select(x => new FolderRecipient { Folder = folder, Recipient = x }).ToList();
+            folder.Recipients = request.Recipients.Select(x => new FolderRecipient { FolderId = folder.Id, RecipientId = x.Id }).ToList();
 
             _workerContext.Folders.Add(folder);
             await _workerContext.SaveChangesAsync(cancellationToken);
 
+            var path = _pathBuilder.BuildPath(folder);
+            if (request.CreateOnDisk && !System.IO.Directory.Exists(path))
+                System.IO.Directory.CreateDirectory(path);
+
+
+            _addNewFolderSubject.NotifyChange(folder);
             return Unit.Value;
         }
     }
