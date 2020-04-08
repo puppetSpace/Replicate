@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Observr;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
@@ -26,13 +27,13 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
     {
         private readonly IWorkerContext _workerContext;
         private readonly PathBuilder _pathBuilder;
-        private readonly AddNewFolderSubject _addNewFolderSubject;
+        private readonly IBroker _broker;
 
-        public AddNewFolderCommandHandler(IWorkerContext workerContext, PathBuilder pathBuilder, AddNewFolderSubject addNewFolderSubject)
+        public AddNewFolderCommandHandler(IWorkerContext workerContext, PathBuilder pathBuilder, IBroker broker)
         {
             _workerContext = workerContext;
             _pathBuilder = pathBuilder;
-            _addNewFolderSubject = addNewFolderSubject;
+            _broker = broker;
         }
 
         public async Task<Unit> Handle(AddNewFolderCommand request, CancellationToken cancellationToken)
@@ -54,7 +55,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
                 System.IO.Directory.CreateDirectory(path);
 
 
-            _addNewFolderSubject.NotifyChange(folder);
+            await _broker.Publish(folder);
             return Unit.Value;
         }
     }

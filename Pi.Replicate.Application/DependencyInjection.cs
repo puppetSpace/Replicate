@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Observr;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Behaviours;
 using Pi.Replicate.Application.Common.Queues;
@@ -23,7 +24,7 @@ namespace Pi.Replicate.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
-            services.AddSingleton<AddNewFolderSubject>();
+            services.AddObservr();
         }
     }
 }
