@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.Files.Commands.AddNewFileToQueue;
+using Pi.Replicate.Application.Files.Commands.AddNewFiles;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Files;
@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Workers
 {
+	//todo on start delete files with status new and changed. When theyhave this status, it means the process got shut down before chunks were made
 	public class FolderWorker : WorkerBase
 	{
 		private readonly int _triggerInterval;
@@ -36,8 +37,8 @@ namespace Pi.Replicate.Workers
 					foreach (var folder in folders)
 					{
 						var collector = _fileCollectorFactory.Get(folder);
-
-						await _mediator.Send(new AddNewFilesToQueueCommand(await collector.GetNewFiles(), folder)); //add to queue
+						var newFoundFiles = await collector.GetNewFiles();
+						await _mediator.Send(new AddNewFilesCommand(newFoundFiles, folder));
 						//await collector.GetChangedFiles(); //add to queue
 					}
 				}

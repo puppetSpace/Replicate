@@ -37,17 +37,14 @@ namespace Pi.Replicate.Processing.Files
 			return newFiles;
 		}
 
-		public async Task<List<File>> GetChangedFiles()
+		public async Task<List<System.IO.FileInfo>> GetChangedFiles()
 		{
 			(var rawFiles, var previousFilesInFolder) = await GetFiles();
 
-			var changed = previousFilesInFolder
-					.Where(x => rawFiles
-						.Any(y => y.FullName == x.Path && y.LastWriteTimeUtc != x.LastModifiedDate))
+			var changed = rawFiles
+					.Where(x => previousFilesInFolder
+						.Any(y => x.FullName == y.Path && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
-
-			foreach (var change in changed)
-				change.UpdateForChange(rawFiles.Single(x => string.Equals(x.FullName, change.Path)));
 
 			Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");
 

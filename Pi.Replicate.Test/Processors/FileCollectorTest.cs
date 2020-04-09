@@ -1,181 +1,138 @@
-//using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using Moq;
-//using Pi.Replicate.Processing.Files;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
+using MediatR;
+using Microsoft.Extensions.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Moq;
+using Pi.Replicate.Application.Files.Queries.GetProcessedFilesForFolder;
+using Pi.Replicate.Domain;
+using Pi.Replicate.Processing.Files;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
-//namespace Pi.Replicate.Test.Processors
-//{
-//    [TestClass]
-//    public class FileCollectorTest
-//    {
+namespace Pi.Replicate.Test.Processors
+{
+    [TestClass]
+    public class FileCollectorTest
+    {
 
-//        [TestInitialize]
-//        public void InitializeTest()
-//        {
-//            EntityBuilder.InitializePathBuilder();
-//        }
+        [TestInitialize]
+        public void InitializeTest()
+        {
+        }
 
+        [TestMethod]
+        public async Task GetNewFiles_ShouldFind5NewFiles()
+        {
+            var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(new List<File>()));
 
-//        [TestMethod]
-//        public async Task Work_NewFiles_5New()
-//        {
-//            //assign
-//            var folder = EntityBuilder.BuildFolder();
+            var fileCollector = new FileCollector(new Application.Common.PathBuilder(configurationMock.Object), mockMediator.Object, folder);
+            var files = await fileCollector.GetNewFiles();
 
-//            var fileCount = 0;
+            Assert.AreEqual(5, files.Count);
+            Assert.IsTrue(files.Any(x=>x.Name == "test1.txt"));
+            Assert.IsTrue(files.Any(x=>x.Name == "test2.txt"));
+            Assert.IsTrue(files.Any(x=>x.Name == "test3.txt"));
+            Assert.IsTrue(files.Any(x=>x.Name == "test4.txt"));
+            Assert.IsTrue(files.Any(x=>x.Name == "test5.txt"));
+        }
 
-//            var mockFileRepository = new Mock<IFileRepository>();
-//            mockFileRepository.Setup(fr => fr.GetSent(folder.Id)).Returns(Task.FromResult<IEnumerable<File>>(new List<File>()));
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task GetNewFiles_FolderDoesNotExists_ShouldThrowException()
+        {
+            var folder = new Folder { Name = "DoesNotExists", FolderOptions = new FolderOption { DeleteAfterSent = false } };
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(new List<File>()));
 
-//            var mockInQueue = new Mock<IWorkItemQueue<Folder>>();
-//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(folder));
-//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
+            var fileCollector = new FileCollector(new Application.Common.PathBuilder(configurationMock.Object), mockMediator.Object, folder);
+            var files = await fileCollector.GetNewFiles();
 
-//            var mockOutQueue = new Mock<IWorkItemQueue<File>>();
-//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
+        }
 
-//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-//            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
+        [TestMethod]
+        public async Task GetNewFiles_2Changed_ShouldFind3NewFiles()
+        {
+            var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
+            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var existingFiles = new List<File>
+            {
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")},
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+            };
 
-//            var mockRepository = new Mock<IRepository>();
-//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(existingFiles));
 
-//            //act
-//            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
-//            await collector.WorkAsync();
+            var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
+            var files = await fileCollector.GetNewFiles();
 
-//            //asert
-//            Assert.AreEqual(5, fileCount);
-//        }
+            Assert.AreEqual(3, files.Count);
+            Assert.IsTrue(files.Any(x => x.Name == "test3.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test4.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test5.txt"));
+        }
 
-//        [TestMethod]
-//        public async Task Work_NewFiles_3New2Old()
-//        {
-//            //assign
-//            var folder = EntityBuilder.BuildFolder();
-//            var files = EntityBuilder.BuildFiles(folder).ToList();
+        [TestMethod]
+        public async Task GetChanged_2Existing_ShouldFind2ChangedFiles()
+        {
+            var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
+            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var existingFiles = new List<File>
+            {
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")},
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+            };
 
-//            var oldFile1 = files[0];
-//            oldFile1.Status = FileStatus.Sent;
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(existingFiles));
 
+            var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
+            var files = await fileCollector.GetChangedFiles();
 
-//            var oldFile2 = files[1];
-//            oldFile2.Status = FileStatus.New;
+            Assert.AreEqual(2, files.Count);
+            Assert.IsTrue(files.Any(x => x.Name == "test1.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
+        }
 
-//            var fileCount = 0;
+        [TestMethod]
+        public async Task GetChanged_2Existing_ShouldFind1ChangedFiles()
+        {
+            var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
+            var configurationMock = new Mock<IConfiguration>();
+            configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
+            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var existingFiles = new List<File>
+            {
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt"), LastModifiedDate = System.IO.File.GetLastWriteTimeUtc( System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt"))},
+                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+            };
 
-//            oldFile1.LastModifiedDate = new System.IO.FileInfo(oldFile1.GetPath()).LastWriteTimeUtc;
-//            oldFile2.LastModifiedDate = new System.IO.FileInfo(oldFile2.GetPath()).LastWriteTimeUtc;
+            var mockMediator = new Mock<IMediator>();
+            mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(existingFiles));
 
+            var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
+            var files = await fileCollector.GetChangedFiles();
 
-//            var mockFileRepository = new Mock<IFileRepository>();
-//            mockFileRepository.Setup(fr => fr.GetSent(folder.Id)).Returns(Task.FromResult<IEnumerable<File>>(new List<File> { oldFile1, oldFile2 }));
-
-
-//            var mockInQueue = new Mock<IWorkItemQueue<Folder>>();
-//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(folder));
-//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
-
-//            var mockOutQueue = new Mock<IWorkItemQueue<File>>();
-//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(() => { fileCount++; return Task.CompletedTask; });
-
-//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-//            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
-
-//            var mockRepository = new Mock<IRepository>();
-//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
-
-//            //act
-//            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
-
-//            await collector.WorkAsync();
-
-//            //asert
-//            Assert.AreEqual(3, fileCount);
-//        }
-
-//        [TestMethod]
-//        public async Task Work_NewFiles_3New1Changed()
-//        {
-
-//            var folder = EntityBuilder.BuildFolder();
-//            var files = EntityBuilder.BuildFiles(folder).ToList();
-
-//            var oldFile1 = files[2];
-//            oldFile1.Status = FileStatus.Sent;
-
-
-//            var oldFile2 = files[3];
-//            oldFile2.Status = FileStatus.New;
-
-//            var fileCount = 0;
-//            oldFile1.LastModifiedDate = new System.IO.FileInfo(oldFile1.GetPath()).LastWriteTimeUtc.AddHours(1);
-//            oldFile2.LastModifiedDate = new System.IO.FileInfo(oldFile2.GetPath()).LastWriteTimeUtc;
-
-
-//            var mockFileRepository = new Mock<IFileRepository>();
-//            mockFileRepository.Setup(fr => fr.GetSent(folder.Id)).Returns(Task.FromResult<IEnumerable<File>>(new List<File> { oldFile1, oldFile2 }));
-
-//            var mockInQueue = new Mock<IWorkItemQueue<Folder>>();
-//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(folder));
-//            mockInQueue.Setup(x => x.HasItems()).Returns(() => fileCount == 0); //only one item . second call should return false
-
-//            var mockOutQueue = new Mock<IWorkItemQueue<File>>();
-//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(Task.CompletedTask).Callback(() => fileCount++);
-
-//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-//            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
-
-//            var mockRepository = new Mock<IRepository>();
-//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
-
-//            //act
-//            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
-//            await collector.WorkAsync();
-
-//            //asert
-//            Assert.AreEqual(4, fileCount);
-//        }
-
-//        [TestMethod]
-//        [ExpectedException(typeof(InvalidOperationException))]
-//        public async Task Work_InvalidFolder_ThrowInvalidOperationException()
-//        {
-
-//            //assign
-//            var folder = EntityBuilder.BuildFolder();
-//            folder.Name = "DoesNotExist";
-
-//            var mockFileRepository = new Mock<IFileRepository>();
-//            mockFileRepository.Setup(fr => fr.GetSent(folder.Id)).Returns(Task.FromResult<IEnumerable<File>>(new List<File>()));
-
-//            var mockInQueue = new Mock<IWorkItemQueue<Folder>>();
-//            mockInQueue.Setup(x => x.Dequeue()).Returns(Task.FromResult(folder));
-//            mockInQueue.Setup(x => x.HasItems()).Returns(true);
-
-//            var mockOutQueue = new Mock<IWorkItemQueue<File>>();
-//            mockOutQueue.Setup(x => x.Enqueue(It.IsAny<File>())).Returns(Task.CompletedTask);
-
-//            var mockFactoryQueue = new Mock<IWorkItemQueueFactory>();
-//            mockFactoryQueue.Setup(x => x.GetQueue<Folder>(It.IsAny<QueueKind>())).Returns(mockInQueue.Object);
-//            mockFactoryQueue.Setup(x => x.GetQueue<File>(It.IsAny<QueueKind>())).Returns(mockOutQueue.Object);
-
-//            var mockRepository = new Mock<IRepository>();
-//            mockRepository.SetupGet(x => x.FileRepository).Returns(mockFileRepository.Object);
-
-//            //act
-//            var collector = new FileCollector(mockFactoryQueue.Object, mockRepository.Object);
-//            await collector.WorkAsync();
-
-//            //asert
-//        }
-
-//        //todo verify save
-//    }
-//}
+            Assert.AreEqual(1, files.Count);
+            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
+        }
+    }
+}

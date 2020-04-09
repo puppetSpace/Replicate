@@ -14,7 +14,7 @@ namespace Pi.Replicate.Domain
 
         public long AmountOfChunks { get; set; }
 
-        public string Hash { get; set; }
+        public ReadOnlyMemory<byte> Hash { get; set; }
 
         public FileStatus Status { get; set; }
 

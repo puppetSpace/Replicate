@@ -13,6 +13,7 @@ namespace Pi.Replicate.Processing
         public static void AddProcessing(this IServiceCollection services) 
         {
             services.AddTransient<FileCollectorFactory>();
+            services.AddTransient<FileSplitterFactory>();
         }
     }
 }

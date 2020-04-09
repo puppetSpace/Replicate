@@ -4,9 +4,10 @@ namespace Pi.Replicate.Domain
     public enum FileStatus
     {
         New = 0,
-        Processed = 1,
-        ReceivedIncomplete = 2,
-        ReceivedComplete = 3,
-        UploadSucessful = 4
+        Changed = 1,
+        Processed = 2,
+        ReceivedIncomplete = 3,
+        ReceivedComplete = 4,
+        UploadSucessful = 5
     }
 }

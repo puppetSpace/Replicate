@@ -34,7 +34,8 @@ namespace Pi.Replicate.Application.Files.Queries.GetProcessedFilesForFolder
         public Task<List<File>> Handle(GetProcessedFilesForFolderQuery request, CancellationToken cancellationToken)
         {
             return _workerContext.Files
-                .Where(x => x.Folder.Id == request.FolderId && (x.Status == Domain.FileStatus.Processed || x.Status == FileStatus.New))
+                .Where(x => x.Folder.Id == request.FolderId && (x.Status == Domain.FileStatus.Processed || x.Status == FileStatus.New || x.Status == FileStatus.Changed))
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
 
         }
