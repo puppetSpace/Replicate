@@ -24,7 +24,6 @@ namespace Pi.Replicate.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
-            services.AddObservr();
         }
     }
 }

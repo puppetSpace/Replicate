@@ -12,6 +12,8 @@ namespace Pi.Replicate.Domain
 
         public string Value { get; set; }
 
+        public ChunkSource ChunkSource { get; set; }
+
         public ChunkStatus Status { get; set; }
     }
 
@@ -33,6 +35,12 @@ namespace Pi.Replicate.Domain
         Failed = 1,
         Requested = 2,
         ToRequest = 3
+    }
+
+    public enum ChunkSource
+    {
+        FromNewFile = 0,
+        FromChangedFile = 1
     }
 
 }

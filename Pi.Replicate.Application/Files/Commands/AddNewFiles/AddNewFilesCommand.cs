@@ -11,11 +11,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
+namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
 {
-    public class AddNewFilesToQueueCommand : IRequest
+    public class AddNewFilesCommand : IRequest
     {
-        public AddNewFilesToQueueCommand(List<System.IO.FileInfo> newFiles, Folder folder)    
+        public AddNewFilesCommand(List<System.IO.FileInfo> newFiles, Folder folder)    
         {
             NewFiles = newFiles;
             Folder = folder;
@@ -25,7 +25,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
         public Folder Folder { get; }
     }
 
-    public class AddNewFileToQueueCommandHandler : IRequestHandler<AddNewFilesToQueueCommand>
+    public class AddNewFileToQueueCommandHandler : IRequestHandler<AddNewFilesCommand>
     {
         private readonly IWorkerContext _workerContext;
         private readonly WorkerQueueFactory _workerQueueFactory;
@@ -38,8 +38,9 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
             _pathBuilder = pathBuilder;
         }
 
-        public async Task<Unit> Handle(AddNewFilesToQueueCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AddNewFilesCommand request, CancellationToken cancellationToken)
         {
+            var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var newFile in request.NewFiles)
             {
                 Log.Verbose($"Adding '{newFile.FullName}' to context");
@@ -47,7 +48,6 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFileToQueue
                 _workerContext.Files.Add(file);
 
                 Log.Verbose($"Adding '{newFile.FullName}' to queue");
-                var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
                 if (queue.GetConsumingEnumerable().Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{newFile.FullName} already present in queue for processing");
                 else
