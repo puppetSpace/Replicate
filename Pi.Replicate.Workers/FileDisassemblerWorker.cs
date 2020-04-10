@@ -3,6 +3,7 @@ using Pi.Replicate.Application.Chunks.AddChunks;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Files;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,12 +30,14 @@ namespace Pi.Replicate.Workers
         {
             var thread = new Thread(async () =>
             {
+                Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
                 var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
                 var fileSplitter = _fileSplitterFactory.Get();
 
                 while (!queue.IsCompleted && !cancellationToken.IsCancellationRequested)
                 {
                     var file = queue.Take(cancellationToken);
+                    Log.Information($"Taking file '{file.Path}' from queue");
                     if(file.Status == FileStatus.New)
                     {
                         var result = await fileSplitter.ProcessFile(file);
