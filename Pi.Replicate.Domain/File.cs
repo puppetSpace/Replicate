@@ -37,6 +37,9 @@ namespace Pi.Replicate.Domain
 
         public static File BuildPartial(System.IO.FileInfo file, Folder folder, string basePath,DateTime? customLastModified = null)
         {
+            if (file is null || !file.Exists)
+                throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
+
             return new File
             {
                 Id = Guid.NewGuid(),

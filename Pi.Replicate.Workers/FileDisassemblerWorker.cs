@@ -30,20 +30,20 @@ namespace Pi.Replicate.Workers
         {
             var thread = new Thread(async () =>
             {
-                Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
-                var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-                var fileSplitter = _fileSplitterFactory.Get();
+                //Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
+                //var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+                //var fileSplitter = _fileSplitterFactory.Get();
 
-                while (!queue.IsCompleted && !cancellationToken.IsCancellationRequested)
-                {
-                    var file = queue.Take(cancellationToken);
-                    Log.Information($"Taking file '{file.Path}' from queue");
-                    if(file.Status == FileStatus.New)
-                    {
-                        var result = await fileSplitter.ProcessFile(file);
-                        await _mediator.Send(new AddChunksCommand { Chunks = result.Chunks, Hash = result.Hash, File = file, ChunkSource = ChunkSource.FromNewFile }, cancellationToken);
-                    }
-                }
+                //while (!queue.IsCompleted && !cancellationToken.IsCancellationRequested)
+                //{
+                //    var file = queue.Take(cancellationToken);
+                //    Log.Information($"Taking file '{file.Path}' from queue");
+                //    if(file.Status == FileStatus.New)
+                //    {
+                //        //var result = await fileSplitter.ProcessFile(file);
+                //        //await _mediator.Send(new AddChunksCommand { Chunks = result.Chunks, Hash = result.Hash, File = file, ChunkSource = ChunkSource.FromNewFile }, cancellationToken);
+                //    }
+                //}
             });
 
             thread.Start();
