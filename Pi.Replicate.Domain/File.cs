@@ -4,28 +4,35 @@ namespace Pi.Replicate.Domain
 {
     public class File
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-		public Folder Folder { get; set; }
+		public Folder Folder { get; private set; }
 
-		public string Name { get; set; }
+		public string Name { get; private set; }
 
-        public long Size { get; set; }
+        public long Size { get; private set; }
 
-        public long AmountOfChunks { get; set; }
+        public long AmountOfChunks { get; private set; }
 
-        public ReadOnlyMemory<byte> Hash { get; set; }
+        public byte[] Hash { get; private set; }
 
-        public FileStatus Status { get; set; }
+        public FileStatus Status { get; private set; }
 
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime LastModifiedDate { get; private set; }
 
-        public string Path { get; set; }
+        public string Path { get; private set; }
 
         public void UpdateForChange(System.IO.FileInfo file)
         {
             LastModifiedDate = file.LastWriteTimeUtc;
             Size = file.Length;
+        }
+
+        public void UpdateAfterProcessesing(int amountOfChunks, byte[] hash)
+        {
+            Hash = hash;
+            AmountOfChunks = amountOfChunks;
+            Status = FileStatus.Processed;
         }
 
         public static File BuildPartial(System.IO.FileInfo file, Folder folder, string basePath)

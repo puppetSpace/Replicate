@@ -4,38 +4,49 @@ namespace Pi.Replicate.Domain
 {
     public class FileChunk
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public File File { get; set; }
+        public File File { get; private set; }
 
-        public int SequenceNo { get; set; }
+        public int SequenceNo { get; private set; }
 
-        public string Value { get; set; }
+        public byte[] Value { get; private set; }
 
-        public ChunkSource ChunkSource { get; set; }
+        public ChunkSource ChunkSource { get; private set; }
 
-        public ChunkStatus Status { get; set; }
+        public static FileChunk Build(File file, int sequenceNo, byte[] value,ChunkSource chunkSource)
+        {
+            return new FileChunk
+            {
+                Id = Guid.NewGuid(),
+                File = file,
+                SequenceNo = sequenceNo,
+                Value = value,
+                ChunkSource = chunkSource
+            };
+        }
     }
 
 
     public class ChunkPackage
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public FileChunk FileChunk { get; set; }
+        public Guid FileChunkId { get; private set; }
 
-        public Recipient Recipient { get; set; }
+        public Guid RecipientId { get; private set; }
 
-        public ChunkPackageType Type { get; set; }
+        public static ChunkPackage Build(Guid fileChunkId, Guid recipientId)
+        {
+            return new ChunkPackage
+            {
+                Id = Guid.NewGuid(),
+                FileChunkId = fileChunkId,
+                RecipientId = recipientId
+            };
+        }
     }
 
-    public enum ChunkPackageType
-    {
-        None = 0,
-        Failed = 1,
-        Requested = 2,
-        ToRequest = 3
-    }
 
     public enum ChunkSource
     {

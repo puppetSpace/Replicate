@@ -33,7 +33,7 @@ namespace Pi.Replicate.Workers
 			{
 				while (!cancellationToken.IsCancellationRequested)
 				{
-					var folders = await _mediator.Send(new GetFoldersToCrawlQuery());
+					var folders = await _mediator.Send(new GetFoldersToCrawlQuery(), cancellationToken);
 					foreach (var folder in folders)
 					{
 						var collector = _fileCollectorFactory.Get(folder);

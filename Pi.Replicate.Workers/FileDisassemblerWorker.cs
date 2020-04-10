@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Chunks.AddChunks;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Files;
@@ -37,7 +38,7 @@ namespace Pi.Replicate.Workers
                     if(file.Status == FileStatus.New)
                     {
                         var result = await fileSplitter.ProcessFile(file);
-                        _mediator.Send
+                        await _mediator.Send(new AddChunksCommand { Chunks = result.Chunks, Hash = result.Hash, File = file, ChunkSource = ChunkSource.FromNewFile }, cancellationToken);
                     }
                 }
             });
