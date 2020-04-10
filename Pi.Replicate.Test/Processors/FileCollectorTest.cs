@@ -69,8 +69,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")},
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath),
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),null,pathBuilder.BasePath)
             };
 
             var mockMediator = new Mock<IMediator>();
@@ -95,8 +95,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")},
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath,DateTime.Now),
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),null,pathBuilder.BasePath,DateTime.Now)
             };
 
             var mockMediator = new Mock<IMediator>();
@@ -120,8 +120,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt"), LastModifiedDate = System.IO.File.GetLastWriteTimeUtc( System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt"))},
-                new File{ Path = System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")}
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath),
+                File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),null,pathBuilder.BasePath,DateTime.Now)
             };
 
             var mockMediator = new Mock<IMediator>();

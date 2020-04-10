@@ -35,15 +35,15 @@ namespace Pi.Replicate.Domain
             Status = FileStatus.Processed;
         }
 
-        public static File BuildPartial(System.IO.FileInfo file, Folder folder, string basePath)
+        public static File BuildPartial(System.IO.FileInfo file, Folder folder, string basePath,DateTime? customLastModified = null)
         {
             return new File
             {
                 Id = Guid.NewGuid(),
                 Folder = folder,
-                LastModifiedDate = file.LastWriteTimeUtc,
+                LastModifiedDate = customLastModified??file.LastWriteTimeUtc,
                 Name = file.Name,
-                Path = file.FullName.Replace(basePath,""), //must be relative to base
+                Path = file.FullName.Replace(basePath+"\\",""), //must be relative to base
                 Size = file.Length,
                 Status = FileStatus.New
             };

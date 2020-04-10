@@ -30,7 +30,7 @@ namespace Pi.Replicate.Processing.Files
 		{
 			(var rawFiles, var previousFilesInFolder) = await GetFiles();
 
-			var newFiles = rawFiles.Where(x=> ! previousFilesInFolder.Any(y => string.Equals(y.Path, x.FullName))).ToList();
+			var newFiles = rawFiles.Where(x=> ! previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y), x.FullName))).ToList();
 
 			Log.Verbose($"{newFiles.Count} new files found in folder '{_folder.Name}'");
 
@@ -43,7 +43,7 @@ namespace Pi.Replicate.Processing.Files
 
 			var changed = rawFiles
 					.Where(x => previousFilesInFolder
-						.Any(y => x.FullName == y.Path && x.LastWriteTimeUtc != y.LastModifiedDate))
+						.Any(y => x.FullName == _pathBuilder.BuildPath(y) && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
 
 			Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");

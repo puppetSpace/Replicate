@@ -36,7 +36,7 @@ namespace Pi.Replicate.Test.Processors
 
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(new File { Path = fileInfo.FullName });
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo,null,pathBuilder.BasePath));
 
 
 			Assert.AreEqual(calculatedAmountOfChunks, result.Chunks.Count);
@@ -59,7 +59,7 @@ namespace Pi.Replicate.Test.Processors
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(new File { Path = fileInfo.FullName });
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath));
 			var createdHashOfFile = Helper.CreateBase64HashForFile(fileInfo.FullName);
 
 
@@ -83,7 +83,7 @@ namespace Pi.Replicate.Test.Processors
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "doesnotexists.txt"));
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(new File { Path = fileInfo.FullName });
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath));
 
 
 			Assert.AreEqual(0, result.Chunks.Count);
@@ -109,7 +109,7 @@ namespace Pi.Replicate.Test.Processors
 			using var fs = fileInfo.OpenWrite();
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(new File { Path = fileInfo.FullName });
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath));
 
 
 			Assert.AreEqual(0, result.Chunks.Count);

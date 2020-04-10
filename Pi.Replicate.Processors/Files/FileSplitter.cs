@@ -28,6 +28,9 @@ namespace Pi.Replicate.Processing.Files
 
         public async Task<(List<byte[]> Chunks, byte[] Hash)> ProcessFile(File file)
         {
+
+            //todo to compress the file, I have to write it to a tempfile first and then read that tempfile in to disassemble it .
+            //if I use a memorystream, too much memory can be used. e.g. 10Gb file have to be compressed in memory and then disasembled. This will take too much memory
             var path = _pathBuilder.BuildPath(file);
             
             if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
@@ -35,7 +38,7 @@ namespace Pi.Replicate.Processing.Files
                 Log.Verbose($"File '{path}' is being processed and turned into chunks of {_sizeofChunkInBytes} bytes");
                 using (var stream = System.IO.File.OpenRead(path))
                 {
-                    return await SplitStream(file, stream);
+                    return await SplitStream(stream);
                 }
             }
             else
@@ -45,7 +48,7 @@ namespace Pi.Replicate.Processing.Files
             }
         }
 
-        private async Task<(List<byte[]> Chunks,byte[] Hash)> SplitStream(File file, System.IO.Stream stream)
+        private async Task<(List<byte[]> Chunks,byte[] Hash)> SplitStream(System.IO.Stream stream)
         {
             var chunks = new List<byte[]>();
             var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
