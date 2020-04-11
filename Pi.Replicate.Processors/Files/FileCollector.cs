@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common;
-using Pi.Replicate.Application.Files.Queries.GetProcessedFilesForFolder;
+using Pi.Replicate.Application.Files.Queries.GetFilesForFolderQuery;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Folders;
 using Pi.Replicate.Processing.Helpers;
@@ -29,7 +29,7 @@ namespace Pi.Replicate.Processing.Files
 		public async Task<List<System.IO.FileInfo>> GetNewFiles()
 		{
 			(var rawFiles, var previousFilesInFolder) = await GetFiles();
-
+//exclude all files that are allready in the database
 			var newFiles = rawFiles.Where(x=> ! previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y), x.FullName))).ToList();
 
 			Log.Verbose($"{newFiles.Count} new files found in folder '{_folder.Name}'");
@@ -40,10 +40,10 @@ namespace Pi.Replicate.Processing.Files
 		public async Task<List<System.IO.FileInfo>> GetChangedFiles()
 		{
 			(var rawFiles, var previousFilesInFolder) = await GetFiles();
-
+//only include the files that are allready processed
 			var changed = rawFiles
 					.Where(x => previousFilesInFolder
-						.Any(y => x.FullName == _pathBuilder.BuildPath(y) && x.LastWriteTimeUtc != y.LastModifiedDate))
+						.Any(y =>y.Status == FileStatus.Processed &&  x.FullName == _pathBuilder.BuildPath(y) && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
 
 			Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");
@@ -63,7 +63,7 @@ namespace Pi.Replicate.Processing.Files
 			var previousFilesInFolder = new List<File>();
 			if (!_folder.FolderOptions.DeleteAfterSent)
 			{
-				previousFilesInFolder = await _mediator.Send(new GetProcessedFilesForFolderQuery(_folder.Id));
+				previousFilesInFolder = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
 				Log.Verbose($"{previousFilesInFolder.Count} files already processed for folder '{_folder.Name}'.");
 			}
 
