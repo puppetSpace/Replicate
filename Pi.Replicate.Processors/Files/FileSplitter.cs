@@ -20,17 +20,15 @@ namespace Pi.Replicate.Processing.Files
 	{
 		private readonly int _sizeofChunkInBytes;
 		private readonly PathBuilder _pathBuilder;
-		private readonly Action<byte[]> _chunkCreatedDelegate;
 		private static byte[] _emptyResultResult = new byte[0];
 
-		public FileSplitter(IConfiguration configuration, PathBuilder pathBuilder, Action<byte[]> chunkCreatedDelegate)
+		public FileSplitter(IConfiguration configuration, PathBuilder pathBuilder)
 		{
 			_sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
 			_pathBuilder = pathBuilder;
-			_chunkCreatedDelegate = chunkCreatedDelegate;
 		}
 
-		public async Task<byte[]> ProcessFile(File file)
+		public async Task<byte[]> ProcessFile(File file,Action<byte[]> chunkCreatedDelegate)
 		{
 			var path = _pathBuilder.BuildPath(file);
 
@@ -42,7 +40,7 @@ namespace Pi.Replicate.Processing.Files
 
 				using (var stream = System.IO.File.OpenRead(pathOfCompressed))
 				{
-					return await SplitStream(stream);
+					return await SplitStream(stream,chunkCreatedDelegate);
 				}
 			}
 			else
@@ -64,7 +62,7 @@ namespace Pi.Replicate.Processing.Files
 			return tempPath;
 		}
 
-		private async Task<byte[]> SplitStream(System.IO.Stream stream)
+		private async Task<byte[]> SplitStream(System.IO.Stream stream,Action<byte[]> chunkCreatedDelegate)
 		{
 			MD5 hashCreator = MD5.Create();
 			var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
@@ -73,7 +71,7 @@ namespace Pi.Replicate.Processing.Files
 			while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 			{
 				hashCreator.TransformBlock(buffer, 0, bytesRead, null, 0);
-				_chunkCreatedDelegate?.Invoke(buffer);
+				chunkCreatedDelegate?.Invoke(buffer);
 			}
 			hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
 
@@ -95,9 +93,9 @@ namespace Pi.Replicate.Processing.Files
 			_pathBuilder = pathBuilder;
 		}
 
-		public FileSplitter Get(Action<byte[]> chunkCreatedDelegate)
+		public FileSplitter Get()
 		{
-			return new FileSplitter(_configuration, _pathBuilder,chunkCreatedDelegate);
+			return new FileSplitter(_configuration, _pathBuilder);
 		}
 	}
 }
