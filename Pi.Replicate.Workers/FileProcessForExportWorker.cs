@@ -1,0 +1,68 @@
+﻿using MediatR;
+using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.Chunks.AddChunks;
+using Pi.Replicate.Application.Common;
+using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Commands.UpdateFileAfterProcessing;
+using Pi.Replicate.Application.Files.Queries.GetFilesForProcessing;
+using Pi.Replicate.Domain;
+using Pi.Replicate.Processing.Files;
+using Pi.Replicate.Shared;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace Pi.Replicate.Workers
+{
+    public class FileProcessForExportWorker : WorkerBase
+    {
+        private readonly int _triggerInterval;
+        private readonly FileSplitterFactory _fileSplitterFactory;
+        private readonly IMediator _mediator;
+        private readonly PathBuilder _pathBuilder;
+
+        public FileProcessForExportWorker(IConfiguration configuration
+        , FileSplitterFactory fileSplitterFactory
+        , IMediator mediator
+        , PathBuilder pathBuilder)
+        {
+            _triggerInterval = int.TryParse(configuration[Constants.FileProcessForExportTriggerInterval], out int interval) ? interval : 10;
+            _fileSplitterFactory = fileSplitterFactory;
+            _mediator = mediator;
+            _pathBuilder = pathBuilder;
+        }
+
+        public override Thread DoWork(CancellationToken cancellationToken)
+        {
+            var thread = new Thread(async () =>
+            {
+                Log.Information($"Starting {nameof(FileProcessForExportWorker)}");
+
+                var fileSplitter = _fileSplitterFactory.Get();
+                while (!cancellationToken.IsCancellationRequested)
+                {
+                    var files = await _mediator.Send(new GetFilesForProcessingQuery());
+                    foreach (var file in files)
+                    {
+                        Log.Information($"Processing file '{file.Path}'");
+                        int sequenceNo = 0;
+                        if (file.Status == FileStatus.New)
+                        {
+                            var result = await fileSplitter.ProcessFile(file, async x => await _mediator.Send(new AddChunkCommand { Chunk = x, SequenceNo = ++sequenceNo, File = file }));
+                            await _mediator.Send(new UpdateFileAfterProcessingCommand { File = file, Hash = result, AmountOfChunks = sequenceNo });
+                        }
+                    }
+                    Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle");
+                    await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+                }
+            });
+
+            thread.Start();
+            return thread;
+        }
+    }
+}

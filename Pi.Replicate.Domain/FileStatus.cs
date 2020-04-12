@@ -6,8 +6,7 @@ namespace Pi.Replicate.Domain
         New = 0,
         Changed = 1,
         Processed = 2,
-        ReceivedIncomplete = 3,
-        ReceivedComplete = 4,
-        UploadSucessful = 5
+        Received = 3,
+        Handled =4
     }
 }
