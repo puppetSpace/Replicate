@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common;
-using Pi.Replicate.Application.Files.Queries.GetFilesForFolderQuery;
+using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Folders;
 using Pi.Replicate.Processing.Helpers;

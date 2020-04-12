@@ -2,7 +2,7 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Application.Files.Queries.GetProcessedFilesForFolder;
+using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Files;
 using Serilog;
