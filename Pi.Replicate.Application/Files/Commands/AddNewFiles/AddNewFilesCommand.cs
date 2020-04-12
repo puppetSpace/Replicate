@@ -25,13 +25,13 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
         public Folder Folder { get; }
     }
 
-    public class AddNewFileToQueueCommandHandler : IRequestHandler<AddNewFilesCommand>
+    public class AddNewFilesCommandHandler : IRequestHandler<AddNewFilesCommand>
     {
         private readonly IWorkerContext _workerContext;
         private readonly WorkerQueueFactory _workerQueueFactory;
         private readonly PathBuilder _pathBuilder;
 
-        public AddNewFileToQueueCommandHandler(IWorkerContext workerContext, WorkerQueueFactory workerQueueFactory, PathBuilder pathBuilder)
+        public AddNewFilesCommandHandler(IWorkerContext workerContext, WorkerQueueFactory workerQueueFactory, PathBuilder pathBuilder)
         {
             _workerContext = workerContext;
             _workerQueueFactory = workerQueueFactory;

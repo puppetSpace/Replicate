@@ -42,6 +42,7 @@ namespace Pi.Replicate.Application.Chunks.AddChunks
             var builtChunk = FileChunk.Build(request.File, request.SequenceNo, request.Chunk, ChunkSource.FromNewFile);
             _workerContext.FileChunks.Add(builtChunk);
 
+//maybe move this to another usecase
             foreach (var recipient in request.File.Folder.Recipients)
             {
                 var chunkPackage = ChunkPackage.Build(builtChunk.Id, recipient.RecipientId);

@@ -2,6 +2,7 @@
 using Pi.Replicate.Application.Chunks.AddChunks;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Commands.UpdateFileAfterProcessing;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Files;
 using Serilog;
@@ -48,13 +49,8 @@ namespace Pi.Replicate.Workers
                     if (file.Status == FileStatus.New)
                     {
                         var result = await fileSplitter.ProcessFile(file, async x => await _mediator.Send(new AddChunkCommand { Chunk = x, SequenceNo = ++sequenceNo, File = file }));
-                        //todo update file and start sending it
-
-                        if (file.Folder.FolderOptions.DeleteAfterSent)
-                        {
-                            var path = _pathBuilder.BuildPath(file);
-                            System.IO.File.Delete(path);
-                        }
+                        Log.Information($"Update file '{file.Path}'");
+                        await _mediator.Send(new UpdateFileAfterProcessingCommand{File = file, Hash = result, AmountOfChunks = sequenceNo});
                     }
                 }
             });
