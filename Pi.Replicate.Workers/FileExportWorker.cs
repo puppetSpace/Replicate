@@ -1,16 +1,22 @@
 using System.Threading;
+using MediatR;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
+using System.Net.Http;
 
 namespace Pi.Replicate.Workers
 {
     public class FileExportWorker : WorkerBase
     {
         private readonly WorkerQueueFactory _workerQueueFactory;
+        private readonly HttpClient _httpClient;
+        private readonly IMediator _mediator;
 
-        public FileExportWorker(WorkerQueueFactory workerQueueFactory)
+        public FileExportWorker(WorkerQueueFactory workerQueueFactory, IMediator mediator, IHttpClientFactory clientFactory)
         {
             _workerQueueFactory = workerQueueFactory;
+            _mediator = mediator;
+            _httpClient = clientFactory.CreateClient();
         }
         public override Thread DoWork(CancellationToken cancellationToken)
         {

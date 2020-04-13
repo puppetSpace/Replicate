@@ -27,6 +27,7 @@ namespace Pi.Replicate.Worker.Console
             services.AddApplication();
             services.AddData(config,ServiceLifetime.Transient);
             services.AddProcessing();
+            services.AddHttpClient();
 
 
             // required to run the application
