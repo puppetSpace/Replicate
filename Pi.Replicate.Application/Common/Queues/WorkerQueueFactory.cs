@@ -11,7 +11,8 @@ namespace Pi.Replicate.Application.Common.Queues
     public enum WorkerQueueType
     {
         ToProcessFiles = 0,
-        ToSendChunks = 0,
+        ToSendFiles = 1,
+        ToSendChunks = 2
     }
 
     public class WorkerQueueFactory

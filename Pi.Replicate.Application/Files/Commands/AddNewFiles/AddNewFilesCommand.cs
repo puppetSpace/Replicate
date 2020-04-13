@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
 {
-    public class AddNewFilesCommand : IRequest
+    public class AddNewFilesCommand : IRequest<List<File>>
     {
         public AddNewFilesCommand(List<System.IO.FileInfo> newFiles, Folder folder)    
         {
@@ -25,36 +25,30 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
         public Folder Folder { get; }
     }
 
-    public class AddNewFilesCommandHandler : IRequestHandler<AddNewFilesCommand>
+    public class AddNewFilesCommandHandler : IRequestHandler<AddNewFilesCommand,List<File>>
     {
         private readonly IWorkerContext _workerContext;
-        private readonly WorkerQueueFactory _workerQueueFactory;
         private readonly PathBuilder _pathBuilder;
 
-        public AddNewFilesCommandHandler(IWorkerContext workerContext, WorkerQueueFactory workerQueueFactory, PathBuilder pathBuilder)
+        public AddNewFilesCommandHandler(IWorkerContext workerContext, PathBuilder pathBuilder)
         {
             _workerContext = workerContext;
-            _workerQueueFactory = workerQueueFactory;
             _pathBuilder = pathBuilder;
         }
 
-        public async Task<Unit> Handle(AddNewFilesCommand request, CancellationToken cancellationToken)
+        public async Task<List<File>> Handle(AddNewFilesCommand request, CancellationToken cancellationToken)
         {
-            var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+            var createdFiles = new List<File>();
             foreach (var newFile in request.NewFiles)
             {
                 Log.Verbose($"Adding '{newFile.FullName}' to context");
                 var file = File.BuildPartial(newFile, request.Folder, _pathBuilder.BasePath);
                 _workerContext.Files.Add(file);
-
-                Log.Verbose($"Adding '{newFile.FullName}' to queue");
-                if (queue.GetConsumingEnumerable().Any(x => string.Equals(x.Path, file.Path)))
-                    Log.Information($"{newFile.FullName} already present in queue for processing");
-                else
-                    queue.Add(file);
+                createdFiles.Add(file);
             }
             await _workerContext.SaveChangesAsync(cancellationToken);
-            return Unit.Value;
+
+            return createdFiles;
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Commands.AddNewFiles;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
 using Pi.Replicate.Domain;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Pi.Replicate.Workers
 {
@@ -19,14 +21,17 @@ namespace Pi.Replicate.Workers
         private readonly int _triggerInterval;
         private readonly IMediator _mediator;
         private readonly FileCollectorFactory _fileCollectorFactory;
+        private readonly WorkerQueueFactory _workerQueueFactory;
 
         public FolderWorker(IConfiguration configuration
             , IMediator mediator
-            , FileCollectorFactory fileCollectorFactory)
+            , FileCollectorFactory fileCollectorFactory
+            , WorkerQueueFactory workerQueueFactory)
         {
             _triggerInterval = int.TryParse(configuration[Constants.FolderCrawlTriggerInterval], out int interval) ? interval : 10;
             _mediator = mediator;
             _fileCollectorFactory = fileCollectorFactory;
+            _workerQueueFactory = workerQueueFactory;
         }
 
         public override Thread DoWork(CancellationToken cancellationToken)
@@ -40,8 +45,7 @@ namespace Pi.Replicate.Workers
                     {
                         Log.Information($"Crawling through folder '{folder.Name}'");
                         var collector = _fileCollectorFactory.Get(folder);
-                        var newFoundFiles = await collector.GetNewFiles();
-                        await _mediator.Send(new AddNewFilesCommand(newFoundFiles, folder));
+                        await ProcessNewFiles(folder, collector);
                         //await collector.GetChangedFiles(); //add to queue
                     }
                 }
@@ -50,6 +54,21 @@ namespace Pi.Replicate.Workers
             });
             workingThread.Start();
             return workingThread;
+        }
+
+        private async Task ProcessNewFiles(Folder folder, FileCollector collector)
+        {
+            var newFoundFiles = await collector.GetNewFiles();
+            var createdFiles = await _mediator.Send(new AddNewFilesCommand(newFoundFiles, folder));
+            var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+            foreach (var file in createdFiles)
+            {
+                Log.Verbose($"Adding '{file.Path}' to queue");
+                if (queue.GetConsumingEnumerable().Any(x => string.Equals(x.Path, file.Path)))
+                    Log.Information($"{file.Path} already present in queue for processing");
+                else
+                    queue.Add(file);
+            }
         }
     }
 }

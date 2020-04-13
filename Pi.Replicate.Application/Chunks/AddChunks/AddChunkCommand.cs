@@ -36,18 +36,11 @@ namespace Pi.Replicate.Application.Chunks.AddChunks
         }
 
         //transform each byte[] to a chunk and add it to the database.
-        //for each recipient of the folder from where the file is, create a chunkpackage and add it to the database
         public async Task<Unit> Handle(AddChunkCommand request, CancellationToken cancellationToken)
         {
             var builtChunk = FileChunk.Build(request.File, request.SequenceNo, request.Chunk, ChunkSource.FromNewFile);
             _workerContext.FileChunks.Add(builtChunk);
 
-//maybe move this to another usecase
-            foreach (var recipient in request.File.Folder.Recipients)
-            {
-                var chunkPackage = ChunkPackage.Build(builtChunk.Id, recipient.RecipientId);
-                _workerContext.ChunkPackages.Add(chunkPackage);
-            }
             await _workerContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
