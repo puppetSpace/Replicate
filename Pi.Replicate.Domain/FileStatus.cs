@@ -7,6 +7,7 @@ namespace Pi.Replicate.Domain
         Changed = 1,
         Processed = 2,
         Received = 3,
-        Handled =4
+        Failed = 4,
+        Handled = 5
     }
 }
