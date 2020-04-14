@@ -10,8 +10,8 @@ using Pi.Replicate.Data.Db;
 namespace Pi.Replicate.Data.Migrations.System
 {
     [DbContext(typeof(SystemContext))]
-    [Migration("20200406073832_System")]
-    partial class System
+    [Migration("20200414121548_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

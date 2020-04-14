@@ -10,7 +10,7 @@ using Pi.Replicate.Data.Db;
 namespace Pi.Replicate.Data.Migrations
 {
     [DbContext(typeof(WorkerContext))]
-    [Migration("20200406073738_Initial")]
+    [Migration("20200414121400_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,14 +27,11 @@ namespace Pi.Replicate.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FileChunkId")
+                    b.Property<Guid>("FileChunkId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("RecipientId")
+                    b.Property<Guid>("RecipientId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -43,6 +40,27 @@ namespace Pi.Replicate.Data.Migrations
                     b.HasIndex("RecipientId");
 
                     b.ToTable("ChunkPackages");
+                });
+
+            modelBuilder.Entity("Pi.Replicate.Domain.FailedFile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("FileId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("RecipientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileId");
+
+                    b.HasIndex("RecipientId");
+
+                    b.ToTable("FailedFiles");
                 });
 
             modelBuilder.Entity("Pi.Replicate.Domain.File", b =>
@@ -57,8 +75,8 @@ namespace Pi.Replicate.Data.Migrations
                     b.Property<Guid?>("FolderId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Hash")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Hash")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime>("LastModifiedDate")
                         .HasColumnType("datetime2");
@@ -88,17 +106,17 @@ namespace Pi.Replicate.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("FileId")
+                    b.Property<int>("ChunkSource")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("SequenceNo")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<byte[]>("Value")
+                        .HasColumnType("varbinary(max)");
 
                     b.HasKey("Id");
 
@@ -157,11 +175,30 @@ namespace Pi.Replicate.Data.Migrations
                 {
                     b.HasOne("Pi.Replicate.Domain.FileChunk", "FileChunk")
                         .WithMany()
-                        .HasForeignKey("FileChunkId");
+                        .HasForeignKey("FileChunkId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Pi.Replicate.Domain.Recipient", "Recipient")
                         .WithMany()
-                        .HasForeignKey("RecipientId");
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Pi.Replicate.Domain.FailedFile", b =>
+                {
+                    b.HasOne("Pi.Replicate.Domain.File", "File")
+                        .WithMany()
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Pi.Replicate.Domain.Recipient", "Recipient")
+                        .WithMany()
+                        .HasForeignKey("RecipientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Pi.Replicate.Domain.File", b =>
@@ -175,7 +212,9 @@ namespace Pi.Replicate.Data.Migrations
                 {
                     b.HasOne("Pi.Replicate.Domain.File", "File")
                         .WithMany()
-                        .HasForeignKey("FileId");
+                        .HasForeignKey("FileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Pi.Replicate.Domain.Folder", b =>

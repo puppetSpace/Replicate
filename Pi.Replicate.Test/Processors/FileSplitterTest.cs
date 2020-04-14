@@ -43,8 +43,8 @@ namespace Pi.Replicate.Test.Processors
 				amountOfCalls++;
 			});
 
-			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder, chunkCreated);
-			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo,null,pathBuilder.BasePath));
+			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
+			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo,null,pathBuilder.BasePath), chunkCreated);
 
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
@@ -66,8 +66,8 @@ namespace Pi.Replicate.Test.Processors
 			var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder,null);
-			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath));
+			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath),null);
 			var createdHashOfFile = Helper.CreateBase64HashForFile(compressedFile.FullName);
 
 
@@ -99,8 +99,8 @@ namespace Pi.Replicate.Test.Processors
 				amountOfCalls++;
 			});
 
-			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder, chunkCreated);
-			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath));
+			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
+			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, null, pathBuilder.BasePath), chunkCreated);
 
 
 			Assert.AreEqual(0, amountOfCalls);

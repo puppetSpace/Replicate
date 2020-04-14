@@ -42,7 +42,7 @@ namespace Pi.Replicate.Data.Migrations
                     Name = table.Column<string>(nullable: true),
                     Size = table.Column<long>(nullable: false),
                     AmountOfChunks = table.Column<long>(nullable: false),
-                    Hash = table.Column<string>(nullable: true),
+                    Hash = table.Column<byte[]>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     LastModifiedDate = table.Column<DateTime>(nullable: false),
                     Path = table.Column<string>(nullable: true)
@@ -83,14 +83,39 @@ namespace Pi.Replicate.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FailedFiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    FileId = table.Column<Guid>(nullable: false),
+                    RecipientId = table.Column<Guid>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FailedFiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FailedFiles_Files_FileId",
+                        column: x => x.FileId,
+                        principalTable: "Files",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_FailedFiles_Recipients_RecipientId",
+                        column: x => x.RecipientId,
+                        principalTable: "Recipients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FileChunks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    FileId = table.Column<Guid>(nullable: true),
+                    FileId = table.Column<Guid>(nullable: false),
                     SequenceNo = table.Column<int>(nullable: false),
-                    Value = table.Column<string>(nullable: true),
-                    Status = table.Column<int>(nullable: false)
+                    Value = table.Column<byte[]>(nullable: true),
+                    ChunkSource = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,7 +125,7 @@ namespace Pi.Replicate.Data.Migrations
                         column: x => x.FileId,
                         principalTable: "Files",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -108,9 +133,8 @@ namespace Pi.Replicate.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(nullable: false),
-                    FileChunkId = table.Column<Guid>(nullable: true),
-                    RecipientId = table.Column<Guid>(nullable: true),
-                    Type = table.Column<int>(nullable: false)
+                    FileChunkId = table.Column<Guid>(nullable: false),
+                    RecipientId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,13 +144,13 @@ namespace Pi.Replicate.Data.Migrations
                         column: x => x.FileChunkId,
                         principalTable: "FileChunks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ChunkPackages_Recipients_RecipientId",
                         column: x => x.RecipientId,
                         principalTable: "Recipients",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -137,6 +161,16 @@ namespace Pi.Replicate.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ChunkPackages_RecipientId",
                 table: "ChunkPackages",
+                column: "RecipientId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FailedFiles_FileId",
+                table: "FailedFiles",
+                column: "FileId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_FailedFiles_RecipientId",
+                table: "FailedFiles",
                 column: "RecipientId");
 
             migrationBuilder.CreateIndex(
@@ -159,6 +193,9 @@ namespace Pi.Replicate.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ChunkPackages");
+
+            migrationBuilder.DropTable(
+                name: "FailedFiles");
 
             migrationBuilder.DropTable(
                 name: "FolderRecipient");

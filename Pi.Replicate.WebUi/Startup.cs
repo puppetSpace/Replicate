@@ -15,6 +15,7 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using Pi.Replicate.Application.Common.Interfaces;
 using Observr;
+using Pi.Replicate.Processing;
 
 namespace Pi.Replicate.WebUi
 {
@@ -37,7 +38,9 @@ namespace Pi.Replicate.WebUi
 			services.AddApplication();
 			services.AddData(Configuration, ServiceLifetime.Transient);
 			services.AddSystemSettings(Configuration);
+			services.AddProcessing();
 			services.AddObservr();
+			services.AddHttpClient();
 
 		}
 
