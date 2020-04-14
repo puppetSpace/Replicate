@@ -22,6 +22,11 @@ namespace Pi.Replicate.Domain
 
         public string Path { get; private set; }
 
+        public void MarkAsHandled()
+        {
+            Status = FileStatus.Handled;
+        }
+
         public void UpdateForChange(System.IO.FileInfo file)
         {
             LastModifiedDate = file.LastWriteTimeUtc;

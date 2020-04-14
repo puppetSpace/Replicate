@@ -18,6 +18,8 @@ namespace Pi.Replicate.Application.Common.Interfaces
 
         DbSet<Recipient> Recipients { get; set; }
 
+        DbSet<FailedFile> FailedFiles { get; set; }
+
         Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

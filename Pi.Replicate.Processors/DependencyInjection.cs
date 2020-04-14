@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Processing.Files;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace Pi.Replicate.Processing
         public static void AddProcessing(this IServiceCollection services) 
         {
             services.AddTransient<FileCollectorFactory>();
-            services.AddTransient<FileSplitterFactory>();
+            services.AddTransient<IFileSplitterFactory, FileSplitterFactory>();
         }
     }
 }

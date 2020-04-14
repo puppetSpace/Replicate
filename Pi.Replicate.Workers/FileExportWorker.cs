@@ -1,53 +1,40 @@
-using System.Threading;
 using MediatR;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Events.SendFileToRecipient;
 using Pi.Replicate.Domain;
-using System.Net.Http;
+using Serilog;
+using System.Threading;
 
 namespace Pi.Replicate.Workers
 {
-    public class FileExportWorker : WorkerBase
-    {
-        private readonly WorkerQueueFactory _workerQueueFactory;
-        private readonly HttpHelper _httpHelper;
-        private readonly IMediator _mediator;
+	public class FileExportWorker : WorkerBase
+	{
+		private readonly WorkerQueueFactory _workerQueueFactory;
+		private readonly IMediator _mediator;
 
-        public FileExportWorker(WorkerQueueFactory workerQueueFactory, IMediator mediator, IHttpClientFactory clientFactory)
-        {
-            _workerQueueFactory = workerQueueFactory;
-            _mediator = mediator;
-            _httpHelper = new HttpHelper(clientFactory);
-        }
-        public override Thread DoWork(CancellationToken cancellationToken)
-        {
-            var thread = new Thread(async () =>
-            {
-                var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
-                while (!queue.IsCompleted || !cancellationToken.IsCancellationRequested)
-                {
-                    var file = queue.Take();
+		public FileExportWorker(IMediator mediator)
+		{
+			_mediator = mediator;
+		}
+		public override Thread DoWork(CancellationToken cancellationToken)
+		{
+			var thread = new Thread(async () =>
+			{
+				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+				var outgoingQueue = _workerQueueFactory.Get<ChunkPackage>(WorkerQueueType.ToSendChunks);
+				while (!incomingQueue.IsCompleted || !cancellationToken.IsCancellationRequested)
+				{
+					var file = incomingQueue.Take();
+					foreach (var recipient in file.Folder.Recipients)
+					{
+						Log.Information($"Sending metadata of file '{file.Path}' to '{recipient.Recipient.Name}'");
+						await _mediator.Send(new SendFileToRecipientEvent { File = file, Recipient = recipient.Recipient });
+					}
+				}
+			});
 
-                    foreach (var recipient in file.Folder.Recipients)
-                    {
-                        var endpoint = $"{recipient.Recipient.Address}/api/file";
-                        try
-                        {
-                            await _httpHelper.Post(endpoint, file);
-                            //todo create chunkpackge
-                            //todo add to queue
-                        }
-                        catch (System.InvalidOperationException ex)
-                        {
-                            //add to failed files
-                            throw;
-                        }
-                    }
-                }
-
-            });
-
-            thread.Start();
-            return thread;
-        }
-    }
+			thread.Start();
+			return thread;
+		}
+	}
 }

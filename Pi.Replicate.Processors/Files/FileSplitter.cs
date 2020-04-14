@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common;
+using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Processing.Helpers;
 using Pi.Replicate.Shared;
@@ -16,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Processing.Files
 {
-	public sealed class FileSplitter
+	public sealed class FileSplitter : IFileSplitter
 	{
 		private readonly int _sizeofChunkInBytes;
 		private readonly PathBuilder _pathBuilder;
@@ -82,7 +83,7 @@ namespace Pi.Replicate.Processing.Files
 	}
 
 
-	public class FileSplitterFactory
+	public class FileSplitterFactory : IFileSplitterFactory
 	{
 		private readonly IConfiguration _configuration;
 		private readonly PathBuilder _pathBuilder;
@@ -93,7 +94,7 @@ namespace Pi.Replicate.Processing.Files
 			_pathBuilder = pathBuilder;
 		}
 
-		public FileSplitter Get()
+		public IFileSplitter Get()
 		{
 			return new FileSplitter(_configuration, _pathBuilder);
 		}

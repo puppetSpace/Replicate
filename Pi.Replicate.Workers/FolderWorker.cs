@@ -34,6 +34,7 @@ namespace Pi.Replicate.Workers
             _workerQueueFactory = workerQueueFactory;
         }
 
+        //todo move to application
         public override Thread DoWork(CancellationToken cancellationToken)
         {
             var workingThread = new Thread(async () =>
