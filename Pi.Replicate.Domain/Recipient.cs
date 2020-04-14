@@ -4,10 +4,15 @@ namespace Pi.Replicate.Domain
 {
     public class Recipient
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
-        public string Address { get; set; }
+        public string Address { get; private set; }
+
+        public static Recipient Build(string name, string address)
+        {
+            return new Recipient { Id = Guid.NewGuid(), Name = name, Address = address };
+        }
     }
 }

@@ -6,14 +6,14 @@
 <form class="folder-add-form">
     @if (ValidationMessages.Any())
     {
-    <div class="validation-summary">
-        <ul>
-            @foreach (var message in ValidationMessages)
-            {
-                <li>@message</li>
-            }
-        </ul>
-    </div>
+        <div class="validation-summary">
+            <ul>
+                @foreach (var message in ValidationMessages)
+                {
+                    <li>@message</li>
+                }
+            </ul>
+        </div>
     }
     <div class="form-group">
         <input type="radio" class="form-check-input" id="create" name="creationOption" value="create"
@@ -48,6 +48,9 @@
         <div class="form-group">
             <label for="recipients">Recipients:</label>
             <CheckBoxListView CheckItems="Recipients" />
+            <a class="link" @onclick="@(()=>ShowCreateRecipientDialog = true)">
+                <span class="oi oi-plus" aria-hidden="true"></span> Create new recipient
+            </a>
         </div>
     </div>
 
@@ -56,6 +59,42 @@
            value="Save" />
 </form>
 
-@code {
+@if (ShowCreateRecipientDialog)
+{
+    <div class="modal fade show" role="dialog" style="display:block" aria-modal="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create new recipient</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" @onclick="@(() => ShowCreateRecipientDialog = false)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (RecipientValidationMessages.Any())
+                    {
+                        <div class="validation-summary">
+                            <ul>
+                                @foreach (var message in RecipientValidationMessages)
+                                {
+                                    <li>@message</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                    <form>
+                        <div class="form-group">
+                            <input type="text" class="form-text" placeholder="Name..." @bind="RecipientModel.Name" />
+                            <input type="text" class="form-text" placeholder="Address..." @bind="RecipientModel.Address" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" @onclick="CreateRecipient">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 }
+

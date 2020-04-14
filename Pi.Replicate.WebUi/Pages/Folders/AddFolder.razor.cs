@@ -1,8 +1,9 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Components;
-using Pi.Replicate.Application.Folders.Commands.AddNewFolder;
+using Pi.Replicate.Application.Folders.Commands.AddFolder;
 using Pi.Replicate.Application.Folders.Queries.GetAvailableFolders;
+using Pi.Replicate.Application.Recipients.Commands.AddRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientList;
 using Pi.Replicate.WebUi.Components;
 using System;
@@ -21,6 +22,10 @@ namespace Pi.Replicate.WebUi.Pages.Folders
         protected bool DeleteAfterSend { get; set; }
         protected List<CheckItem<Domain.Recipient>> Recipients { get; set; } = new List<CheckItem<Domain.Recipient>>();
         protected List<string> ValidationMessages { get; set; } = new List<string>();
+        protected List<string> RecipientValidationMessages { get; set; } = new List<string>();
+        protected bool ShowCreateRecipientDialog { get; set; }
+        protected RecipientModel RecipientModel { get; set; } = new RecipientModel();
+
 
         [Inject]
         protected IMediator Mediator { get; set; }
@@ -38,7 +43,7 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
         protected async Task CreateNewFolder()
         {
-            var command = new AddNewFolderCommand
+            var command = new AddFolderCommand
             {
                 Name = SelectedFolder,
                 DeleteAfterSend = DeleteAfterSend,
@@ -53,6 +58,27 @@ namespace Pi.Replicate.WebUi.Pages.Folders
             catch (ValidationException ex)
             {
                 ValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
+            }
+        }
+
+        protected async Task CreateRecipient()
+        {
+            var command = new AddRecipientCommand
+            {
+                Name = RecipientModel.Name,
+                Address = RecipientModel.Address,
+            };
+            try
+            {
+                var createdRecipient = await Mediator.Send(command);
+                Recipients.Add(new CheckItem<Domain.Recipient> { Data = createdRecipient, DisplayText = createdRecipient.Name, IsChecked = true });
+                RecipientModel = new RecipientModel();
+                RecipientValidationMessages.Clear();
+                ShowCreateRecipientDialog = false;
+            }
+            catch (ValidationException ex)
+            {
+                RecipientValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
             }
         }
 
@@ -74,5 +100,12 @@ namespace Pi.Replicate.WebUi.Pages.Folders
     {
         CreateNew = 0,
         SelectExisting = 1
+    }
+
+    public class RecipientModel
+    {
+        public string Name { get; set; }
+
+        public string Address { get; set; }
     }
 }

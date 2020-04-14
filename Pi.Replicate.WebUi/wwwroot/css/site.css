@@ -75,7 +75,6 @@
   padding: 10px;
   margin-bottom: 20px;
 }
-/*FOLDERADD*/
 .folder-add-form {
   padding: 1rem;
   display: flex;
@@ -162,4 +161,24 @@ app {
   position: absolute;
   right: 0.75rem;
   top: 0.5rem;
+}
+.link {
+  color: #d7d7d7;
+  border-radius: 4px;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  line-height: 2.5rem;
+  margin-top: 5px;
+}
+.link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  cursor: pointer;
+}
+.modal-content {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.modal-content button {
+  color: #ffffff;
 }

@@ -5,6 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Recipients\Commands\**" />
+    <EmbeddedResource Remove="Recipients\Commands\**" />
+    <None Remove="Recipients\Commands\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Recipients\Commands\AddNewRecipient\AddRecipientCommand.cs" />
+    <Compile Include="Recipients\Commands\AddNewRecipient\AddRecipientValidator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="FluentValidation" Version="8.6.2" />
@@ -22,7 +33,6 @@
 
   <ItemGroup>
     <Folder Include="Chunks\Queries\" />
-    <Folder Include="Recipients\Commands\" />
   </ItemGroup>
 
   <ItemGroup>

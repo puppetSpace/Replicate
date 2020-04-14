@@ -10,9 +10,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
+namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 {
-    public class AddNewFolderCommand : IRequest
+    public class AddFolderCommand : IRequest
     {
         public string Name { get; set; }
 
@@ -23,7 +23,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
         public List<Recipient> Recipients { get; set; }
     }
 
-    public class AddNewFolderCommandHandler : IRequestHandler<AddNewFolderCommand>
+    public class AddNewFolderCommandHandler : IRequestHandler<AddFolderCommand>
     {
         private readonly IWorkerContext _workerContext;
         private readonly PathBuilder _pathBuilder;
@@ -36,7 +36,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddNewFolder
             _broker = broker;
         }
 
-        public async Task<Unit> Handle(AddNewFolderCommand request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(AddFolderCommand request, CancellationToken cancellationToken)
         {
             var folder = new Folder
             {
