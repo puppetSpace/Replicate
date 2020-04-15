@@ -49,7 +49,7 @@ namespace Pi.Replicate.Application.Files.Processing
             return changed;
         }
 
-        private async Task<(IList<System.IO.FileInfo> AllFiles, List<File> ProcessedFiles)> GetFiles()
+        private async Task<(IList<System.IO.FileInfo> AllFiles, ICollection<File> ProcessedFiles)> GetFiles()
         {
             var folderPath = _pathBuilder.BuildPath(_folder.Name);
             if (_folder is null || !System.IO.Directory.Exists(folderPath))
@@ -58,7 +58,7 @@ namespace Pi.Replicate.Application.Files.Processing
                 throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
             }
 
-            var previousFilesInFolder = new List<File>();
+            ICollection<File> previousFilesInFolder = new List<File>();
             if (!_folder.FolderOptions.DeleteAfterSent)
             {
                 previousFilesInFolder = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));

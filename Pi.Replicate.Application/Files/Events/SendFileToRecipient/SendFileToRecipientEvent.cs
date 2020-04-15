@@ -46,9 +46,7 @@ namespace Pi.Replicate.Application.Files.Events.SendFileToRecipient
 					outgoingQueue.Add(package);
 
 				request.File.MarkAsHandled();
-				_workerContext.Files.Update(request.File);
-
-				await _workerContext.SaveChangesAsync(cancellationToken);
+				await _workerContext.FileRepository.Update(request.File);
 			}
 
 			return Unit.Value;
@@ -84,8 +82,7 @@ namespace Pi.Replicate.Application.Files.Events.SendFileToRecipient
 			catch (System.InvalidOperationException ex)
 			{
 				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to FailedFiles and retrying later");
-				_workerContext.FailedFiles.Add(FailedFile.Build(file.Id, recipient.Id));
-				await _workerContext.SaveChangesAsync(cancellationToken);
+				await _workerContext.FailedFileRepository.Create(FailedFile.Build(file, recipient));
 				return false;
 			}
 		}

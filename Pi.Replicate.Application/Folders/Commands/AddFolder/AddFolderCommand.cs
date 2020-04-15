@@ -44,10 +44,9 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
                 FolderOptions = new FolderOption { DeleteAfterSent = request.DeleteAfterSend },
             };
 
-            folder.Recipients = request.Recipients.Select(x => new FolderRecipient { FolderId = folder.Id, RecipientId = x.Id }).ToList();
+            folder.Recipients = request.Recipients;
 
-            _workerContext.Folders.Add(folder);
-            await _workerContext.SaveChangesAsync(cancellationToken);
+            await _workerContext.FolderRepository.Create(folder);
 
             var path = _pathBuilder.BuildPath(folder.Name);
             if (request.CreateOnDisk && !System.IO.Directory.Exists(path))

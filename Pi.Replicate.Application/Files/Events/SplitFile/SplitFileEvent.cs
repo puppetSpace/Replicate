@@ -24,7 +24,7 @@ namespace Pi.Replicate.Application.Files.Events.SplitFile
 		public SplitFileEventHandler(FileSplitterFactory fileSplitterFactory
 		, WorkerQueueFactory workerQueueFactory
 		, IWorkerContext workerContext
-			, PathBuilder pathBuilder)
+		, PathBuilder pathBuilder)
 		{
 			_fileSplitterFactory = fileSplitterFactory;
 			_workerQueueFactory = workerQueueFactory;
@@ -34,35 +34,34 @@ namespace Pi.Replicate.Application.Files.Events.SplitFile
 
 		public async Task<Unit> Handle(SplitFileEvent request, CancellationToken cancellationToken)
 		{
-			var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
-			var fileSplitter = _fileSplitterFactory.Get();
-			int sequenceNo = 0;
-			if (request.File.Status == FileStatus.New)
+			using (_workerContext)
 			{
-				//todo Save regulary to reduce memory consumption
-				var fileHash = await fileSplitter.ProcessFile(request.File, async x =>
+				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+				var fileSplitter = _fileSplitterFactory.Get();
+				int sequenceNo = 0;
+				if (request.File.Status == FileStatus.New)
 				{
-					var builtChunk = FileChunk.Build(request.File, sequenceNo, x, ChunkSource.FromNewFile);
-					_workerContext.FileChunks.Add(builtChunk);
+					var fileHash = await fileSplitter.ProcessFile(request.File, async x =>
+					{
+						var builtChunk = FileChunk.Build(request.File.Id, sequenceNo, x, ChunkSource.FromNewFile);
+						await _workerContext.FileChunkRepository.Create(builtChunk);
 
-				});
+					});
 
-				var delta = new Delta();
-				var signature = delta.CreateSignature(_pathBuilder.BuildPath(request.File.Path));
+					var delta = new Delta();
+					var signature = delta.CreateSignature(_pathBuilder.BuildPath(request.File.Path));
 
-				request.File.UpdateAfterProcessesing(sequenceNo, fileHash, signature);
-				_workerContext.Files.Update(request.File);
+					request.File.UpdateAfterProcessesing(sequenceNo, fileHash, signature);
+					await _workerContext.FileRepository.Update(request.File);
 
-				await _workerContext.SaveChangesAsync(cancellationToken);
-
-				if (request.File.Folder.FolderOptions.DeleteAfterSent)
-				{
-					var path = _pathBuilder.BuildPath(request.File.Path);
-					System.IO.File.Delete(path);
+					if (request.File.Folder.FolderOptions.DeleteAfterSent)
+					{
+						var path = _pathBuilder.BuildPath(request.File.Path);
+						System.IO.File.Delete(path);
+					}
 				}
+				outgoingQueue.Add(request.File);
 			}
-			outgoingQueue.Add(request.File);
-
 			return Unit.Value;
 		}
 	}

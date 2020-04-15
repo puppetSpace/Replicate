@@ -29,9 +29,8 @@ namespace Pi.Replicate.Application.Files.Events.RetryFailedFiles
 
         public async Task<Unit> Handle(RetryFailedFilesEvent request, CancellationToken cancellationToken)
         {
-            var failedFiles = await _workerContext.FailedFiles.AsNoTracking().ToListAsync();
-            _workerContext.FailedFiles.RemoveRange(_workerContext.FailedFiles.AsNoTracking());
-            await _workerContext.SaveChangesAsync(cancellationToken);
+            var failedFiles = await _workerContext.FailedFileRepository.Get();
+            await _workerContext.FailedFileRepository.DeleteAll();
 
             foreach (var file in failedFiles)
             {

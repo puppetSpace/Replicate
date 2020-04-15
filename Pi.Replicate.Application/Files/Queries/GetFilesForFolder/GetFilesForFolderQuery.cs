@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 {
-    public class GetFilesForFolderQuery : IRequest<List<File>>
+    public class GetFilesForFolderQuery : IRequest<ICollection<File>>
     {
         public GetFilesForFolderQuery(Guid folderId)
         {
@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
         public Guid FolderId { get; }
     }
 
-    public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, List<File>>
+    public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, ICollection<File>>
     {
         private readonly IWorkerContext _workerContext;
 
@@ -31,13 +31,9 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
             _workerContext = workerContext;
         }
 
-        public Task<List<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
         {
-            return _workerContext.Files
-                .Where(x => x.Folder.Id == request.FolderId)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
-
+            return await _workerContext.FileRepository.GetForFolder(request.FolderId);
         }
     }
 }

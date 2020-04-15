@@ -27,7 +27,7 @@ namespace Pi.Replicate.Workers
 				{
 					var chunkPackage = queue.Take();
 
-					Log.Verbose($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' of file '{chunkPackage.FileChunk.File.Path}' to '{chunkPackage.Recipient.Name}'");
+					Log.Verbose($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' of file with Id '{chunkPackage.FileChunk.FileId}' to '{chunkPackage.Recipient.Name}'");
 					await _mediator.Send(new SendChunkToRecipientEvent { ChunkPackage = chunkPackage });
 				}
 

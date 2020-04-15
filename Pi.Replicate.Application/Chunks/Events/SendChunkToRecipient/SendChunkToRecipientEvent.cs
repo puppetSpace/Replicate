@@ -34,12 +34,11 @@ namespace Pi.Replicate.Application.Chunks.Events.SendChunkToRecipient
             try
             {
                 await _httpHelper.Post($"{request.ChunkPackage.Recipient.Address}/Api/Chunk", request.ChunkPackage.FileChunk);
-                _workerContext.ChunkPackages.Remove(request.ChunkPackage);
-                await _workerContext.SaveChangesAsync(cancellationToken);
+                await _workerContext.ChunkPackageRepository.Delete(request.ChunkPackage.Id);
             }
             catch (InvalidOperationException ex)
             {
-                Log.Error(ex, $"Failed to send chunk of file '{request.ChunkPackage.FileChunk.File.Path}' to '{request.ChunkPackage.Recipient.Name}'");
+                Log.Error(ex, $"Failed to send chunk of file with Id '{request.ChunkPackage.FileChunk.FileId}' to '{request.ChunkPackage.Recipient.Name}'");
             }
 
             return Unit.Value;

@@ -11,18 +11,12 @@ namespace Pi.Replicate.Data
     {
         public static void AddData(this IServiceCollection services, IConfiguration configuration, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
-            services.AddDbContext<WorkerContext>(options =>
-            {
-                options.UseLoggerFactory(LoggerFactory.Create(x => x.AddConsole()));
-                options.UseSqlServer(configuration.GetConnectionString("ReplicateDatabase"));
-            }, serviceLifetime);
-
             services.AddDbContext<SystemContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("ReplicateDatabase"));
             }, serviceLifetime);
 
-            services.AddTransient<IWorkerContext>(provider => provider.GetService<WorkerContext>());
+            services.AddTransient<IWorkerContext, WorkerContext>();
             services.AddTransient<ISystemContext>(provider => provider.GetService<SystemContext>());
         }
 

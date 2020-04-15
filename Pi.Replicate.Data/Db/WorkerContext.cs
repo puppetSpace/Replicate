@@ -1,35 +1,39 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Application.Common.Interfaces.Repositories;
+using Pi.Replicate.Data.Db.Repositories;
 using Pi.Replicate.Domain;
 using System;
 
 namespace Pi.Replicate.Data.Db
 {
-	public class WorkerContext : DbContext, IWorkerContext
+	public class WorkerContext : IWorkerContext
 	{
-
-		public WorkerContext(DbContextOptions<WorkerContext> options) : base(options)
+		private readonly SqlConnection _sqlConnection;
+		public WorkerContext(IConfiguration configuration)
 		{
-
+			_sqlConnection = new SqlConnection(configuration.GetConnectionString("ReplicateDatabase"));
+			FolderRepository = new FolderRepository(_sqlConnection);
+			FileRepository = new FileRepository(_sqlConnection);
+			FileChunkRepository = new FileChunkRepository(_sqlConnection);
+			ChunkPackageRepository = new ChunkPackageRepository(_sqlConnection);
+			RecipientRepository = new RecipientRepository(_sqlConnection);
+			FailedFileRepository = new FailedFileRepository(_sqlConnection);
 		}
-		public DbSet<Folder> Folders { get; set; }
-		public DbSet<File> Files { get; set; }
-		public DbSet<FileChunk> FileChunks { get; set; }
-		public DbSet<ChunkPackage> ChunkPackages { get; set; }
-		public DbSet<Recipient> Recipients { get; set; }
-		public DbSet<FailedFile> FailedFiles { get; set; }
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+
+		public IFolderRepository FolderRepository { get; }
+		public IFileRepository FileRepository { get; }
+		public IFileChunkRepository FileChunkRepository { get; }
+		public IChunkPackageRepository ChunkPackageRepository { get; }
+		public IRecipientRepository RecipientRepository { get; }
+		public IFailedFileRepository FailedFileRepository { get; }
+
+		public void Dispose()
 		{
-			modelBuilder.Entity<Folder>(x =>
-			{
-				x.OwnsOne(f => f.FolderOptions);
-			});
-
-			modelBuilder.Entity<FolderRecipient>(x =>
-			{
-				x.HasKey(k => new { k.RecipientId, k.FolderId });
-			});
+			_sqlConnection?.Close();
 		}
 	}
 }

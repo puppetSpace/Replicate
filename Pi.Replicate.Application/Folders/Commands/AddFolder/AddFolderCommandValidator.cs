@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
                 .WithMessage("A folder or name for a folder must be provided");
 
             RuleFor(x => x.Name)
-                .Must(x => !workerContext.Folders.AsNoTracking().ToList().Any(y => string.Equals(y.Name, x, StringComparison.OrdinalIgnoreCase)))
+                .MustAsync((x,y) => workerContext.FolderRepository.IsUnique(x))
                 .WithMessage(x => $"Folder '{x.Name}' already exists.");
 
             RuleFor(x => x.Recipients)

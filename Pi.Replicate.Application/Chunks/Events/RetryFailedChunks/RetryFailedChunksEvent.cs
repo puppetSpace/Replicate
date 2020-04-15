@@ -28,16 +28,17 @@ namespace Pi.Replicate.Application.Chunks.Events.RetryFailedChunks
             _workerQueueFactory = workerQueueFactory;
         }
 
-        public Task<Unit> Handle(RetryFailedChunksEvent request, CancellationToken cancellationToken)
+        public async Task<Unit> Handle(RetryFailedChunksEvent request, CancellationToken cancellationToken)
         {
             var queue = _workerQueueFactory.Get<ChunkPackage>(WorkerQueueType.ToSendChunks);
-            foreach (var chunkPackage in _workerContext.ChunkPackages.AsNoTracking())
+            var chunkPackages = await _workerContext.ChunkPackageRepository.Get();
+            foreach (var chunkPackage in chunkPackages)
             {
-                if (!queue.GetConsumingEnumerable().Any(x => x.Id == chunkPackage.Id))
+                if (!queue.Any(x => x.Id == chunkPackage.Id))
                     queue.Add(chunkPackage);
             }
 
-            return Unit.Task;
+            return Unit.Value;
         }
     }
 }

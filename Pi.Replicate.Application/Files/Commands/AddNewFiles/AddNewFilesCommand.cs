@@ -43,11 +43,10 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
             foreach (var newFile in request.NewFiles)
             {
                 Log.Verbose($"Adding '{newFile.FullName}' to context");
-                var file = File.BuildPartial(newFile, request.Folder, _pathBuilder.BasePath);
-                _workerContext.Files.Add(file);
+                var file = File.BuildPartial(newFile, request.Folder.Id, _pathBuilder.BasePath);
+                await _workerContext.FileRepository.Create(file);
                 createdFiles.Add(file);
             }
-            await _workerContext.SaveChangesAsync(cancellationToken);
 
             return createdFiles;
         }

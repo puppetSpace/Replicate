@@ -6,7 +6,7 @@ namespace Pi.Replicate.Domain
     {
         public Guid Id { get; private set; }
 
-		public Folder Folder { get; private set; }
+		public Guid FolderId { get; private set; }
 
 		public string Name { get; private set; }
 
@@ -43,7 +43,7 @@ namespace Pi.Replicate.Domain
             Status = FileStatus.Processed;
         }
 
-        public static File BuildPartial(System.IO.FileInfo file, Folder folder, string basePath,DateTime? customLastModified = null)
+        public static File BuildPartial(System.IO.FileInfo file, Guid folderId, string basePath,DateTime? customLastModified = null)
         {
             if (file is null || !file.Exists)
                 throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
@@ -51,7 +51,7 @@ namespace Pi.Replicate.Domain
             return new File
             {
                 Id = Guid.NewGuid(),
-                Folder = folder,
+                FolderId = folderId,
                 LastModifiedDate = customLastModified??file.LastWriteTimeUtc,
                 Name = file.Name,
                 Path = file.FullName.Replace(basePath+"\\",""), //must be relative to base
