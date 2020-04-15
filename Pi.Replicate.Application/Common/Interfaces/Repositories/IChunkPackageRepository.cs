@@ -11,6 +11,8 @@ namespace Pi.Replicate.Application.Common.Interfaces.Repositories
     {
         Task<ICollection<ChunkPackage>> Get();
 
+        Task Create(ChunkPackage chunkPackage);
+
         Task Delete(Guid id);
     }
 }

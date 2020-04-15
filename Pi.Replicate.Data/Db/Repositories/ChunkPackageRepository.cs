@@ -42,5 +42,10 @@ namespace Pi.Replicate.Data.Db.Repositories
 		{
 			await _sqlConnection.ExecuteAsync("DELETE FROM db.ChunkPackages WHERE Id = @Id", new { Id = id });
 		}
-	}
+
+        public async Task Create(ChunkPackage chunkPackage)
+        {
+            await _sqlConnection.ExecuteAsync("INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId",new{chunkPackage.Id, FileChunkId=chunkPackage.FileChunk.Id,RecipientId=chunkPackage.Recipient.Id});
+        }
+    }
 }

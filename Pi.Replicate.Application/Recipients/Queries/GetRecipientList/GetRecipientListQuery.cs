@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientList
 
         public async Task<RecipientListVm> Handle(GetRecipientListQuery request, CancellationToken cancellationToken)
         {
-            var recipients = await _workerContext.Recipients.ToListAsync();
+            var recipients = await _workerContext.RecipientRepository.GetRecipients();
 
             return new RecipientListVm { Recipients = recipients };
         }

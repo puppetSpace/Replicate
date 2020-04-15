@@ -29,9 +29,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
         public async Task<Recipient> Handle(AddRecipientCommand request, CancellationToken cancellationToken)
         {
             var builtRecipient = Recipient.Build(request.Name, request.Address);
-           _workerContext.Recipients.Add(builtRecipient); ;
-
-            await _workerContext.SaveChangesAsync(cancellationToken);
+           await _workerContext.RecipientRepository.Create(builtRecipient); ;
 
             return builtRecipient;
         }

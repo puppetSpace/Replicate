@@ -55,20 +55,16 @@ namespace Pi.Replicate.Application.Files.Events.SendFileToRecipient
 		private async IAsyncEnumerable<ChunkPackage> CreateChunkPackages(Guid fileId, Recipient recipient, CancellationToken cancellationToken)
 		{
 
-			var chunks = _workerContext
-				.FileChunks
-				.Include(x => x.File)
-				.AsNoTracking()
-				.Where(x => x.FileId == fileId);
+			var chunks = await _workerContext
+				.FileChunkRepository
+				.GetForFile(fileId);
 
 			foreach (var chunk in chunks)
 			{
 				var package = ChunkPackage.Build(chunk, recipient);
-				_workerContext.ChunkPackages.Add(package);
+				await _workerContext.ChunkPackageRepository.Create(package);
 				yield return package;
 			}
-
-			await _workerContext.SaveChangesAsync(cancellationToken);
 		}
 
 		private async Task<bool> SendFile(File file, Recipient recipient, CancellationToken cancellationToken)

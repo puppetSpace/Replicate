@@ -11,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
 {
-    public class GetFoldersToCrawlQuery : IRequest<List<Folder>>
+    public class GetFoldersToCrawlQuery : IRequest<ICollection<Folder>>
     {
         
     }
 
-    public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, List<Folder>>
+    public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, ICollection<Folder>>
     {
         private readonly IWorkerContext _workerContext;
 
@@ -25,13 +25,11 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
             _workerContext = workerContext;
         }
 
-        public Task<List<Folder>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<Folder>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
         {
-            return _workerContext
-                .Folders
-                .Include(x=>x.Recipients)
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+            return await _workerContext
+                .FolderRepository
+                .Get();
         }
     }
 }

@@ -28,9 +28,8 @@ namespace Pi.Replicate.Application.Folders.Queries.GetAvailableFolders
         public async Task<AvailableFoldersViewModel> Handle(GetAvailableFoldersQuery request, CancellationToken cancellationToken)
         {
             var usedFolders = await _workerContext
-                .Folders
-                .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .FolderRepository
+                .Get();
 
             var availableFolders = System.IO.Directory.GetDirectories(_pathBuilder.BasePath)
                 .Select(x => new System.IO.DirectoryInfo(x))

@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 				.WithMessage("Name cannot be empty");
 
 			RuleFor(x => x.Name)
-				.Must(x => !workerContext.Recipients.ToList().Any(y => string.Equals(y.Name, x, StringComparison.OrdinalIgnoreCase)))
+				.MustAsync((x,c) => workerContext.RecipientRepository.IsNameUnique(x))
 				.WithMessage(x => $"The name '{x}' is not unique");
 
 			RuleFor(x => x.Address)
@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 				.WithMessage("Address canot be empty");
 
 			RuleFor(x => x.Address)
-				.Must(x => !workerContext.Recipients.ToList().Any(y => string.Equals(y.Address, x, StringComparison.OrdinalIgnoreCase)))
+				.MustAsync((x,c) => workerContext.RecipientRepository.IsAddressUnique(x))
 				.WithMessage(x => $"There is already a recipient with the address '{x}'");
 		}
 	}

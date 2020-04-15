@@ -9,6 +9,6 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientList
 {
     public class RecipientListVm
     {
-        public List<Recipient> Recipients { get; set; }
+        public ICollection<Recipient> Recipients { get; set; }
     }
 }

@@ -9,6 +9,7 @@ namespace Pi.Replicate.Application.Common.Interfaces.Repositories
 {
     public interface IFileChunkRepository
     {
+        Task<ICollection<FileChunk>> GetForFile(Guid fileId);
         Task Create(FileChunk fileChunk);
     }
 }
