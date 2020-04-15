@@ -21,5 +21,11 @@ namespace Pi.Replicate.Application.Files.Processing
             return memoryStream.ToArray();
         }
 
+        public byte[] CreateSignature(string path)
+        {
+            using (var fs = new FileStream(path, FileMode.Open))
+                return CreateSignature(fs);
+        }
+
     }
 }

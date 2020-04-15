@@ -47,9 +47,10 @@ namespace Pi.Replicate.Application.Files.Events.SplitFile
 
 				});
 
-				//var delta = new Delta
+				var delta = new Delta();
+				var signature = delta.CreateSignature(_pathBuilder.BuildPath(request.File.Path));
 
-				request.File.UpdateAfterProcessesing(sequenceNo, fileHash, null);
+				request.File.UpdateAfterProcessesing(sequenceNo, fileHash, signature);
 				_workerContext.Files.Update(request.File);
 
 				await _workerContext.SaveChangesAsync(cancellationToken);
