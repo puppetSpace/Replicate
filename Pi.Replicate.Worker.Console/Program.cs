@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Pi.Replicate.Application;
 using Pi.Replicate.Data;
+using Pi.Replicate.Workers;
 using System.IO;
 
 namespace Pi.Replicate.Worker.Console
@@ -24,7 +25,12 @@ namespace Pi.Replicate.Worker.Console
 
             services.AddApplication();
             services.AddData(config, ServiceLifetime.Transient);
+            services.AddSystemSettings(config);
             services.AddHttpClient();
+
+
+            services.AddTransient<FolderWorker>();
+            services.AddTransient<FileProcessForExportWorker>();
 
 
             // required to run the application

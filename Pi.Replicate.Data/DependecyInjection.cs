@@ -13,6 +13,7 @@ namespace Pi.Replicate.Data
         {
             services.AddDbContext<WorkerContext>(options =>
             {
+                options.UseLoggerFactory(LoggerFactory.Create(x => x.AddConsole()));
                 options.UseSqlServer(configuration.GetConnectionString("ReplicateDatabase"));
             }, serviceLifetime);
 

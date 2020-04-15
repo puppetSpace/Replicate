@@ -48,9 +48,11 @@ namespace Pi.Replicate.Workers
                         await ProcessNewFiles(folder, collector);
                         //await collector.GetChangedFiles(); //add to queue
                     }
+
+                    Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+                    await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
                 }
-                Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
-                await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+
             });
             workingThread.Start();
             return workingThread;
@@ -64,7 +66,7 @@ namespace Pi.Replicate.Workers
             foreach (var file in createdFiles)
             {
                 Log.Verbose($"Adding '{file.Path}' to queue");
-                if (queue.GetConsumingEnumerable().Any(x => string.Equals(x.Path, file.Path)))
+                if (queue.Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{file.Path} already present in queue for processing");
                 else
                     queue.Add(file);
