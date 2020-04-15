@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Pi.Replicate.Data.Db;
 
 namespace Pi.Replicate.Data.Migrations
 {
     [DbContext(typeof(WorkerContext))]
-    partial class WorkerContextModelSnapshot : ModelSnapshot
+    [Migration("20200415064018_AddSignature")]
+    partial class AddSignature
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
