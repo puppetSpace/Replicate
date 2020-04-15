@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Domain;
-using Pi.Replicate.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Common
+namespace Pi.Replicate.Shared
 {
     public class PathBuilder
     {
@@ -18,14 +16,9 @@ namespace Pi.Replicate.Application.Common
 
 		public string BasePath { get; }
 
-		public string BuildPath(Folder folder)
+		public string BuildPath(string relativePath)
         {
-            return System.IO.Path.Combine(BasePath, folder?.Name??"");
-        }
-
-        public string BuildPath(File file)
-        {
-            return System.IO.Path.Combine(BasePath, file?.Path??"");
+            return System.IO.Path.Combine(BasePath, relativePath??"");
         }
     }
 }

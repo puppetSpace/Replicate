@@ -28,7 +28,6 @@
     <ProjectReference Include="..\Pi.Replicate.Application\Pi.Replicate.Application.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Data\Pi.Replicate.Data.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Domain\Pi.Replicate.Domain.csproj" />
-    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Workers\Pi.Replicate.Workers.csproj" />
   </ItemGroup>
 

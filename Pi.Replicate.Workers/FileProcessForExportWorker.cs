@@ -1,16 +1,11 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Events.SplitFile;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Processing.Files;
 using Pi.Replicate.Shared;
 using Serilog;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

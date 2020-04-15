@@ -2,10 +2,9 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
+using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Processing.Files;
-using Serilog;
+using Pi.Replicate.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,15 +32,15 @@ namespace Pi.Replicate.Test.Processors
             mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(new List<File>()));
 
-            var fileCollector = new FileCollector(new Application.Common.PathBuilder(configurationMock.Object), mockMediator.Object, folder);
+            var fileCollector = new FileCollector(new PathBuilder(configurationMock.Object), mockMediator.Object, folder);
             var files = await fileCollector.GetNewFiles();
 
             Assert.AreEqual(5, files.Count);
-            Assert.IsTrue(files.Any(x=>x.Name == "test1.txt"));
-            Assert.IsTrue(files.Any(x=>x.Name == "test2.txt"));
-            Assert.IsTrue(files.Any(x=>x.Name == "test3.txt"));
-            Assert.IsTrue(files.Any(x=>x.Name == "test4.txt"));
-            Assert.IsTrue(files.Any(x=>x.Name == "test5.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test1.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test3.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test4.txt"));
+            Assert.IsTrue(files.Any(x => x.Name == "test5.txt"));
         }
 
         [TestMethod]
@@ -55,7 +54,7 @@ namespace Pi.Replicate.Test.Processors
             mockMediator.Setup(x => x.Send(It.IsAny<IRequest<List<File>>>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(new List<File>()));
 
-            var fileCollector = new FileCollector(new Application.Common.PathBuilder(configurationMock.Object), mockMediator.Object, folder);
+            var fileCollector = new FileCollector(new PathBuilder(configurationMock.Object), mockMediator.Object, folder);
             var files = await fileCollector.GetNewFiles();
 
         }
@@ -66,7 +65,7 @@ namespace Pi.Replicate.Test.Processors
             var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
-            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var pathBuilder = new PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
                 File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath),
@@ -92,7 +91,7 @@ namespace Pi.Replicate.Test.Processors
             var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
-            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var pathBuilder = new PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
                 File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath,DateTime.Now),
@@ -117,7 +116,7 @@ namespace Pi.Replicate.Test.Processors
             var folder = new Folder { Name = "FileFolder", FolderOptions = new FolderOption { DeleteAfterSent = false } };
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
-            var pathBuilder = new Application.Common.PathBuilder(configurationMock.Object);
+            var pathBuilder = new PathBuilder(configurationMock.Object);
             var existingFiles = new List<File>
             {
                 File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),null,pathBuilder.BasePath),

@@ -1,21 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application;
-using Pi.Replicate.Data;
-using FluentValidation.AspNetCore;
-using FluentValidation;
-using Pi.Replicate.Application.Common.Interfaces;
 using Observr;
-using Pi.Replicate.Processing;
+using Pi.Replicate.Application;
+using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Data;
 
 namespace Pi.Replicate.WebUi
 {
@@ -38,7 +30,6 @@ namespace Pi.Replicate.WebUi
 			services.AddApplication();
 			services.AddData(Configuration, ServiceLifetime.Transient);
 			services.AddSystemSettings(Configuration);
-			services.AddProcessing();
 			services.AddObservr();
 			services.AddHttpClient();
 

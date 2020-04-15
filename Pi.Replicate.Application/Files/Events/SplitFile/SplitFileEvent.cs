@@ -1,8 +1,9 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,12 +16,12 @@ namespace Pi.Replicate.Application.Files.Events.SplitFile
 
 	public class SplitFileEventHandler : IRequestHandler<SplitFileEvent>
 	{
-		private readonly IFileSplitterFactory _fileSplitterFactory;
+		private readonly FileSplitterFactory _fileSplitterFactory;
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IWorkerContext _workerContext;
 		private readonly PathBuilder _pathBuilder;
 
-		public SplitFileEventHandler(IFileSplitterFactory fileSplitterFactory
+		public SplitFileEventHandler(FileSplitterFactory fileSplitterFactory
 		, WorkerQueueFactory workerQueueFactory
 		, IWorkerContext workerContext
 			, PathBuilder pathBuilder)
@@ -39,20 +40,23 @@ namespace Pi.Replicate.Application.Files.Events.SplitFile
 			if (request.File.Status == FileStatus.New)
 			{
 				//todo Save regulary to reduce memory consumption
-				var result = await fileSplitter.ProcessFile(request.File, async x =>
+				var fileHash = await fileSplitter.ProcessFile(request.File, async x =>
 				{
 					var builtChunk = FileChunk.Build(request.File, sequenceNo, x, ChunkSource.FromNewFile);
 					_workerContext.FileChunks.Add(builtChunk);
+
 				});
 
-				request.File.UpdateAfterProcessesing(sequenceNo, result);
+				//var delta = new Delta
+
+				request.File.UpdateAfterProcessesing(sequenceNo, fileHash, null);
 				_workerContext.Files.Update(request.File);
 
 				await _workerContext.SaveChangesAsync(cancellationToken);
 
 				if (request.File.Folder.FolderOptions.DeleteAfterSent)
 				{
-					var path = _pathBuilder.BuildPath(request.File);
+					var path = _pathBuilder.BuildPath(request.File.Path);
 					System.IO.File.Delete(path);
 				}
 			}

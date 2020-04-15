@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Pi.Replicate.Application\Pi.Replicate.Application.csproj" />
-    <ProjectReference Include="..\Pi.Replicate.Processors\Pi.Replicate.Processing.csproj" />
   </ItemGroup>
 
 </Project>

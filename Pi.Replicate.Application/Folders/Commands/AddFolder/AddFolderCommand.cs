@@ -1,12 +1,11 @@
 ﻿using MediatR;
 using Observr;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,7 +49,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
             _workerContext.Folders.Add(folder);
             await _workerContext.SaveChangesAsync(cancellationToken);
 
-            var path = _pathBuilder.BuildPath(folder);
+            var path = _pathBuilder.BuildPath(folder.Name);
             if (request.CreateOnDisk && !System.IO.Directory.Exists(path))
                 System.IO.Directory.CreateDirectory(path);
 

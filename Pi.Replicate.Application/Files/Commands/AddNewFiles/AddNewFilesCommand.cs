@@ -3,6 +3,7 @@ using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Collections.Generic;

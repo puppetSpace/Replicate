@@ -1,11 +1,9 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Shared;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +11,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetAvailableFolders
 {
     public class GetAvailableFoldersQuery : IRequest<AvailableFoldersViewModel>
     {
-        
+
     }
 
     public class GetAvailableFoldersQueryHandler : IRequestHandler<GetAvailableFoldersQuery, AvailableFoldersViewModel>

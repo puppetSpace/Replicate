@@ -1,17 +1,15 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
+using Pi.Replicate.Application.Folders.Processing;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Processing.Folders;
-using Pi.Replicate.Processing.Helpers;
+using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processing.Files
+namespace Pi.Replicate.Application.Files.Processing
 {
     public sealed class FileCollector
     {
@@ -30,7 +28,7 @@ namespace Pi.Replicate.Processing.Files
         {
             (var rawFiles, var previousFilesInFolder) = await GetFiles();
             //exclude all files that are allready in the database
-            var newFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y), x.FullName))).ToList();
+            var newFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 
             Log.Verbose($"{newFiles.Count} new files found in folder '{_folder.Name}'");
 
@@ -43,7 +41,7 @@ namespace Pi.Replicate.Processing.Files
             //only include the files that are already processed
             var changed = rawFiles
                     .Where(x => previousFilesInFolder
-                        .Any(y => y.Status == FileStatus.Handled && x.FullName == _pathBuilder.BuildPath(y) && x.LastWriteTimeUtc != y.LastModifiedDate))
+                        .Any(y => y.Status == FileStatus.Handled && x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
                     .ToList();
 
             Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");
@@ -53,7 +51,7 @@ namespace Pi.Replicate.Processing.Files
 
         private async Task<(IList<System.IO.FileInfo> AllFiles, List<File> ProcessedFiles)> GetFiles()
         {
-            var folderPath = _pathBuilder.BuildPath(_folder);
+            var folderPath = _pathBuilder.BuildPath(_folder.Name);
             if (_folder is null || !System.IO.Directory.Exists(folderPath))
             {
                 Log.Warning($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");

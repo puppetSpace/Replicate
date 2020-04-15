@@ -6,19 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processing.Files
+namespace Pi.Replicate.Application.Files.Processing
 {
     //https://github.com/OctopusDeploy/Octodiff
     public class Delta
     {
         
-        public ReadOnlyMemory<byte> CreateSignature(Stream input)
+        public byte[] CreateSignature(Stream input)
         {
             var signatureBuilder = new SignatureBuilder();
             var memoryStream = new MemoryStream();
             var signatureWriter = new SignatureWriter(memoryStream);
             signatureBuilder.Build(input, signatureWriter);
-            return memoryStream.ToArray().AsMemory();
+            return memoryStream.ToArray();
         }
 
     }

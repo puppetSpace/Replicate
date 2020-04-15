@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Processing.Helpers
+namespace Pi.Replicate.Shared
 {
-    internal static class FileLock
+    public static class FileLock
     {
         public static bool IsLocked(string filePath)
         {

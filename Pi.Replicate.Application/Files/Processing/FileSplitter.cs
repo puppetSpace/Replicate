@@ -1,23 +1,17 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.Common;
-using Pi.Replicate.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Processing.Helpers;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.IO.Compression;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 
-namespace Pi.Replicate.Processing.Files
+namespace Pi.Replicate.Application.Files.Processing
 {
-	public sealed class FileSplitter : IFileSplitter
+	public sealed class FileSplitter
 	{
 		private readonly int _sizeofChunkInBytes;
 		private readonly PathBuilder _pathBuilder;
@@ -29,9 +23,9 @@ namespace Pi.Replicate.Processing.Files
 			_pathBuilder = pathBuilder;
 		}
 
-		public async Task<byte[]> ProcessFile(File file,Action<byte[]> chunkCreatedDelegate)
+		public async Task<byte[]> ProcessFile(File file, Action<byte[]> chunkCreatedDelegate)
 		{
-			var path = _pathBuilder.BuildPath(file);
+			var path = _pathBuilder.BuildPath(file.Path);
 
 			if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
@@ -41,7 +35,7 @@ namespace Pi.Replicate.Processing.Files
 
 				using (var stream = System.IO.File.OpenRead(pathOfCompressed))
 				{
-					return await SplitStream(stream,chunkCreatedDelegate);
+					return await SplitStream(stream, chunkCreatedDelegate);
 				}
 			}
 			else
@@ -63,7 +57,7 @@ namespace Pi.Replicate.Processing.Files
 			return tempPath;
 		}
 
-		private async Task<byte[]> SplitStream(System.IO.Stream stream,Action<byte[]> chunkCreatedDelegate)
+		private async Task<byte[]> SplitStream(System.IO.Stream stream, Action<byte[]> chunkCreatedDelegate)
 		{
 			MD5 hashCreator = MD5.Create();
 			var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
@@ -83,7 +77,7 @@ namespace Pi.Replicate.Processing.Files
 	}
 
 
-	public class FileSplitterFactory : IFileSplitterFactory
+	public class FileSplitterFactory
 	{
 		private readonly IConfiguration _configuration;
 		private readonly PathBuilder _pathBuilder;
@@ -94,7 +88,7 @@ namespace Pi.Replicate.Processing.Files
 			_pathBuilder = pathBuilder;
 		}
 
-		public IFileSplitter Get()
+		public FileSplitter Get()
 		{
 			return new FileSplitter(_configuration, _pathBuilder);
 		}

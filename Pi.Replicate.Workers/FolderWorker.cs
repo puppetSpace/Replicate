@@ -2,16 +2,15 @@
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Commands.AddNewFiles;
+using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Processing.Files;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace Pi.Replicate.Workers
 {

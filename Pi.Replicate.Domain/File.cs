@@ -16,6 +16,8 @@ namespace Pi.Replicate.Domain
 
         public byte[] Hash { get; private set; }
 
+        public byte[] Signature { get; set; }
+
         public FileStatus Status { get; private set; }
 
         public DateTime LastModifiedDate { get; private set; }
@@ -33,10 +35,11 @@ namespace Pi.Replicate.Domain
             Size = file.Length;
         }
 
-        public void UpdateAfterProcessesing(int amountOfChunks, byte[] hash)
+        public void UpdateAfterProcessesing(int amountOfChunks, byte[] hash, byte[] signature)
         {
             Hash = hash;
             AmountOfChunks = amountOfChunks;
+            Signature = signature;
             Status = FileStatus.Processed;
         }
 

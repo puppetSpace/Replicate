@@ -40,4 +40,10 @@
     <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Octodiff">
+      <HintPath>..\Octodiff.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
