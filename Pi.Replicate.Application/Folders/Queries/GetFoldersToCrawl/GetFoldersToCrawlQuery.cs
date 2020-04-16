@@ -27,7 +27,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
 
         public async Task<ICollection<Folder>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
         {
-            return await _workerContext
+                return await _workerContext
                 .FolderRepository
                 .Get();
         }

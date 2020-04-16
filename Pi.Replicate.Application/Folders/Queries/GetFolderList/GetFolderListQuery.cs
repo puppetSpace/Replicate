@@ -30,11 +30,11 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
 
         public async Task<FolderListViewModel> Handle(GetFolderListQuery request, CancellationToken cancellationToken)
         {
-            var folders = await _workerContext
+                var folders = await _workerContext
                 .FolderRepository
                 .Get();
 
-            return new FolderListViewModel { Folders = folders.Select(x=>new FolderLookupDto{Name = x.Name}).ToList() };
+                return new FolderListViewModel { Folders = folders.Select(x => new FolderLookupDto { Name = x.Name }).ToList() };
         }
     }
 }

@@ -11,16 +11,16 @@ namespace Pi.Replicate.Data.Db
 {
 	public class WorkerContext : IWorkerContext
 	{
-		private readonly SqlConnection _sqlConnection;
+		private readonly string _connectionString;
 		public WorkerContext(IConfiguration configuration)
 		{
-			_sqlConnection = new SqlConnection(configuration.GetConnectionString("ReplicateDatabase"));
-			FolderRepository = new FolderRepository(_sqlConnection);
-			FileRepository = new FileRepository(_sqlConnection);
-			FileChunkRepository = new FileChunkRepository(_sqlConnection);
-			ChunkPackageRepository = new ChunkPackageRepository(_sqlConnection);
-			RecipientRepository = new RecipientRepository(_sqlConnection);
-			FailedFileRepository = new FailedFileRepository(_sqlConnection);
+			_connectionString = configuration.GetConnectionString("ReplicateDatabase");
+			FolderRepository = new FolderRepository(_connectionString);
+			FileRepository = new FileRepository(_connectionString);
+			FileChunkRepository = new FileChunkRepository(_connectionString);
+			ChunkPackageRepository = new ChunkPackageRepository(_connectionString);
+			RecipientRepository = new RecipientRepository(_connectionString);
+			FailedFileRepository = new FailedFileRepository(_connectionString);
 		}
 
 
@@ -31,9 +31,9 @@ namespace Pi.Replicate.Data.Db
 		public IRecipientRepository RecipientRepository { get; }
 		public IFailedFileRepository FailedFileRepository { get; }
 
-		public void Dispose()
+		public SqlConnection BuildConnection()
 		{
-			_sqlConnection?.Close();
+			return new SqlConnection(_connectionString);
 		}
 	}
 }

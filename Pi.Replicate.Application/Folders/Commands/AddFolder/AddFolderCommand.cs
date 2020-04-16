@@ -37,24 +37,24 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 
         public async Task<Unit> Handle(AddFolderCommand request, CancellationToken cancellationToken)
         {
-            var folder = new Folder
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                FolderOptions = new FolderOption { DeleteAfterSent = request.DeleteAfterSend },
-            };
+                var folder = new Folder
+                {
+                    Id = Guid.NewGuid(),
+                    Name = request.Name,
+                    FolderOptions = new FolderOption { DeleteAfterSent = request.DeleteAfterSend },
+                };
 
-            folder.Recipients = request.Recipients;
+                folder.Recipients = request.Recipients;
 
-            await _workerContext.FolderRepository.Create(folder);
+                await _workerContext.FolderRepository.Create(folder);
 
-            var path = _pathBuilder.BuildPath(folder.Name);
-            if (request.CreateOnDisk && !System.IO.Directory.Exists(path))
-                System.IO.Directory.CreateDirectory(path);
+                var path = _pathBuilder.BuildPath(folder.Name);
+                if (request.CreateOnDisk && !System.IO.Directory.Exists(path))
+                    System.IO.Directory.CreateDirectory(path);
 
 
-            await _broker.Publish(folder);
-            return Unit.Value;
+                await _broker.Publish(folder);
+                return Unit.Value;
         }
     }
 }

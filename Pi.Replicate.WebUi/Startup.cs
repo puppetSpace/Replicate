@@ -8,6 +8,7 @@ using Observr;
 using Pi.Replicate.Application;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Data;
+using Serilog;
 
 namespace Pi.Replicate.WebUi
 {
@@ -48,7 +49,7 @@ namespace Pi.Replicate.WebUi
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
-
+			app.UseSerilogRequestLogging();
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 

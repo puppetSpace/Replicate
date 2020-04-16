@@ -23,7 +23,7 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder
         }
         public async Task<ICollection<Recipient>> Handle(GetRecipientsForFolderQuery request, CancellationToken cancellationToken)
         {
-           return await _workerContext.RecipientRepository.GetRecipientsForFolder(request.FolderId);
+                return await _workerContext.RecipientRepository.GetRecipientsForFolder(request.FolderId);
         }
     }
 }

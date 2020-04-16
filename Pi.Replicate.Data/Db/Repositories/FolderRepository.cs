@@ -13,37 +13,51 @@ namespace Pi.Replicate.Data.Db.Repositories
 {
 	public class FolderRepository : IFolderRepository
 	{
-		private SqlConnection _sqlConnection;
+		private readonly string _connectionString;
 
-		public FolderRepository(SqlConnection sqlConnection)
+		public FolderRepository(string connectionString)
 		{
-			_sqlConnection = sqlConnection;
+			_connectionString = connectionString;
 		}
 
 		public async Task Create(Folder folder)
 		{
-			await _sqlConnection.ExecuteAsync(@"INSERT INTO dbo.Folders(Id,Name,FolderOptions_DeleteAfterSent) VALUES(@Id,@Name,@DeleteAfterSent", new { folder.Id, folder.Name, folder.FolderOptions.DeleteAfterSent });
-			foreach(var recipient in folder.Recipients)
-				await _sqlConnection.ExecuteAsync(@"INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,RecipientId)", new { FolderId=folder.Id, RecipientId = recipient.Id });
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				await sqlConnection.ExecuteAsync(@"INSERT INTO dbo.Folders(Id,Name,FolderOptions_DeleteAfterSent) VALUES(@Id,@Name,@DeleteAfterSent", new { folder.Id, folder.Name, folder.FolderOptions.DeleteAfterSent });
+				foreach (var recipient in folder.Recipients)
+					await sqlConnection.ExecuteAsync(@"INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,RecipientId)", new { FolderId = folder.Id, RecipientId = recipient.Id });
+			}
 		}
 
 		public async Task<bool> IsUnique(string name)
 		{
-			var folderid = await _sqlConnection.QueryFirstAsync<Guid>("SELECT Id FROM dbo.Folders WHERE Name = @Name",new {Name = name });
-			return folderid != Guid.Empty;
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				var folderid = await sqlConnection.QueryFirstAsync<Guid>("SELECT Id FROM dbo.Folders WHERE Name = @Name", new { Name = name });
+				return folderid != Guid.Empty;
+			}
 		}
 
 		public async Task<ICollection<Folder>> Get()
 		{
-			var folders = await _sqlConnection.QueryAsync<Folder>("SELECT Id, Name, FolderOptions_DeleteAfterSent FROM dbo.Folders");
-			var folderRecipients = await _sqlConnection.QueryAsync<Guid,Recipient,(Guid folderId,Recipient recipient)>(@"
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				var folders = await sqlConnection.QueryAsync<Folder, FolderOption, Folder>("SELECT Id, Name, FolderOptions_DeleteAfterSent as DeleteAfterSent FROM dbo.Folders",
+				(f, fo) =>
+				{
+					f.FolderOptions = fo;
+					return f;
+				}, splitOn: "DeleteAfterSent");
+				var folderRecipients = await sqlConnection.QueryAsync<Guid, Recipient, (Guid folderId, Recipient recipient)>(@"
 				select fr.FolderId, re.Id,re.Name,re.Address
 				from dbo.FolderRecipient fr
-				inner join dbo.Recipients re on re.Id = fr.RecipientId", (x, y) =>(x,y));
+				inner join dbo.Recipients re on re.Id = fr.RecipientId", (x, y) => (x, y));
 
-			return folders
-				.GroupJoin(folderRecipients, x => x.Id, (x) => x.folderId, (x, y) => { x.Recipients = y.Select(x => x.recipient).ToList(); return x; })
-				.ToList();
+				return folders
+					.GroupJoin(folderRecipients, x => x.Id, (x) => x.folderId, (x, y) => { x.Recipients = y.Select(x => x.recipient).ToList(); return x; })
+					.ToList();
+			}
 		}
 	}
 }

@@ -23,20 +23,25 @@ namespace Pi.Replicate.Application.Files.Processing
 			_pathBuilder = pathBuilder;
 		}
 
-		public async Task<byte[]> ProcessFile(File file, Action<byte[]> chunkCreatedDelegate)
+		public async Task<byte[]> ProcessFile(File file, Func<byte[],Task> chunkCreatedDelegate)
 		{
 			var path = _pathBuilder.BuildPath(file.Path);
 
 			if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
-				Log.Verbose($"File '{path}' is being processed and turned into chunks of {_sizeofChunkInBytes} bytes");
-
+				Log.Information($"'{path}' is being processed");
+				Log.Information($"'{path}' is being compressed");
 				var pathOfCompressed = await CompressFile(path);
 
+				Log.Information($"'{path}' is being split");
+				byte[] hash;
 				using (var stream = System.IO.File.OpenRead(pathOfCompressed))
 				{
-					return await SplitStream(stream, chunkCreatedDelegate);
+					hash =  await SplitStream(stream, chunkCreatedDelegate);
 				}
+				Log.Information($"'compressed file of {path}' is being deleted");
+				System.IO.File.Delete(pathOfCompressed);
+				return hash;
 			}
 			else
 			{
@@ -57,16 +62,15 @@ namespace Pi.Replicate.Application.Files.Processing
 			return tempPath;
 		}
 
-		private async Task<byte[]> SplitStream(System.IO.Stream stream, Action<byte[]> chunkCreatedDelegate)
+		private async Task<byte[]> SplitStream(System.IO.Stream stream, Func<byte[],Task> chunkCreatedDelegate)
 		{
 			MD5 hashCreator = MD5.Create();
 			var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
 			int bytesRead;
-			//todo compression
 			while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 			{
 				hashCreator.TransformBlock(buffer, 0, bytesRead, null, 0);
-				chunkCreatedDelegate?.Invoke(buffer);
+				await chunkCreatedDelegate(buffer);
 			}
 			hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
 

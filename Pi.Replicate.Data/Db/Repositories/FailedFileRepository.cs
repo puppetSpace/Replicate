@@ -12,26 +12,34 @@ namespace Pi.Replicate.Data.Db.Repositories
 {
 	public class FailedFileRepository : IFailedFileRepository
 	{
-		private SqlConnection _sqlConnection;
+		private readonly string _connectionString;
 
-		public FailedFileRepository(SqlConnection sqlConnection)
+		public FailedFileRepository(string connectionString)
 		{
-			_sqlConnection = sqlConnection;
+			_connectionString = connectionString;
 		}
 
 		public async Task Create(FailedFile failedFile)
 		{
-			await _sqlConnection.ExecuteAsync("INSERT INTO dbo.FailedFiles(Id,FileId,RecipientId) VALUES (@Id,@FileId,@RecipientId", new { failedFile.Id, FileId = failedFile.File.Id, RecipientId = failedFile.Recipient.Id });
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				await sqlConnection.ExecuteAsync("INSERT INTO dbo.FailedFiles(Id,FileId,RecipientId) VALUES (@Id,@FileId,@RecipientId", new { failedFile.Id, FileId = failedFile.File.Id, RecipientId = failedFile.Recipient.Id });
+			}
 		}
 
 		public async Task DeleteAll()
 		{
-			await _sqlConnection.ExecuteAsync("DELETE FROM dbo.FailedFiles");
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				await sqlConnection.ExecuteAsync("DELETE FROM dbo.FailedFiles");
+			}
 		}
 
 		public async Task<ICollection<FailedFile>> Get()
 		{
-			var result = await _sqlConnection.QueryAsync<FailedFile, File, Recipient, FailedFile>(@"
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				var result = await sqlConnection.QueryAsync<FailedFile, File, Recipient, FailedFile>(@"
 				select ff.Id
 				,fi.Id, fi.FolderId,fi.AmountOfChunks, fi.Hash, fi.LastModifiedDate, fi.Name,fi.Path, fi.Signature,fi.Size, fi.Status
 				, re.Id, re.Name, re.Address
@@ -45,7 +53,8 @@ namespace Pi.Replicate.Data.Db.Repositories
 					return ff;
 				});
 
-			return result.ToList();
+				return result.ToList();
+			}
 		}
 	}
 }

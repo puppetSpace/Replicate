@@ -1,8 +1,10 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Chunks.Events.SendChunkToRecipient;
+using Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using Serilog;
+using System.Net.Http;
 using System.Threading;
 
 namespace Pi.Replicate.Workers
@@ -11,11 +13,13 @@ namespace Pi.Replicate.Workers
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IMediator _mediator;
+		private readonly HttpHelper _httpHelper;
 
-		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, IMediator mediator)
+		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, IMediator mediator, IHttpClientFactory httpClientFactory)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_mediator = mediator;
+			_httpHelper = new HttpHelper(httpClientFactory);
 		}
 
 		public override Thread DoWork(CancellationToken cancellationToken)
@@ -28,7 +32,8 @@ namespace Pi.Replicate.Workers
 					var chunkPackage = queue.Take();
 
 					Log.Verbose($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' of file with Id '{chunkPackage.FileChunk.FileId}' to '{chunkPackage.Recipient.Name}'");
-					await _mediator.Send(new SendChunkToRecipientEvent { ChunkPackage = chunkPackage });
+					await _httpHelper.Post($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk);
+					await _mediator.Send(new DeleteChunkPackageCommand { ChunkPackageId = chunkPackage.Id });
 				}
 
 			});

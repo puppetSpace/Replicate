@@ -12,40 +12,49 @@ namespace Pi.Replicate.Data.Db.Repositories
 {
 	public class ChunkPackageRepository : IChunkPackageRepository
 	{
-		private SqlConnection _sqlConnection;
+		private readonly string _connectionString;
 
-		public ChunkPackageRepository(SqlConnection sqlConnection)
+		public ChunkPackageRepository(string connectionString)
 		{
-			_sqlConnection = sqlConnection;
+			_connectionString = connectionString;
 		}
 
 		public async Task<ICollection<ChunkPackage>> Get()
 		{
-			var result = await _sqlConnection.QueryAsync<ChunkPackage, FileChunk, Recipient, ChunkPackage>(@"
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				var result = await sqlConnection.QueryAsync<ChunkPackage, FileChunk, Recipient, ChunkPackage>(@"
 				select cp.Id
 				, fc.Id, fc.FileId, fc.SequenceNo, fc.Value, fc.ChunkSource
 				, re.Id, re.Name, re.Address
 				from dbo.ChunkPackages cp
 				inner join dbo.FileChunks fc on fc.Id = cp.FileChunkId
 				inner join dbo.Recipients re on re.Id = cp.RecipientId"
-				,(cp,fc,re)=> 
-				{
-					cp.FileChunk = fc;
-					cp.Recipient = re;
-					return cp;
-				});
+				, (cp, fc, re) =>
+				 {
+					 cp.FileChunk = fc;
+					 cp.Recipient = re;
+					 return cp;
+				 });
 
-			return result.ToList();
+				return result.ToList();
+			}
 		}
 
 		public async Task Delete(Guid id)
 		{
-			await _sqlConnection.ExecuteAsync("DELETE FROM db.ChunkPackages WHERE Id = @Id", new { Id = id });
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				await sqlConnection.ExecuteAsync("DELETE FROM db.ChunkPackages WHERE Id = @Id", new { Id = id });
+			}
 		}
 
         public async Task Create(ChunkPackage chunkPackage)
         {
-            await _sqlConnection.ExecuteAsync("INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId",new{chunkPackage.Id, FileChunkId=chunkPackage.FileChunk.Id,RecipientId=chunkPackage.Recipient.Id});
+			using (var sqlConnection = new SqlConnection(_connectionString))
+			{
+				await sqlConnection.ExecuteAsync("INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId", new { chunkPackage.Id, FileChunkId = chunkPackage.FileChunk.Id, RecipientId = chunkPackage.Recipient.Id });
+			}
         }
     }
 }

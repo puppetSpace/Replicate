@@ -1,6 +1,6 @@
 using MediatR;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Events.SendFileToRecipient;
+using Pi.Replicate.Application.Files.Commands.SendFileToRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Domain;
 using Serilog;
@@ -30,7 +30,7 @@ namespace Pi.Replicate.Workers
 					foreach (var recipient in recipients)
 					{
 						Log.Information($"Sending metadata of file '{file.Path}' to '{recipient.Name}'");
-						await _mediator.Send(new SendFileToRecipientEvent { File = file, Recipient = recipient });
+						await _mediator.Send(new SendFileToRecipientCommand { File = file, Recipient = recipient });
 					}
 				}
 			});

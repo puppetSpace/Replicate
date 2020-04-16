@@ -33,7 +33,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 
         public async Task<ICollection<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
         {
-            return await _workerContext.FileRepository.GetForFolder(request.FolderId);
+                return await _workerContext.FileRepository.GetForFolder(request.FolderId);
         }
     }
 }
