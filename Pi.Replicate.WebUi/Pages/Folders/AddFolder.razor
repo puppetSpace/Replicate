@@ -33,9 +33,9 @@
         <select class="form-control" @bind="SelectedFolder"
                 disabled="@(SelectedFolderCreationOption != FolderCreationOption.SelectExisting)">
             <option></option>
-            @foreach (var folder in AvailableFolders)
+            @foreach (var folder in AvailableFolderNames)
             {
-                <option value="@folder.Name">@folder.Name</option>
+                <option value="@folder">@folder</option>
             }
         </select>
     </div>

@@ -12,14 +12,22 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 {
     public class AddFolderCommandValidator : AbstractValidator<AddFolderCommand>
     {
-        public AddFolderCommandValidator(IWorkerContext workerContext)
+        public AddFolderCommandValidator(IDatabase database)
         {
+            
             RuleFor(x => x.Name)
                 .NotEmpty()
                 .WithMessage("A folder or name for a folder must be provided");
 
             RuleFor(x => x.Name)
-                .MustAsync((x,y) => workerContext.FolderRepository.IsUnique(x))
+                .MustAsync(async (x,y) => 
+                {
+                    using (database)
+                    {
+                        var folderid = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Folders WHERE Name = @Name", new { Name = x });
+                        return folderid != Guid.Empty;
+                    }
+                })
                 .WithMessage(x => $"Folder '{x.Name}' already exists.");
 
             RuleFor(x => x.Recipients)

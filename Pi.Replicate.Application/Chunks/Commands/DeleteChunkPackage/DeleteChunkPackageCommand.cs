@@ -16,16 +16,19 @@ namespace Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage
 
     public class DeleteChunkPackageCommandHandler : IRequestHandler<DeleteChunkPackageCommand>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _deleteStatement = "DELETE FROM db.ChunkPackages WHERE Id = @Id";
 
-        public DeleteChunkPackageCommandHandler(IWorkerContext workerContext)
+        public DeleteChunkPackageCommandHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
         public async Task<Unit> Handle(DeleteChunkPackageCommand request, CancellationToken cancellationToken)
         {
-            await _workerContext.ChunkPackageRepository.Delete(request.ChunkPackageId);
+            using (_database)
+                await _database.Execute(_deleteStatement, new { Id = request.ChunkPackageId });
+
             return Unit.Value;
         }
     }

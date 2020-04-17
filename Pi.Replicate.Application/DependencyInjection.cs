@@ -5,6 +5,7 @@ using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Behaviours;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Processing;
+using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
 using System.Reflection;
 
@@ -21,6 +22,8 @@ namespace Pi.Replicate.Application
             services.AddSingleton<WorkerQueueFactory>();
             services.AddTransient<FileCollectorFactory>();
             services.AddTransient<FileSplitterFactory>();
+            services.AddTransient<FileChunkService>();
+            services.AddTransient<CommunicationService>();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,25 +11,25 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientList
 {
-    public class GetRecipientListQuery : IRequest<RecipientListVm>
+    public class GetRecipientListQuery : IRequest<ICollection<Recipient>>
     {
         
     }
 
-    public class GetRecipientsListQueryHandler : IRequestHandler<GetRecipientListQuery, RecipientListVm>
+    public class GetRecipientsListQueryHandler : IRequestHandler<GetRecipientListQuery, ICollection<Recipient>>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _selectStatement = "SELECT Id,Name,Address FROM dbo.Recipients";
 
-        public GetRecipientsListQueryHandler(IWorkerContext workerContext)
+        public GetRecipientsListQueryHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
-        public async Task<RecipientListVm> Handle(GetRecipientListQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<Recipient>> Handle(GetRecipientListQuery request, CancellationToken cancellationToken)
         {
-                var recipients = await _workerContext.RecipientRepository.GetRecipients();
-
-                return new RecipientListVm { Recipients = recipients };
+            using(_database)
+                return await _database.Query<Recipient>(_selectStatement, null);
         }
     }
 }

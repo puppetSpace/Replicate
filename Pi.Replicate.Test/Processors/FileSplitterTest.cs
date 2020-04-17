@@ -37,9 +37,10 @@ namespace Pi.Replicate.Test.Processors
 			int amountOfCalls = 0;
 
 
-			var chunkCreated = new Action<byte[]>(x =>
+			var chunkCreated = new Func<byte[],Task>(x =>
 			{
 				amountOfCalls++;
+				return Task.CompletedTask;
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
@@ -93,9 +94,10 @@ namespace Pi.Replicate.Test.Processors
 			using var fs = fileInfo.OpenWrite();
 
 			int amountOfCalls = 0;
-			var chunkCreated = new Action<byte[]>(x =>
+			var chunkCreated = new Func<byte[], Task>(x =>
 			{
 				amountOfCalls++;
+				return Task.CompletedTask;
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);

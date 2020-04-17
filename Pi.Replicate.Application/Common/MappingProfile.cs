@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Pi.Replicate.Application.Files.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,7 @@ namespace Pi.Replicate.Application.Common
 
         private void InitializeMappings()
         {
-            CreateMap<Domain.Folder, Folders.Queries.GetFolderList.FolderLookupDto>();
+            CreateMap<Domain.File, FileTransmissionModel>();
         }
     }
 }

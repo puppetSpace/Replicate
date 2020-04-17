@@ -24,16 +24,18 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 
     public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, ICollection<File>>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _selectStatement = "SELECT Id, FolderId,AmountOfChunks, Hash, LastModifiedDate, Name,Path, Signature,Size,Status FROM dbo.Files WHERE FolderId = @FolderId";
 
-        public GetFilesForFolderQueryHandler(IWorkerContext workerContext)
+        public GetFilesForFolderQueryHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
         public async Task<ICollection<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
         {
-                return await _workerContext.FileRepository.GetForFolder(request.FolderId);
+            using(_database)
+                return await _database.Query<File>(_selectStatement, new { request.FolderId });
         }
     }
 }

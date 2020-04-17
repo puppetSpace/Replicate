@@ -1,40 +1,30 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Pi.Replicate.Application.Common.Interfaces;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper.QueryableExtensions;
-using AutoMapper;
 
 namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
 {
-    public class GetFolderListQuery :IRequest<FolderListViewModel>
+    public class GetFolderListQuery : IRequest<ICollection<string>>
     {
-        
+
     }
 
-    public class GetFolderListQueryHandler : IRequestHandler<GetFolderListQuery, FolderListViewModel>
+    public class GetFolderListQueryHandler : IRequestHandler<GetFolderListQuery, ICollection<string>>
     {
-        private readonly IWorkerContext _workerContext;
-        private readonly IMapper _mapper;
+        private readonly IDatabase _database;
+        private readonly string _selectStatement = "SELECT Name from db.Folders";
 
-        public GetFolderListQueryHandler(IWorkerContext workerContext, IMapper mapper)
+        public GetFolderListQueryHandler(IDatabase database)
         {
-            _workerContext = workerContext;
-            _mapper = mapper;
+            _database = database;
         }
 
-        public async Task<FolderListViewModel> Handle(GetFolderListQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<string>> Handle(GetFolderListQuery request, CancellationToken cancellationToken)
         {
-                var folders = await _workerContext
-                .FolderRepository
-                .Get();
-
-                return new FolderListViewModel { Folders = folders.Select(x => new FolderLookupDto { Name = x.Name }).ToList() };
+            using(_database)
+                return await _database.Query<string>(_selectStatement, null);
         }
     }
 }

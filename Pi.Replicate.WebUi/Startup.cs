@@ -26,13 +26,13 @@ namespace Pi.Replicate.WebUi
 		public void ConfigureServices(IServiceCollection services)
 		{
 			services.AddRazorPages()
-				.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IWorkerContext>()); ;
+				.AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IDatabase>()); ;
 			services.AddServerSideBlazor();
 			services.AddApplication();
 			services.AddData(Configuration, ServiceLifetime.Transient);
 			services.AddSystemSettings(Configuration);
 			services.AddObservr();
-			services.AddHttpClient();
+			//services.AddHttpClient();
 
 		}
 

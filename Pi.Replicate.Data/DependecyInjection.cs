@@ -16,7 +16,8 @@ namespace Pi.Replicate.Data
                 options.UseSqlServer(configuration.GetConnectionString("ReplicateDatabase"));
             }, serviceLifetime);
 
-            services.AddTransient<IWorkerContext, WorkerContext>();
+            services.AddTransient<IDatabase, Database>();
+            services.AddTransient<IDatabaseFactory, DatabaseFactory>();
             services.AddTransient<ISystemContext>(provider => provider.GetService<SystemContext>());
         }
 

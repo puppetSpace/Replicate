@@ -3,12 +3,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Pi.Replicate.Application;
 using Pi.Replicate.Data;
 using Pi.Replicate.Workers;
+using Polly;
 using Serilog;
+using System;
 using System.IO;
+using System.Net.Http.Headers;
 
 namespace Pi.Replicate.Worker.Console
 {
-	//todo on restart delete the new files in db. new files are not processed yet and chunks are not completely saved in db. must be processed first
 	class Program
 	{
 		static async System.Threading.Tasks.Task Main(string[] args)
@@ -35,7 +37,11 @@ namespace Pi.Replicate.Worker.Console
 			services.AddApplication();
 			services.AddData(config, ServiceLifetime.Transient);
 			services.AddSystemSettings(config);
-			services.AddHttpClient();
+			services.AddHttpClient("default", client =>
+			{
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
 
 
 			services.AddTransient<FolderWorker>();

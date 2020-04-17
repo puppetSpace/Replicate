@@ -18,18 +18,34 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
 
     public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, ICollection<Folder>>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _selectStatementFolder = "SELECT Id, Name, FolderOptions_DeleteAfterSent as DeleteAfterSent FROM dbo.Folders";
+        private const string _selectStatementFolderRecipients = @"select fr.FolderId, re.Id,re.Name,re.Address
+				from dbo.FolderRecipient fr
+				inner join dbo.Recipients re on re.Id = fr.RecipientId";
 
-        public GetFoldersToCrawlQueryHandler(IWorkerContext workerContext)
+        public GetFoldersToCrawlQueryHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
         public async Task<ICollection<Folder>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
         {
-                return await _workerContext
-                .FolderRepository
-                .Get();
+            using (_database)
+            {
+                var folders = await _database.Query<Folder, FolderOption, Folder>(_selectStatementFolder, null,
+                                (f, fo) =>
+                                {
+                                    f.FolderOptions = fo;
+                                    return f;
+                                }, splitOn: "DeleteAfterSent");
+
+                var folderRecipients = await _database.Query<Guid, Recipient, (Guid folderId, Recipient recipient)>(_selectStatementFolderRecipients,null, (x, y) => (x, y));
+
+                return folders
+                    .GroupJoin(folderRecipients, x => x.Id, (x) => x.folderId, (x, y) => { x.Recipients = y.Select(x => x.recipient).ToList(); return x; })
+                    .ToList();
+            }
         }
     }
 }

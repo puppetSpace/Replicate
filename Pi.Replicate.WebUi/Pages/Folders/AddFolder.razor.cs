@@ -16,7 +16,7 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 {
     public class AddFolderBase : ComponentBase
     {
-        protected List<AvailableFolderDto> AvailableFolders { get; set; } = new List<AvailableFolderDto>();
+        protected ICollection<string> AvailableFolderNames { get; set; } = new List<string>();
         protected string SelectedFolder { get; set; }
         protected FolderCreationOption SelectedFolderCreationOption { get; set; } = FolderCreationOption.CreateNew;
         protected bool DeleteAfterSend { get; set; }
@@ -35,10 +35,10 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
         protected override async Task OnInitializedAsync()
         {
-            var foldersVm = await Mediator.Send(new GetAvailableFoldersQuery());
-            AvailableFolders = foldersVm.Folders;
-            var recipientsVm = await Mediator.Send(new GetRecipientListQuery());
-            Recipients = recipientsVm.Recipients.OrderBy(x=>x.Name).Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
+            var folderNames = await Mediator.Send(new GetAvailableFoldersQuery());
+            AvailableFolderNames = folderNames;
+            var recipients = await Mediator.Send(new GetRecipientListQuery());
+            Recipients = recipients.OrderBy(x=>x.Name).Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
         }
 
         protected async Task CreateNewFolder()
@@ -84,9 +84,9 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
         private void ClearForm()
         {
-            var toRemovefolder = AvailableFolders.FirstOrDefault(x => string.Equals(x.Name, SelectedFolder, StringComparison.OrdinalIgnoreCase));
+            var toRemovefolder = AvailableFolderNames.FirstOrDefault(x => string.Equals(x, SelectedFolder, StringComparison.OrdinalIgnoreCase));
             if (toRemovefolder is object)
-                AvailableFolders.Remove(toRemovefolder);
+                AvailableFolderNames.Remove(toRemovefolder);
 
             ValidationMessages.Clear();
             Recipients.ForEach(x => x.IsChecked = false);

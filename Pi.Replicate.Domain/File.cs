@@ -16,7 +16,7 @@ namespace Pi.Replicate.Domain
 
         public byte[] Hash { get; private set; }
 
-        public byte[] Signature { get; set; }
+        public byte[] Signature { get; private set; }
 
         public FileStatus Status { get; private set; }
 

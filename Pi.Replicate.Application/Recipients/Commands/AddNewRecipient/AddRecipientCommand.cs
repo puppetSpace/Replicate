@@ -19,19 +19,23 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 
     public class AddRecipientCommandHandler : IRequestHandler<AddRecipientCommand, Recipient>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _insertStatement = "INSERT INTO dbo.Recipient(Id,Name,Address) VALUES(@Id,@Name,@Address";
 
-        public AddRecipientCommandHandler(IWorkerContext workerContext)
+        public AddRecipientCommandHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
         public async Task<Recipient> Handle(AddRecipientCommand request, CancellationToken cancellationToken)
         {
+            using (_database)
+            {
                 var builtRecipient = Recipient.Build(request.Name, request.Address);
-                await _workerContext.RecipientRepository.Create(builtRecipient); ;
+                await _database.Execute(_insertStatement, new { builtRecipient.Id, builtRecipient.Name, builtRecipient.Address }); ;
 
                 return builtRecipient;
+            }
         }
     }
 }

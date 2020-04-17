@@ -28,27 +28,31 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
 
 	public class AddNewFilesCommandHandler : IRequestHandler<AddNewFilesCommand, List<File>>
 	{
-		private readonly IWorkerContext _workerContext;
+		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
+		private const string _insertStatement= "INSERT INTO dbo.Files(Id,FolderId, Name, Size,AmountOfChunks,Hash,Status,LastModifiedDate,Path,Signature) VALUES(@Id,@FolderId,@Name,@Size, @AmountOfChunks, @Hash, @Status, @LastModifiedDate,@Path, @Signature)";
 
-		public AddNewFilesCommandHandler(IWorkerContext workerContext, PathBuilder pathBuilder)
+		public AddNewFilesCommandHandler(IDatabase database, PathBuilder pathBuilder)
 		{
-			_workerContext = workerContext;
+			_database = database;
 			_pathBuilder = pathBuilder;
 		}
 
 		public async Task<List<File>> Handle(AddNewFilesCommand request, CancellationToken cancellationToken)
 		{
-			var createdFiles = new List<File>();
-			foreach (var newFile in request.NewFiles)
+			using (_database)
 			{
-				Log.Verbose($"Adding '{newFile.FullName}' to database");
-				var file = File.BuildPartial(newFile, request.Folder.Id, _pathBuilder.BasePath);
-				await _workerContext.FileRepository.Create(file);
-				createdFiles.Add(file);
+				var createdFiles = new List<File>();
+				foreach (var newFile in request.NewFiles)
+				{
+					Log.Verbose($"Adding '{newFile.FullName}' to database");
+					var file = File.BuildPartial(newFile, request.Folder.Id, _pathBuilder.BasePath);
+					await _database.Execute(_insertStatement, new { file.Id, file.FolderId, file.Name, file.Size, file.AmountOfChunks, file.Hash, file.Status, file.LastModifiedDate, file.Path, file.Signature });
+					createdFiles.Add(file);
 
+				}
+				return createdFiles;
 			}
-			return createdFiles;
 		}
 	}
 }

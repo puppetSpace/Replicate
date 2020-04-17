@@ -17,17 +17,30 @@ namespace Pi.Replicate.Application.Chunks.Queries.GetChunkPackages
 
     public class GetChunkPackagesQueryHandler : IRequestHandler<GetChunkPackagesQuery, ICollection<ChunkPackage>>
     {
-        private readonly IWorkerContext _workerContext;
+        private readonly IDatabase _database;
+        private const string _selectStatement = @"
+				select cp.Id
+				, fc.Id, fc.FileId, fc.SequenceNo, fc.Value, fc.ChunkSource
+				, re.Id, re.Name, re.Address
+				from dbo.ChunkPackages cp
+				inner join dbo.FileChunks fc on fc.Id = cp.FileChunkId
+				inner join dbo.Recipients re on re.Id = cp.RecipientId";
 
-        public GetChunkPackagesQueryHandler(IWorkerContext workerContext)
+        public GetChunkPackagesQueryHandler(IDatabase database)
         {
-            _workerContext = workerContext;
+            _database = database;
         }
 
 
         public async Task<ICollection<ChunkPackage>> Handle(GetChunkPackagesQuery request, CancellationToken cancellationToken)
         {
-                return await _workerContext.ChunkPackageRepository.Get();
+            using(_database)
+                return await _database.Query<ChunkPackage, FileChunk, Recipient, ChunkPackage>(_selectStatement,null, (cp, fc, re) =>
+                {
+                    cp.FileChunk = fc;
+                    cp.Recipient = re;
+                    return cp;
+                });
         }
     }
 }
