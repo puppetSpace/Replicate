@@ -14,15 +14,15 @@ namespace Pi.Replicate.Application.Chunks.Queries.GetForFile
     {
         public Guid FileId { get; set; }
 
-        public uint MinSequenceNo { get; set; } = 0;
+        public int MinSequenceNo { get; set; } = 0;
 
-        public uint MaxSequenceNo { get; set; } = int.MaxValue;
+        public int MaxSequenceNo { get; set; } = int.MaxValue;
     }
 
     public class GetForFileQueryHandler : IRequestHandler<GetForFileQuery, ICollection<FileChunk>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource WHERE FileId = @FileId and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
+        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource FROM dbo.FileChunks WHERE FileId = @FileId and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
 
         public GetForFileQueryHandler(IDatabase database)
         {

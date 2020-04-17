@@ -36,11 +36,11 @@ namespace Pi.Replicate.Workers
 
         private async Task CreateChunkPackages(File file, Recipient recipient, BlockingCollection<ChunkPackage> outgoingQueue)
         {
-            uint processedChunks = 0;
+            int processedChunks = 0;
             while (processedChunks < file.AmountOfChunks)
             {
                 var chunks = await _mediator.Send(new GetForFileQuery { FileId = file.Id, MinSequenceNo = processedChunks, MaxSequenceNo = 100 });
-                processedChunks += (uint)chunks.Count;
+                processedChunks += chunks.Count;
                 var builtChunkPackages = await _mediator.Send(new CreateChunkPackagesCommand { FileChunks = chunks, Recipient = recipient });
                 foreach (var package in builtChunkPackages)
                     outgoingQueue.Add(package);

@@ -1,15 +1,9 @@
 using MediatR;
-using Pi.Replicate.Application.Chunks.CreateChunkPackages;
-using Pi.Replicate.Application.Chunks.Queries.GetForFile;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Commands.UpdateFileAsHandled;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
-using Serilog;
-using System.Collections.Concurrent;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Pi.Replicate.Workers
 {
@@ -19,10 +13,11 @@ namespace Pi.Replicate.Workers
 		private readonly IMediator _mediator;
 		private readonly CommunicationService _communicationService;
 
-		public FileExportWorker(IMediator mediator, CommunicationService communicationService)
+		public FileExportWorker(IMediator mediator, CommunicationService communicationService, WorkerQueueFactory workerQueueFactory)
 		{
 			_mediator = mediator;
 			_communicationService = communicationService;
+			_workerQueueFactory = workerQueueFactory;
 		}
 		public override Thread DoWork(CancellationToken cancellationToken)
 		{

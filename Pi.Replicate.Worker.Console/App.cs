@@ -11,19 +11,25 @@ namespace Pi.Replicate.Worker.Console
     public class App
     {
         private readonly FolderWorker _folderWorker;
-        private readonly FileProcessForExportWorker _fileProcessForExportWorker;
+        private readonly FilePreExportWorker _filePreExportWorker;
+        private readonly FileExportWorker _fileExportWorker;
+        private readonly ChunkExportWorker _chunkExportWorker;
 
-        public App(FolderWorker folderWorker, FileProcessForExportWorker fileProcessForExportWorker)
+        public App(FolderWorker folderWorker, FilePreExportWorker filePreExportWorker, FileExportWorker fileExportWorker, ChunkExportWorker chunkExportWorker)
         {
             _folderWorker = folderWorker;
-            _fileProcessForExportWorker = fileProcessForExportWorker;
+            _filePreExportWorker = filePreExportWorker;
+            _fileExportWorker = fileExportWorker;
+            _chunkExportWorker = chunkExportWorker;
         }
 
         public async Task Run()
         {
             var cancellationToken = new CancellationTokenSource();
             _folderWorker.DoWork(cancellationToken.Token);
-            _fileProcessForExportWorker.DoWork(cancellationToken.Token);
+            _filePreExportWorker.DoWork(cancellationToken.Token);
+            _fileExportWorker.DoWork(cancellationToken.Token);
+            _chunkExportWorker.DoWork(cancellationToken.Token);
 
             await Task.Delay(Timeout.Infinite);
         }

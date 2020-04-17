@@ -15,7 +15,7 @@ namespace Pi.Replicate.Application.Files.Processing
 	{
 		private readonly int _sizeofChunkInBytes;
 		private readonly PathBuilder _pathBuilder;
-		private static byte[] _emptyResultResult = new byte[0];
+		private static readonly byte[] _emptyResultResult = Array.Empty<byte>();
 
 		public FileSplitter(IConfiguration configuration, PathBuilder pathBuilder)
 		{
@@ -29,7 +29,6 @@ namespace Pi.Replicate.Application.Files.Processing
 
 			if (!String.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
-				Log.Information($"'{path}' is being processed");
 				Log.Information($"'{path}' is being compressed");
 				var pathOfCompressed = await CompressFile(path);
 

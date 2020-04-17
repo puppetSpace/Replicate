@@ -17,7 +17,7 @@ namespace Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage
     public class DeleteChunkPackageCommandHandler : IRequestHandler<DeleteChunkPackageCommand>
     {
         private readonly IDatabase _database;
-        private const string _deleteStatement = "DELETE FROM db.ChunkPackages WHERE Id = @Id";
+        private const string _deleteStatement = "DELETE FROM dbo.ChunkPackages WHERE Id = @Id";
 
         public DeleteChunkPackageCommandHandler(IDatabase database)
         {

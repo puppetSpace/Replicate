@@ -17,26 +17,28 @@ namespace Pi.Replicate.Application.Common.Queues
 
     public class WorkerQueueFactory
     {
-        private readonly ConcurrentDictionary<WorkerQueueType, IDisposable> _queues = new ConcurrentDictionary<WorkerQueueType, IDisposable>();
+        private readonly Dictionary<WorkerQueueType, IDisposable> _queues = new Dictionary<WorkerQueueType, IDisposable>();
 
 
         public BlockingCollection<TE> Get<TE>(WorkerQueueType workerQueueType)
         {
-            var workerQueueTypeName = Enum.GetName(typeof(WorkerQueueType), workerQueueType);
-            if (_queues.ContainsKey(workerQueueType))
-            {
-                Log.Verbose($"Getting existing queue for type {workerQueueTypeName}");
-                if (_queues.TryGetValue(workerQueueType, out var queue))
-                    return queue as BlockingCollection<TE>;
+            lock (_queues) {
+                var workerQueueTypeName = Enum.GetName(typeof(WorkerQueueType), workerQueueType);
+                if (_queues.ContainsKey(workerQueueType))
+                {
+                    Log.Verbose($"Getting existing queue for type {workerQueueTypeName}");
+                    if (_queues.TryGetValue(workerQueueType, out var queue))
+                        return queue as BlockingCollection<TE>;
+                    else
+                        throw new InvalidOperationException($"Unable to get Queue for {workerQueueTypeName}");
+                }
                 else
-                    throw new InvalidOperationException($"Unable to get Queue for {workerQueueTypeName}");
-            }
-            else
-            {
-                Log.Verbose($"Creating new queue for type {workerQueueTypeName}");
-                var workerQueue = new BlockingCollection<TE>();
-                _queues.AddOrUpdate(workerQueueType, workerQueue, (x, y) => workerQueue);
-                return workerQueue;
+                {
+                    Log.Verbose($"Creating new queue for type {workerQueueTypeName}");
+                    var workerQueue = new BlockingCollection<TE>();
+                    _queues.Add(workerQueueType, workerQueue);
+                    return workerQueue;
+                }
             }
         }
     }

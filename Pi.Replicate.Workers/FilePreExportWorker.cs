@@ -15,14 +15,14 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Workers
 {
-	public class FileProcessForExportWorker : WorkerBase
+	public class FilePreExportWorker : WorkerBase
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IMediator _mediator;
 		private readonly PathBuilder _pathBuilder;
 		private readonly FileChunkService _fileSplitterService;
 
-		public FileProcessForExportWorker(IConfiguration configuration
+		public FilePreExportWorker(IConfiguration configuration
 		, WorkerQueueFactory workerQueueFactory
 		, IMediator mediator
 		, PathBuilder pathBuilder
@@ -38,18 +38,19 @@ namespace Pi.Replicate.Workers
 		{
 			var thread = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(Replicate.Workers.FileProcessForExportWorker)}");
+				Log.Information($"Starting {nameof(Replicate.Workers.FilePreExportWorker)}");
 				var incomingQueue = _workerQueueFactory.Get<ProcessItem<File, FolderOption>>((WorkerQueueType)WorkerQueueType.ToProcessFiles);
 				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
 				var runningTasks = new List<Task>();
 				var semaphore = new SemaphoreSlim(10); //todo create setting for this
 				while (!incomingQueue.IsCompleted && !cancellationToken.IsCancellationRequested)
 				{
-					runningTasks.RemoveAll(x => (bool)x.IsCompleted);
+					runningTasks.RemoveAll(x => x.IsCompleted);
 					var processItem = incomingQueue.Take(cancellationToken);
 					runningTasks.Add(Task.Run(async () =>
 					{
 						await semaphore.WaitAsync();
+						Log.Information($"'{processItem.Item.Path}' is being processed");
 						if (processItem.Item.Status == FileStatus.New)
 						{
 							await ProcessNewItem(processItem);
@@ -59,7 +60,7 @@ namespace Pi.Replicate.Workers
 							//todo process update
 						}
 						outgoingQueue.Add(processItem.Item);
-
+						Log.Information($"'{processItem.Item.Path}' is processed");
 						semaphore.Release();
 					}));
 

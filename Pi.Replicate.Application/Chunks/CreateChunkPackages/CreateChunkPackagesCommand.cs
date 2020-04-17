@@ -20,7 +20,7 @@ namespace Pi.Replicate.Application.Chunks.CreateChunkPackages
     public class CreateChunkPackagesCommandHandler : IRequestHandler<CreateChunkPackagesCommand, ICollection<ChunkPackage>>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId";
+        private const string _insertStatement = "INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId)";
 
         public CreateChunkPackagesCommandHandler(IDatabase database)
         {
