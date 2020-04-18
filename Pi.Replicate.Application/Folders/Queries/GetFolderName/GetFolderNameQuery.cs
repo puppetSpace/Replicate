@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderName
     public class GetFolderQueryHandler : IRequestHandler<GetFolderNameQuery, string>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Name FROM dbo.Folders WHERE Id = @Id";
+        private const string _selectStatement = "SELECT Name FROM dbo.Folder WHERE Id = @Id";
 
         public GetFolderQueryHandler(IDatabase database)
         {

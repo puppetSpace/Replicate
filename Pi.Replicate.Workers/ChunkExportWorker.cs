@@ -36,7 +36,7 @@ namespace Pi.Replicate.Workers
 					try
 					{
 						await client.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);
-						await _mediator.Send(new DeleteChunkPackageCommand { ChunkPackageId = chunkPackage.Id });
+						await _mediator.Send(new DeleteChunkPackageCommand { RecipientId = chunkPackage.Recipient.Id, FileChunkId = chunkPackage.FileChunk.Id });
 					}
 					catch (System.InvalidOperationException ex)
 					{

@@ -19,10 +19,10 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
     public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, ICollection<Folder>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatementFolder = "SELECT Id, Name, FolderOptions_DeleteAfterSent as DeleteAfterSent FROM dbo.Folders";
+        private const string _selectStatementFolder = "SELECT Id, Name, FolderOptions_DeleteAfterSent as DeleteAfterSent FROM dbo.Folder";
         private const string _selectStatementFolderRecipients = @"select fr.FolderId, re.Id,re.Name,re.Address
 				from dbo.FolderRecipient fr
-				inner join dbo.Recipients re on re.Id = fr.RecipientId";
+				inner join dbo.Recipient re on re.Id = fr.RecipientId";
 
         public GetFoldersToCrawlQueryHandler(IDatabase database)
         {

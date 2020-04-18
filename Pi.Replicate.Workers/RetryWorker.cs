@@ -64,7 +64,7 @@ namespace Pi.Replicate.Workers
 
             foreach (var chunkPackage in chunkPackages)
             {
-                if (!queue.Any(x => x.Id == chunkPackage.Id))
+                if (!queue.Any(x => x.FileChunk.Id == chunkPackage.FileChunk.Id && x.Recipient.Id == chunkPackage.Recipient.Id))
                     queue.Add(chunkPackage);
             }
         }

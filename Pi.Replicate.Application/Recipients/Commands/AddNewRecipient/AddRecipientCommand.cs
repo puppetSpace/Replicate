@@ -20,7 +20,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
     public class AddRecipientCommandHandler : IRequestHandler<AddRecipientCommand, Recipient>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.Recipient(Id,Name,Address) VALUES(@Id,@Name,@Address";
+        private const string _insertStatement = "INSERT INTO dbo.Recipient(Id,Name,Address) VALUES(@Id,@Name,@Address)";
 
         public AddRecipientCommandHandler(IDatabase database)
         {

@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 	{
 		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
-		private const string _insertStatementFolder = "INSERT INTO dbo.Folders(Id,Name,FolderOptions_DeleteAfterSent) VALUES(@Id,@Name,@DeleteAfterSent";
+		private const string _insertStatementFolder = "INSERT INTO dbo.Folder(Id,Name,FolderOptions_DeleteAfterSent) VALUES(@Id,@Name,@DeleteAfterSent";
 		private const string _insertStatementFolderRecipient = "INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,RecipientId)";
 		private readonly IBroker _broker;
 

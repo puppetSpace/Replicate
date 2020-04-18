@@ -20,7 +20,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddFailedFile
     public class AddFailedFileCommandHandler : IRequestHandler<AddFailedFileCommand>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.FailedFiles(Id,FileId,RecipientId) VALUES (@Id,@FileId,@RecipientId)";
+        private const string _insertStatement = "INSERT INTO dbo.FailedFile(FileId,RecipientId) VALUES (@FileId,@RecipientId)";
 
         public AddFailedFileCommandHandler(IDatabase database)
         {
@@ -31,7 +31,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddFailedFile
         {
             var failedFile = FailedFile.Build(request.File, request.Recipient);
             using (_database)
-                await _database.Execute(_insertStatement, new { failedFile.Id, FileId = failedFile.File.Id, RecipientId = failedFile.Recipient.Id });
+                await _database.Execute(_insertStatement, new {FileId = failedFile.File.Id, RecipientId = failedFile.Recipient.Id });
 
             return Unit.Value;
         }

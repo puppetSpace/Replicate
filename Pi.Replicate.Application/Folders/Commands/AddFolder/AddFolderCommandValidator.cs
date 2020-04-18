@@ -33,7 +33,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
             RuleFor(x => x.Recipients)
                 .NotNull()
                 .NotEmpty()
-                .WithMessage("I need a place to sync too, Atleast 1 recipient must be selected.");
+                .WithMessage("I need a place to sync too, atleast 1 recipient must be selected.");
         }
     }
 }

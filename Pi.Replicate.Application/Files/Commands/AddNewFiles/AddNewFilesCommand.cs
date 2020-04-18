@@ -30,7 +30,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
 	{
 		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
-		private const string _insertStatement= "INSERT INTO dbo.Files(Id,FolderId, Name, Size,AmountOfChunks,Hash,Status,LastModifiedDate,Path,Signature) VALUES(@Id,@FolderId,@Name,@Size, @AmountOfChunks, @Hash, @Status, @LastModifiedDate,@Path, @Signature)";
+		private const string _insertStatement= "INSERT INTO dbo.File(Id,FolderId, Name, Size,AmountOfChunks,Hash,Status,LastModifiedDate,Path,Signature) VALUES(@Id,@FolderId,@Name,@Size, @AmountOfChunks, @Hash, @Status, @LastModifiedDate,@Path, @Signature)";
 
 		public AddNewFilesCommandHandler(IDatabase database, PathBuilder pathBuilder)
 		{

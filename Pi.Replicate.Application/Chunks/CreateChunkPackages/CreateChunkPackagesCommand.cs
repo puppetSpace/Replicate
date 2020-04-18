@@ -20,7 +20,7 @@ namespace Pi.Replicate.Application.Chunks.CreateChunkPackages
     public class CreateChunkPackagesCommandHandler : IRequestHandler<CreateChunkPackagesCommand, ICollection<ChunkPackage>>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.ChunkPackages(Id,FileChunkId,RecipientId) VALUES(@Id,@FileChunkId,@RecipientId)";
+        private const string _insertStatement = "INSERT INTO dbo.ChunkPackage(FileChunkId,RecipientId) VALUES(@FileChunkId,@RecipientId)";
 
         public CreateChunkPackagesCommandHandler(IDatabase database)
         {
@@ -36,7 +36,7 @@ namespace Pi.Replicate.Application.Chunks.CreateChunkPackages
                 foreach (var chunk in request.FileChunks)
                 {
                     var package = ChunkPackage.Build(chunk, request.Recipient);
-                    await _database.Execute(_insertStatement, new { package.Id, FileChunkId = package.FileChunk.Id, RecipientId = package.Recipient.Id });
+                    await _database.Execute(_insertStatement, new {FileChunkId = package.FileChunk.Id, RecipientId = package.Recipient.Id });
                     builtChunkPackages.Add(package);
                 }
             }

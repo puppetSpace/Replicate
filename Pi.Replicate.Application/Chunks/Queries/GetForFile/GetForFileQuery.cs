@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.Chunks.Queries.GetForFile
     public class GetForFileQueryHandler : IRequestHandler<GetForFileQuery, ICollection<FileChunk>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource FROM dbo.FileChunks WHERE FileId = @FileId and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
+        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
 
         public GetForFileQueryHandler(IDatabase database)
         {

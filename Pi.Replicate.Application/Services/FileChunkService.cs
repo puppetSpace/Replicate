@@ -14,7 +14,7 @@ namespace Pi.Replicate.Application.Services
     {
         private readonly FileSplitterFactory _fileSplitterFactory;
         private readonly IDatabaseFactory _databaseFactory;
-        private const string _insertStatement = "INSERT INTO dbo.FileChunks(Id,FileId,SequenceNo,Value,ChunkSource) VALUES (@Id,@FileId,@SequenceNo,@Value,@ChunkSource)";
+        private const string _insertStatement = "INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value,ChunkSource) VALUES (@Id,@FileId,@SequenceNo,@Value,@ChunkSource)";
 
         public FileChunkService(FileSplitterFactory fileSplitterFactory, IDatabaseFactory databaseFactory)
         {

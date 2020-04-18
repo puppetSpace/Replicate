@@ -19,12 +19,11 @@ namespace Pi.Replicate.Application.Chunks.Queries.GetChunkPackages
     {
         private readonly IDatabase _database;
         private const string _selectStatement = @"
-				select cp.Id
-				, fc.Id, fc.FileId, fc.SequenceNo, fc.Value, fc.ChunkSource
+				select fc.Id, fc.FileId, fc.SequenceNo, fc.Value, fc.ChunkSource
 				, re.Id, re.Name, re.Address
-				from dbo.ChunkPackages cp
-				inner join dbo.FileChunks fc on fc.Id = cp.FileChunkId
-				inner join dbo.Recipients re on re.Id = cp.RecipientId";
+				from dbo.ChunkPackage cp
+				inner join dbo.FileChunk fc on fc.Id = cp.FileChunkId
+				inner join dbo.Recipient re on re.Id = cp.RecipientId";
 
         public GetChunkPackagesQueryHandler(IDatabase database)
         {

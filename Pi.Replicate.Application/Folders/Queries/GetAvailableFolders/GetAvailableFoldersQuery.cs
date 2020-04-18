@@ -20,7 +20,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetAvailableFolders
 	{
 		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
-		private const string _selectStatement = "SELECT Name from dbo.Folders";
+		private const string _selectStatement = "SELECT Name from dbo.Folder";
 
 		public GetAvailableFoldersQueryHandler(IDatabase database, PathBuilder pathBuilder)
 		{

@@ -18,14 +18,13 @@ namespace Pi.Replicate.Application.Files.Queries.GetFailedFiles
     public class GetFailedFilesQueryHandler : IRequestHandler<GetFailedFilesQuery, ICollection<FailedFile>>
     {
         private readonly IDatabase _database;
-        private const string _deleteStatement = "DELETE FROM dbo.FailedFiles";
+        private const string _deleteStatement = "DELETE FROM dbo.FailedFile";
         private const string _selectStatement = @"
-				select ff.Id
-				,fi.Id, fi.FolderId,fi.AmountOfChunks, fi.Hash, fi.LastModifiedDate, fi.Name,fi.Path, fi.Signature,fi.Size, fi.Status
+				select fi.Id, fi.FolderId,fi.AmountOfChunks, fi.Hash, fi.LastModifiedDate, fi.Name,fi.Path, fi.Signature,fi.Size, fi.Status
 				, re.Id, re.Name, re.Address
-				from dbo.FailedFiles ff
-				inner join dbo.Files fi on fi.Id = ff.FileId
-				inner join dbo.Recipients re on re.Id = ff.RecipientId";
+				from dbo.FailedFile ff
+				inner join dbo.File fi on fi.Id = ff.FileId
+				inner join dbo.Recipient re on re.Id = ff.RecipientId";
 
         public GetFailedFilesQueryHandler(IDatabase database)
         {

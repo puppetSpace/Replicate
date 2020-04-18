@@ -8,13 +8,13 @@ namespace Pi.Replicate.Domain
 
         public Guid FileId { get; private set; }
 
-        public int SequenceNo { get; private set; }
+        public double SequenceNo { get; private set; }
 
         public byte[] Value { get; private set; }
 
         public ChunkSource ChunkSource { get; private set; }
 
-        public static FileChunk Build(Guid fileId, int sequenceNo, byte[] value,ChunkSource chunkSource)
+        public static FileChunk Build(Guid fileId, double sequenceNo, byte[] value,ChunkSource chunkSource)
         {
             return new FileChunk
             {
@@ -30,8 +30,6 @@ namespace Pi.Replicate.Domain
 
     public class ChunkPackage
     {
-        public Guid Id { get; private set; }
-
         public FileChunk FileChunk { get; set; }
 
         public Recipient Recipient { get; set; }
@@ -40,7 +38,6 @@ namespace Pi.Replicate.Domain
         {
             return new ChunkPackage
             {
-                Id = Guid.NewGuid(),
                 FileChunk = fileChunk,
                 Recipient = recipient
             };

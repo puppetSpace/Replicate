@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 				{
 					using (database)
 					{
-						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipients where name = @Name", new { Name = x });
+						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipient where name = @Name", new { Name = x });
 						return result != Guid.Empty;
 					}
 				})
@@ -33,7 +33,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 				{
 					using (database)
 					{
-						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipients where address = @Address", new { Address = x });
+						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipient where address = @Address", new { Address = x });
 						return result != Guid.Empty;
 					}
 				})

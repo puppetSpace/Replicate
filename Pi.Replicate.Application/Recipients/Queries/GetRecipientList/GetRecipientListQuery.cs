@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientList
     public class GetRecipientsListQueryHandler : IRequestHandler<GetRecipientListQuery, ICollection<Recipient>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id,Name,Address FROM dbo.Recipients";
+        private const string _selectStatement = "SELECT Id,Name,Address FROM dbo.Recipient";
 
         public GetRecipientsListQueryHandler(IDatabase database)
         {
