@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 					using (database)
 					{
 						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipient where name = @Name", new { Name = x });
-						return result != Guid.Empty;
+						return result == Guid.Empty;
 					}
 				})
 				.WithMessage(x => $"The name '{x}' is not unique");
@@ -34,7 +34,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.AddRecipient
 					using (database)
 					{
 						var result = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Recipient where address = @Address", new { Address = x });
-						return result != Guid.Empty;
+						return result == Guid.Empty;
 					}
 				})
 				.WithMessage(x => $"There is already a recipient with the address '{x}'");

@@ -4,6 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Data.Db;
+using System.Collections.Generic;
+using Pi.Replicate.Domain;
 
 namespace Pi.Replicate.Data
 {
@@ -11,21 +13,16 @@ namespace Pi.Replicate.Data
     {
         public static void AddData(this IServiceCollection services, IConfiguration configuration, ServiceLifetime serviceLifetime = ServiceLifetime.Scoped)
         {
-            services.AddDbContext<SystemContext>(options =>
-            {
-                options.UseSqlServer(configuration.GetConnectionString("ReplicateDatabase"));
-            }, serviceLifetime);
-
             services.AddTransient<IDatabase, Database>();
             services.AddTransient<IDatabaseFactory, DatabaseFactory>();
-            services.AddTransient<ISystemContext>(provider => provider.GetService<SystemContext>());
         }
 
 
         public static void AddSystemSettings(this IServiceCollection services, IConfiguration configuration)
         {
-            var systemContext = services.BuildServiceProvider().GetService<ISystemContext>();
-            foreach (var systemSetting in systemContext.SystemSettings)
+            var database = services.BuildServiceProvider().GetService<IDatabase>();
+            var systemSettings = database.Query<SystemSetting>("SELECT [Key],[Value] from dbo.SystemSetting",null).GetAwaiter().GetResult();
+            foreach (var systemSetting in systemSettings)
                 configuration[systemSetting.Key] = systemSetting.Value;
         }
     }

@@ -24,8 +24,8 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
                 {
                     using (database)
                     {
-                        var folderid = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Folders WHERE Name = @Name", new { Name = x });
-                        return folderid != Guid.Empty;
+                        var folderid = await database.QuerySingle<Guid>("SELECT Id FROM dbo.Folder WHERE Name = @Name", new { Name = x });
+                        return folderid == Guid.Empty;
                     }
                 })
                 .WithMessage(x => $"Folder '{x.Name}' already exists.");

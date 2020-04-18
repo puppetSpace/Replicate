@@ -28,7 +28,7 @@ namespace Pi.Replicate.Data.Db
 
         public Task<TE> QuerySingle<TE>(string query, object parameters)
         {
-            return Connection.QuerySingleAsync<TE>(query, parameters);
+            return Connection.QueryFirstOrDefaultAsync<TE>(query, parameters);
         }
 
         public async Task<ICollection<TE>> Query<TE>(string query, object parameters)

@@ -9,7 +9,7 @@ GO
 create table dbo.Recipient(
 	Id uniqueidentifier NOT NULL,
 	[Name] varchar(30) NOT NULL,
-	[Address] bit NOT NULL,
+	[Address] varchar(max) NOT NULL,
 	CONSTRAINT PK_Recipient PRIMARY KEY(Id)
 );
 GO

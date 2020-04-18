@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Pi.Replicate.Agent/Pi.Replicate.Agent.csproj"
+                "${workspaceFolder}/Pi.Replicate.WebUi/Pi.Replicate.WebUi.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

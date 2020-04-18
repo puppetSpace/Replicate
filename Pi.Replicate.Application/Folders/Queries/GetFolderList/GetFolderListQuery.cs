@@ -14,7 +14,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
     public class GetFolderListQueryHandler : IRequestHandler<GetFolderListQuery, ICollection<string>>
     {
         private readonly IDatabase _database;
-        private readonly string _selectStatement = "SELECT Name from db.Folders";
+        private readonly string _selectStatement = "SELECT Name from dbo.Folder";
 
         public GetFolderListQueryHandler(IDatabase database)
         {
