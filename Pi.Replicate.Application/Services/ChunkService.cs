@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-    public class FileChunkService
+    public class ChunkService
     {
         private readonly FileSplitterFactory _fileSplitterFactory;
         private readonly IDatabaseFactory _databaseFactory;
         private const string _insertStatement = "INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value,ChunkSource) VALUES (@Id,@FileId,@SequenceNo,@Value,@ChunkSource)";
 
-        public FileChunkService(FileSplitterFactory fileSplitterFactory, IDatabaseFactory databaseFactory)
+        public ChunkService(FileSplitterFactory fileSplitterFactory, IDatabaseFactory databaseFactory)
         {
             _fileSplitterFactory = fileSplitterFactory;
             _databaseFactory = databaseFactory;
@@ -39,7 +39,12 @@ namespace Pi.Replicate.Application.Services
                 });
             }
 
-            return (fileHash,sequenceNo);
+            return (fileHash, sequenceNo);
+        }
+
+        public async Task SplitByteArrayIntoChunks(byte[] bytes)
+        {
+
         }
     }
 }

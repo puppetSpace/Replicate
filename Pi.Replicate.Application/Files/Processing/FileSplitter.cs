@@ -49,6 +49,7 @@ namespace Pi.Replicate.Application.Files.Processing
 			}
 		}
 
+		//todo move to seperate class
 		private async Task<string> CompressFile(string path)
 		{
 			var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());

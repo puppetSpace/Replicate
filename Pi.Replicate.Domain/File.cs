@@ -35,6 +35,7 @@ namespace Pi.Replicate.Domain
         {
             LastModifiedDate = file.LastWriteTimeUtc;
             Size = file.Length;
+            Status = FileStatus.Changed;
         }
 
         public void UpdateAfterProcessesing(int amountOfChunks, byte[] hash, byte[] signature)

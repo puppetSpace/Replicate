@@ -20,13 +20,13 @@ namespace Pi.Replicate.Workers
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IMediator _mediator;
 		private readonly PathBuilder _pathBuilder;
-		private readonly FileChunkService _fileSplitterService;
+		private readonly ChunkService _fileSplitterService;
 
 		public FilePreExportWorker(IConfiguration configuration
 		, WorkerQueueFactory workerQueueFactory
 		, IMediator mediator
 		, PathBuilder pathBuilder
-		, FileChunkService fileSplitterService)
+		, ChunkService fileSplitterService)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_mediator = mediator;
@@ -57,7 +57,7 @@ namespace Pi.Replicate.Workers
 						}
 						else
 						{
-							//todo process update
+							await ProcessChangedItem(processItem);
 						}
 						outgoingQueue.Add(processItem.Item);
 						Log.Information($"'{processItem.Item.Path}' is processed");
@@ -75,7 +75,7 @@ namespace Pi.Replicate.Workers
 		private async Task ProcessNewItem(ProcessItem<File, FolderOption> processItem)
 		{
 			var result = await _fileSplitterService.SplitFileIntoChunksAndProduceHash(processItem.Item);
-
+//move delta to splitfile service???
 			var delta = new Delta();
 			var signature = delta.CreateSignature(_pathBuilder.BuildPath(processItem.Item.Path));
 			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Hash = result.fileHash, Signature = signature, AmountOfChunks = result.amountOfChunks });
@@ -85,6 +85,20 @@ namespace Pi.Replicate.Workers
 				var path = _pathBuilder.BuildPath(processItem.Item.Path);
 				System.IO.File.Delete(path);
 			}
+		}
+
+		private async Task ProcessChangedItem(ProcessItem<File, FolderOption> processItem)
+		{
+			//todo maybe don't use hash???
+			var path = _pathBuilder.BuildPath(processItem.Item.Path);
+			var delta = new Delta(); //todo create service of this
+			var deltaChange = delta.CreateDelta(path,processItem.Item.Signature);
+			var newSignature = delta.CreateSignature(path);
+
+			//todo split up deltaChange into chunks
+
+			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Hash = result.fileHash, Signature = newSignature, AmountOfChunks = result.amountOfChunks });
+			
 		}
 	}
 }

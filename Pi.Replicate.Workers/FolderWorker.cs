@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Commands.AddNewFiles;
+using Pi.Replicate.Application.Files.Commands.UpdateChangedFiles;
 using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
 using Pi.Replicate.Domain;
@@ -47,7 +48,7 @@ namespace Pi.Replicate.Workers
                         Log.Information($"Crawling through folder '{folder.Name}'");
                         var collector = _fileCollectorFactory.Get(folder);
                         await ProcessNewFiles(folder, collector);
-                        //await collector.GetChangedFiles(); //add to queue
+                        await ProcessChangedFiles(collector);
                     }
 
                     Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
@@ -71,6 +72,21 @@ namespace Pi.Replicate.Workers
                     Log.Information($"{file.Path} already present in queue for processing");
                 else
                     queue.Add(new ProcessItem<File,FolderOption>(file,folder.FolderOptions));
+            }
+        }
+
+         private async Task ProcessChangedFiles(FileCollector collector)
+        {
+            var changedFiles = await collector.GetChangedFiles();
+            var updatedFiles = await _mediator.Send(new UpdateChangedFilesCommand{ Files = changedFiles });
+            var queue = _workerQueueFactory.Get<ProcessItem<File,FolderOption>>(WorkerQueueType.ToProcessFiles);
+            foreach (var file in updatedFiles)
+            {
+                Log.Verbose($"Adding '{file.Path}' to queue");
+                if (queue.Any(x => string.Equals(x.Item.Path, file.Path)))
+                    Log.Information($"{file.Path} already present in queue for processing");
+                else
+                    queue.Add(new ProcessItem<File,FolderOption>(file,FolderOption.Empty));
             }
         }
     }
