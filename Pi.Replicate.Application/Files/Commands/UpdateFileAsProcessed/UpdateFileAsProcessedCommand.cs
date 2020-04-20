@@ -24,7 +24,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFileAsProcessed
     public class UpdateFileAsProcessedCommandHandler : IRequestHandler<UpdateFileAsProcessedCommand>
     {
         private readonly IDatabase _database;
-        private const string _updateStatement = "UPDATE dbo.File SET AmountOfChunks = @AmountOfChunks, Hash = @Hash, Status = @Status, Signature = @Signature where Id = @Id";
+        private const string _updateStatement = "UPDATE dbo.[File] SET AmountOfChunks = @AmountOfChunks, Hash = @Hash, Status = @Status, Signature = @Signature where Id = @Id";
 
         public UpdateFileAsProcessedCommandHandler(IDatabase database)
         {

@@ -29,7 +29,7 @@ namespace Pi.Replicate.Worker.Console
             _folderWorker.DoWork(cancellationToken.Token);
             _filePreExportWorker.DoWork(cancellationToken.Token);
             _fileExportWorker.DoWork(cancellationToken.Token);
-            _chunkExportWorker.DoWork(cancellationToken.Token);
+            //_chunkExportWorker.DoWork(cancellationToken.Token);
 
             await Task.Delay(Timeout.Infinite);
         }

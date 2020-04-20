@@ -1,6 +1,27 @@
-﻿ @import "darkTheme_colors.less";
+﻿@import "darkTheme_colors.less";
+
+.nav-link {
+    color: #d7d7d7;
+    border-radius: 4px;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    line-height: 2.5rem;
+
+    &:hover {
+        background-color: @color-white-fade-10;
+        color: white;
+    }
+}
+
+.nav-link.active {
+    background-color: @color-white-fade-20;
+    color: white;
+}
 
 .main {
+    width: 100%;
+
     h3 {
         font-size: x-large;
         margin-top: 15px;
@@ -8,7 +29,7 @@
     }
 
     h4 {
-        font-size:medium;
+        font-size: medium;
         margin-top: 15px;
         font-weight: bolder;
     }
@@ -20,7 +41,8 @@
     color: @color-red;
     padding: 10px;
     margin-bottom: 20px;
-    ul{
+
+    ul {
         overflow-wrap: break-word;
     }
 }
@@ -30,6 +52,7 @@
     padding: 1rem;
     display: flex;
     flex-direction: column;
+    width: fit-content;
 
     .form-group {
         padding-left: 2rem;
@@ -45,3 +68,77 @@
     }
 }
 
+.folder-overview {
+    display: flex;
+    flex-direction: column;
+
+    .folder-overview-data {
+        h3 {
+            margin-right: 25px;
+        }
+
+        display: flex;
+        flex-direction: row;
+        flex: 1;
+        border-bottom: 2px solid @color-white;
+    }
+
+    .metadata {
+        display: flex;
+        flex-direction: column;
+        font-size: smaller;
+        margin-top: 0.5rem;
+    }
+
+    .folder-setting {
+        font-size: x-large;
+        align-self: center;
+        margin-left: auto;
+    }
+
+    .folder-overview-recipients {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        margin-top: 20px;
+
+
+        .recipient {
+            .recipient-header {
+                h4 {
+                    margin: 0;
+                }
+
+                h4, p {
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                    width: 80%;
+                    text-align: center;
+                }
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .recipient-address {
+                font-size: smaller;
+                font-style: italic;
+            }
+
+            &:hover {
+                background-color: @color-white-fade-20;
+                color: #d7d7d7;
+                cursor:pointer;
+            }
+
+            background-color: @color-white-fade-10;
+            box-shadow: 0 6.4px 14.4px 0 @color-dark-fade-30, 0 1.2px 3.6px 0 @color-dark-fade-20;
+            padding: 10px;
+            border-radius: 5px;
+            width: 13rem;
+            margin: 10px;
+        }
+    }
+}

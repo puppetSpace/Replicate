@@ -27,12 +27,13 @@ create table dbo.[File](
 	FolderId uniqueidentifier NOT NULL,
 	[Name] varchar(255) NOT NULL,
 	Size bigint NOT NULL,
-	AmountOfChunk int NULL,
+	AmountOfChunks int NULL,
 	[Hash] varbinary(max) NULL,
 	[Status] int NOT NULL,
-	[LastModifiedDate] timestamp NOT NULL,
+	[LastModifiedDate] datetime NOT NULL,
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
+	[Source] int NOT NULL,
 	CONSTRAINT PK_File PRIMARY KEY(Id),
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
 );
@@ -75,7 +76,7 @@ create table dbo.SystemSetting(
 );
 GO
 
-insert into dbo.SystemSetting VALUES(NEWID(),'ReplicateBasePath','C:\Temp');
+insert into dbo.SystemSetting VALUES(NEWID(),'ReplicateBasePath','D:\Temp');
 insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10');
 insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10');
 insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000');

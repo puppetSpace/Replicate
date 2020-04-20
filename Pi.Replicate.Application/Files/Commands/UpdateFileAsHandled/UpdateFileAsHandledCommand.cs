@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFileAsHandled
 	public class UpdateFileAsHandledCommandHandler : IRequestHandler<UpdateFileAsHandledCommand>
 	{
 		private readonly IDatabase _database;
-		private const string _updateStatement = "UPDATE dbo.File SET Status = @Status WHERE Id = @Id";
+		private const string _updateStatement = "UPDATE dbo.[File] SET Status = @Status WHERE Id = @Id";
 
 		public UpdateFileAsHandledCommandHandler(IDatabase database)
 		{

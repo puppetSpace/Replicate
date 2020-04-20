@@ -43,7 +43,7 @@ namespace Pi.Replicate.Application.Services
 				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok:true);
 				return true;
 			}
-			catch (System.InvalidOperationException ex)
+			catch (System.Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
 			{
 				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to FailedFiles and retrying later");
 				await _mediator.Send(new AddFailedFileCommand { File = file, Recipient = recipient });

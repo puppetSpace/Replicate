@@ -22,21 +22,21 @@ namespace Pi.Replicate.WebUi.Shared
         [Inject]
         protected IMediator Mediator { get; set; }
 
-        protected List<string> Folders { get; set; } = new List<string>();
+        protected List<FolderListItem> Folders { get; set; } = new List<FolderListItem>();
 
         protected override async Task OnInitializedAsync()
         {
             _subscription?.Dispose();
             _subscription = Broker.Subscribe(this);
             var folderNames = await Mediator.Send(new GetFolderListQuery());
-            Folders = folderNames.OrderBy(x=>x).ToList();
+            Folders = folderNames.OrderBy(x=>x.Name).ToList();
         }
 
         public async Task Handle(Folder value, CancellationToken cancellationToken)
         {
             await InvokeAsync(()=>
             {
-                Folders.Add(value.Name);
+                Folders.Add(new FolderListItem { Id = value.Id, Name = value.Name });
                 Folders = Folders.OrderBy(x=>x).ToList();
                 StateHasChanged();
             });

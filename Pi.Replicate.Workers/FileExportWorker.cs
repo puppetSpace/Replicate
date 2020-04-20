@@ -32,6 +32,7 @@ namespace Pi.Replicate.Workers
 					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
 					foreach (var recipient in recipients)
 					{
+						//todo try todo this in parallel
 						await sendFileHandler.Handle(file, recipient, outgoingQueue);
 					}
 				}

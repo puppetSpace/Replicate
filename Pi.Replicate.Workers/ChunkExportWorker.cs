@@ -4,6 +4,7 @@ using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
+using System;
 using System.Net.Http;
 using System.Threading;
 
@@ -38,7 +39,7 @@ namespace Pi.Replicate.Workers
 						await client.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);
 						await _mediator.Send(new DeleteChunkPackageCommand { RecipientId = chunkPackage.Recipient.Id, FileChunkId = chunkPackage.FileChunk.Id });
 					}
-					catch (System.InvalidOperationException ex)
+					catch (Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
 					{
 						Log.Error(ex, "Failed to send chunk");
 					}

@@ -1,5 +1,51 @@
-﻿@page "/folder/{folderid}"
+﻿@page "/folder/{folderId}"
 @inherits FolderOverviewBase
 
-<h3>FolderOverview</h3>
-
+<div class="folder-overview">
+    <div class="folder-overview-data">
+        <h3>@FolderOverviewModel.FolderName</h3>
+        <div class="metadata">
+            <span>
+                Files:
+                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @FolderOverviewModel.AmountOfFilesSent
+                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.AmountOfFilesReceived
+            </span>
+            <span>
+                Data:
+                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @FolderOverviewModel.GetTotalAmountOfBytesSentDisplay()
+                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.GetTotalAmountOfBytesReceivedDisplay()
+            </span>
+        </div>
+        <div class="metadata">
+            <span>
+                Total size on disk: @FolderOverviewModel.GetTotalSizeOnDiskDisplay()
+            </span>
+        </div>
+        <NavLink class="nav-link folder-setting" href='@("folder/"+ FolderId + "/settings")'>
+            <span class="oi oi-cog" aria-hidden="true"></span>
+        </NavLink>
+    </div>
+    <div class="folder-overview-recipients">
+        @foreach(var recipient in FolderOverviewModel.Recipients.OrderBy(x=>x.RecipientName))
+        {
+        <div class="recipient" @onclick="@(()=>RecipientClicked(recipient.RecipientId))">
+            <div class="recipient-header">
+                <h4 title="@recipient.RecipientName">@recipient.RecipientName</h4>
+                <p title="@recipient.RecipientAddress" class="recipient-address">@recipient.RecipientAddress</p>
+            </div>
+            <div class="metadata">
+                <span>
+                    Files:
+                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountOfFilesSent
+                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.AmountOfFilesReceived
+                </span>
+                <span>
+                    Data:
+                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesSentDisplay()
+                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesReceivedDisplay()
+                </span>
+            </div>
+        </div>
+            }
+        </div>
+</div>
