@@ -22,9 +22,7 @@ namespace Pi.Replicate.Application.Common
         {
             CreateMap<Domain.File, FileTransmissionModel>();
             CreateMap<Domain.FileChange, FileChangeTransmissionModel>();
-            CreateMap<GetFilesForFolderDto, Domain.File>()
-                .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
-            CreateMap<FoundToUpdateFileDto, Domain.File>()
+            CreateMap<FileDto, Domain.File>()
                 .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
         }
     }

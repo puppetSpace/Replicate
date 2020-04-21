@@ -50,6 +50,7 @@ namespace Pi.Replicate.Application.Services
         public async Task<int> SplitMemoryIntoChunks(File forFile,int startofSequenceNo,ReadOnlyMemory<byte> memory)
         {
             var sizeofChunkInBytes = int.Parse(_configuration[Constants.FileSplitSizeOfChunksInBytes]);
+            sizeofChunkInBytes = memory.Length>sizeofChunkInBytes ? sizeofChunkInBytes : memory.Length;
             var database = _databaseFactory.Get();
             var indexOfSlice = 0;
             double sequenceNo = startofSequenceNo;
@@ -59,7 +60,7 @@ namespace Pi.Replicate.Application.Services
                 database.Connection.Open();
                 while (indexOfSlice < memory.Length)
                 {
-                    sequenceNo = sequenceNo + 0.1;
+                    sequenceNo = sequenceNo + 0.0001;
                     var builtChunk = FileChunk.Build(forFile.Id, sequenceNo, memory.Slice(indexOfSlice,sizeofChunkInBytes), ChunkSource.FromChangedFile);
                     Log.Verbose($"Inserting delta chunk {builtChunk.SequenceNo} from changed '{forFile.Path}' into database");
                     await database.Execute(_insertStatement, new { builtChunk.Id, builtChunk.FileId, builtChunk.SequenceNo, Value = builtChunk.Value.ToArray(), builtChunk.ChunkSource });

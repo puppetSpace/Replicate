@@ -2,9 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Commands.AddNewFiles;
-using Pi.Replicate.Application.Files.Commands.UpdateChangedFiles;
+using Pi.Replicate.Application.Files.Commands.AddNewFile;
 using Pi.Replicate.Application.Files.Processing;
+using Pi.Replicate.Application.Files.Queries.GetFileForChange;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -24,16 +24,19 @@ namespace Pi.Replicate.Workers
         private readonly IMediator _mediator;
         private readonly FileCollectorFactory _fileCollectorFactory;
         private readonly WorkerQueueFactory _workerQueueFactory;
+        private readonly PathBuilder _pathBuilder;
 
         public FolderWorker(IConfiguration configuration
             , IMediator mediator
             , FileCollectorFactory fileCollectorFactory
-            , WorkerQueueFactory workerQueueFactory)
+            , WorkerQueueFactory workerQueueFactory
+            , PathBuilder pathBuilder)
         {
             _triggerInterval = int.TryParse(configuration[Constants.FolderCrawlTriggerInterval], out int interval) ? interval : 10;
             _mediator = mediator;
             _fileCollectorFactory = fileCollectorFactory;
             _workerQueueFactory = workerQueueFactory;
+            _pathBuilder = pathBuilder;
         }
 
         public override Thread DoWork(CancellationToken cancellationToken)
@@ -48,7 +51,7 @@ namespace Pi.Replicate.Workers
                         Log.Information($"Crawling through folder '{folder.Name}'");
                         var collector = _fileCollectorFactory.Get(folder);
                         await collector.CollectFiles();
-                        await ProcessNewFiles(folder,collector.NewFiles);
+                        await ProcessNewFiles(folder, collector.NewFiles);
                         await ProcessChangedFiles(collector.ChangedFiles);
                     }
 
@@ -63,10 +66,11 @@ namespace Pi.Replicate.Workers
 
         private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
         {
-            var createdFiles = await _mediator.Send(new AddNewFilesCommand(newFiles, folder));
             var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-            foreach (var file in createdFiles)
+            foreach (var newFile in newFiles)
             {
+                var file = File.BuildPartial(newFile, folder.Id, _pathBuilder.BasePath);
+                await _mediator.Send(new AddNewFileCommand { File = file });
                 Log.Verbose($"Adding '{file.Path}' to queue");
                 if (queue.Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{file.Path} already present in queue for processing");
@@ -75,17 +79,26 @@ namespace Pi.Replicate.Workers
             }
         }
 
-         private async Task ProcessChangedFiles(List<System.IO.FileInfo> changedFiles)
+        private async Task ProcessChangedFiles(List<System.IO.FileInfo> changedFiles)
         {
-            var updatedFiles = await _mediator.Send(new UpdateChangedFilesCommand{ Files = changedFiles });
             var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-            foreach (var file in updatedFiles)
+            foreach (var file in changedFiles)
             {
-                Log.Verbose($"Adding '{file.Path}' to queue");
-                if (queue.Any(x => string.Equals(x.Path, file.Path)))
-                    Log.Information($"{file.Path} already present in queue for processing");
+                var relativePath = file.FullName.Replace(_pathBuilder.BasePath + "\\", "");
+                var foundFile = await _mediator.Send(new GetFileForChangeQuery { Path = relativePath });
+                if (foundFile is object)
+                {
+                    foundFile.UpdateForChange(file);
+                    Log.Verbose($"Adding '{foundFile.Path}' to queue");
+                    if (queue.Any(x => string.Equals(x.Path, foundFile.Path)))
+                        Log.Information($"{foundFile.Path} already present in queue for processing");
+                    else
+                        queue.Add(foundFile);
+                }
                 else
-                    queue.Add(file);
+                {
+                    Log.Information($"Unable to perform update action. No file found with path '{relativePath}'");
+                }
             }
         }
     }

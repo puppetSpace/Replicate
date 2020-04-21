@@ -1,13 +1,9 @@
-﻿using Pi.Replicate.Domain;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Pi.Replicate.Domain;
 
-namespace Pi.Replicate.Application.Files.Commands.UpdateChangedFiles
+namespace Pi.Replicate.Application.Files.Models
 {
-    public class FoundToUpdateFileDto
+    public class FileDto
     {
         public Guid Id { get; set; }
 

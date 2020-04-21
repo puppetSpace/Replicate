@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Application.Files.Models;
 using Pi.Replicate.Domain;
 using System;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
         {
             using (_database)
             {
-                var result = await _database.Query<GetFilesForFolderDto>(_selectStatement, new { request.FolderId });
+                var result = await _database.Query<FileDto>(_selectStatement, new { request.FolderId });
                 return _mapper.Map<ICollection<File>>(result);
             }
         }
