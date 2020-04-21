@@ -74,11 +74,11 @@ namespace Pi.Replicate.Workers
 
 		private async Task ProcessNewItem(ProcessItem<File, FolderOption> processItem)
 		{
-			var result = await _fileSplitterService.SplitFileIntoChunksAndProduceHash(processItem.Item);
+			var amountOfChunks = await _fileSplitterService.SplitFileIntoChunksAndProduceHash(processItem.Item);
 //move delta to splitfile service???
 			var delta = new Delta();
 			var signature = delta.CreateSignature(_pathBuilder.BuildPath(processItem.Item.Path));
-			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Hash = result.fileHash, Signature = signature, AmountOfChunks = result.amountOfChunks });
+			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Signature = signature, AmountOfChunks = amountOfChunks });
 
 			if (processItem.Metadata.DeleteAfterSent)
 			{
@@ -97,7 +97,7 @@ namespace Pi.Replicate.Workers
 
 			//todo split up deltaChange into chunks
 
-			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Hash = result.fileHash, Signature = newSignature, AmountOfChunks = result.amountOfChunks });
+			//await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Signature = newSignature, AmountOfChunks = result.amountOfChunks });
 			
 		}
 	}

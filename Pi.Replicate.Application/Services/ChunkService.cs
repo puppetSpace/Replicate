@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.Services
             _databaseFactory = databaseFactory;
         }
 
-        public async Task<(byte[] fileHash, int amountOfChunks)> SplitFileIntoChunksAndProduceHash(File file)
+        public async Task<int> SplitFileIntoChunksAndProduceHash(File file)
         {
             byte[] fileHash;
             int sequenceNo = 0;
@@ -31,7 +31,7 @@ namespace Pi.Replicate.Application.Services
             using (database)
             {
                 database.Connection.Open();
-                fileHash = await fileSplitter.ProcessFile(file, async x =>
+                 await fileSplitter.ProcessFile(file, async x =>
                 {
                     var builtChunk = FileChunk.Build(file.Id, ++sequenceNo, x, ChunkSource.FromNewFile);
                     Log.Verbose($"Inserting chunk {builtChunk.SequenceNo} from '{file.Path}' into database");
@@ -39,7 +39,7 @@ namespace Pi.Replicate.Application.Services
                 });
             }
 
-            return (fileHash, sequenceNo);
+            return sequenceNo;
         }
 
         public async Task SplitByteArrayIntoChunks(byte[] bytes)

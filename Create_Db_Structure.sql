@@ -28,7 +28,6 @@ create table dbo.[File](
 	[Name] varchar(255) NOT NULL,
 	Size bigint NOT NULL,
 	AmountOfChunks int NULL,
-	[Hash] varbinary(max) NULL,
 	[Status] int NOT NULL,
 	[LastModifiedDate] datetime NOT NULL,
 	[Path] varchar(max) NOT NULL,

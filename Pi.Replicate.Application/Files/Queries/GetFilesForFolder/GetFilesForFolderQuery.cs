@@ -25,7 +25,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
     public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, ICollection<File>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id, FolderId,AmountOfChunks, Hash, LastModifiedDate, Name,Path, Signature,Size,Status,Source FROM dbo.[File] WHERE FolderId = @FolderId";
+        private const string _selectStatement = "SELECT Id, FolderId,AmountOfChunks, LastModifiedDate, Name,Path, Signature,Size,Status,Source FROM dbo.[File] WHERE FolderId = @FolderId";
 
         public GetFilesForFolderQueryHandler(IDatabase database)
         {

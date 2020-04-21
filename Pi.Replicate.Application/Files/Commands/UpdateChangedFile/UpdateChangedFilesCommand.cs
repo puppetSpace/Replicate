@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateChangedFiles
         private readonly IDatabase _database;
         private readonly PathBuilder _pathBuilder;
 
-        private const string _selectStatement = @"select Id, FolderId, AmountOfChunks, Hash, LastModifiedDate, Name,Path, Signature,Size,Status,Source from dbo.[File] where Path = @Path";
+        private const string _selectStatement = @"select Id, FolderId, AmountOfChunks, LastModifiedDate, Name,Path, Signature,Size,Status,Source from dbo.[File] where Path = @Path";
         private const string _updateStatement = @"Update dbo.[File] set Size = @Size, LastModifiedDate = @LastModifiedDate, Status = @Status where Id = @Id";
 
         public UpdateChangedFilesCommandHandler(IDatabase database, PathBuilder pathBuilder)

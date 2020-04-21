@@ -15,7 +15,6 @@ namespace Pi.Replicate.Application.Files.Processing
 	{
 		private readonly int _sizeofChunkInBytes;
 		private readonly PathBuilder _pathBuilder;
-		private static readonly byte[] _emptyResultResult = Array.Empty<byte>();
 
 		public FileSplitter(IConfiguration configuration, PathBuilder pathBuilder)
 		{
@@ -23,7 +22,7 @@ namespace Pi.Replicate.Application.Files.Processing
 			_pathBuilder = pathBuilder;
 		}
 
-		public async Task<byte[]> ProcessFile(File file, Func<byte[],Task> chunkCreatedDelegate)
+		public async Task ProcessFile(File file, Func<byte[],Task> chunkCreatedDelegate)
 		{
 			var path = _pathBuilder.BuildPath(file.Path);
 
@@ -33,19 +32,15 @@ namespace Pi.Replicate.Application.Files.Processing
 				var pathOfCompressed = await CompressFile(path);
 
 				Log.Information($"'{path}' is being split");
-				byte[] hash;
 				using (var stream = System.IO.File.OpenRead(pathOfCompressed))
-				{
-					hash =  await SplitStream(stream, chunkCreatedDelegate);
-				}
+					await SplitStream(stream, chunkCreatedDelegate);
+
 				Log.Information($"'compressed file of {path}' is being deleted");
 				System.IO.File.Delete(pathOfCompressed);
-				return hash;
 			}
 			else
 			{
 				Log.Warning($"File '{path}' does not exist or is locked. File will not be processedd");
-				return _emptyResultResult;
 			}
 		}
 
@@ -62,20 +57,14 @@ namespace Pi.Replicate.Application.Files.Processing
 			return tempPath;
 		}
 
-		private async Task<byte[]> SplitStream(System.IO.Stream stream, Func<byte[],Task> chunkCreatedDelegate)
+		private async Task SplitStream(System.IO.Stream stream, Func<byte[],Task> chunkCreatedDelegate)
 		{
-			MD5 hashCreator = MD5.Create();
 			var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
-			int bytesRead;
-			while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+			while ((await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 			{
-				hashCreator.TransformBlock(buffer, 0, bytesRead, null, 0);
 				await chunkCreatedDelegate(buffer);
 			}
-			hashCreator.TransformFinalBlock(buffer, 0, bytesRead);
-
 			ArrayPool<byte>.Shared.Return(buffer);
-			return hashCreator.Hash;
 		}
 
 	}

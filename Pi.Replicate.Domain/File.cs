@@ -14,8 +14,6 @@ namespace Pi.Replicate.Domain
 
         public long AmountOfChunks { get; private set; }
 
-        public byte[] Hash { get; private set; }
-
         public byte[] Signature { get; private set; }
 
         public FileSource Source { get; private set; }
@@ -38,9 +36,8 @@ namespace Pi.Replicate.Domain
             Status = FileStatus.Changed;
         }
 
-        public void UpdateAfterProcessesing(int amountOfChunks, byte[] hash, byte[] signature)
+        public void UpdateAfterProcessesing(int amountOfChunks, byte[] signature)
         {
-            Hash = hash;
             AmountOfChunks = amountOfChunks;
             Signature = signature;
             Status = FileStatus.Processed;
