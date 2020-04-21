@@ -33,13 +33,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
         {
             using (_database)
             {
-                var folders = await _database.Query<Folder, FolderOption, Folder>(_selectStatementFolder, null,
-                                (f, fo) =>
-                                {
-                                    f.FolderOptions = fo;
-                                    return f;
-                                }, splitOn: "DeleteAfterSent");
-
+                var folders = await _database.Query<Folder>(_selectStatementFolder, null);
                 var folderRecipients = await _database.Query<Guid, Recipient, (Guid folderId, Recipient recipient)>(_selectStatementFolderRecipients,null, (x, y) => (x, y));
 
                 return folders

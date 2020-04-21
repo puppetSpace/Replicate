@@ -44,6 +44,7 @@ namespace Pi.Replicate.Worker.Console
 			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
 
 
+			services.AddTransient<Startup>();
 			services.AddTransient<FolderWorker>();
 			services.AddTransient<FilePreExportWorker>();
 			services.AddTransient<FileExportWorker>();

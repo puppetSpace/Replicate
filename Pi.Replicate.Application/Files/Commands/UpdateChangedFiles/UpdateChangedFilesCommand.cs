@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
 using MediatR;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
@@ -18,14 +19,15 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateChangedFiles
     {
         private readonly IDatabase _database;
         private readonly PathBuilder _pathBuilder;
-
+        private readonly IMapper _mapper;
         private const string _selectStatement = @"select Id, FolderId, AmountOfChunks, LastModifiedDate, Name,Path, Signature,Size,Status,Source from dbo.[File] where Path = @Path";
         private const string _updateStatement = @"Update dbo.[File] set Size = @Size, LastModifiedDate = @LastModifiedDate, Status = @Status where Id = @Id";
 
-        public UpdateChangedFilesCommandHandler(IDatabase database, PathBuilder pathBuilder)
+        public UpdateChangedFilesCommandHandler(IDatabase database, PathBuilder pathBuilder, IMapper mapper)
         {
             _database = database;
             _pathBuilder = pathBuilder;
+            _mapper = mapper;
         }
 
         public async Task<ICollection<File>> Handle(UpdateChangedFilesCommand request, CancellationToken cancellationToken)
@@ -34,7 +36,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateChangedFiles
             foreach (var changedFile in request.Files)
             {
                 var path = changedFile.FullName.Replace(_pathBuilder.BasePath + "\\", "");
-                var foundFile = await _database.QuerySingle<File>(_selectStatement, new { Path = path });
+                var foundFile = _mapper.Map<File>(await _database.QuerySingle<FoundToUpdateFileDto>(_selectStatement, new { Path = path }));
                 if (foundFile is null)
                 {
                     Log.Information($"Unable to perform update action. No file found with path '{path}'");

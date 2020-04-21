@@ -42,13 +42,9 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFiles
 				var createdFiles = new List<File>();
 				foreach (var newFile in request.NewFiles)
 				{
-					Log.Information($"Creating signature for delta-calculations of file '{newFile.FullName}'");
-					var deltaservice = new DeltaService();
-					var signature = deltaservice.CreateSignature(newFile.FullName);
-
 					Log.Information($"Adding file '{newFile.FullName}' in database");
-					var file = File.BuildPartial(newFile, request.Folder.Id, _pathBuilder.BasePath, signature);
-					await _database.Execute(_insertStatement, new { file.Id, file.FolderId, file.Name, file.Size, file.AmountOfChunks, file.Status, file.LastModifiedDate, file.Path, file.Signature, file.Source });
+					var file = File.BuildPartial(newFile, request.Folder.Id, _pathBuilder.BasePath);
+					await _database.Execute(_insertStatement, new { file.Id, file.FolderId, file.Name, file.Size, file.AmountOfChunks, file.Status, file.LastModifiedDate, file.Path, Signature=file.Signature.ToArray(), file.Source });
 					createdFiles.Add(file);
 
 				}

@@ -1,8 +1,11 @@
 ﻿using Octodiff.Core;
+using Octodiff.Diagnostics;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -30,7 +33,7 @@ namespace Pi.Replicate.Application.Services
         public ReadOnlyMemory<byte> CreateDelta(Stream input, ReadOnlyMemory<byte> signature)
         {
             var deltaStream = new MemoryStream();
-            var signatureReader = new SignatureReader(new MemoryStream(signature.ToArray()), null);
+            var signatureReader = new SignatureReader(new MemoryStream(signature.ToArray()), LogProgressReporter.Get());
             var deltaWriter = new AggregateCopyOperationsDecorator(new BinaryDeltaWriter(deltaStream));
             var deltaBuilder = new DeltaBuilder();
             deltaBuilder.BuildDelta(input, signatureReader, deltaWriter);
@@ -46,7 +49,7 @@ namespace Pi.Replicate.Application.Services
 
         public void ApplyDelta(Stream input, ReadOnlyMemory<byte> delta, Stream output)
         {
-            var deltaReader = new BinaryDeltaReader(new MemoryStream(delta.ToArray()), null);
+            var deltaReader = new BinaryDeltaReader(new MemoryStream(delta.ToArray()), LogProgressReporter.Get());
             var deltaApplier = new DeltaApplier { SkipHashCheck = true };
             deltaApplier.Apply(input, deltaReader, output);
         }
@@ -65,5 +68,17 @@ namespace Pi.Replicate.Application.Services
             //move temp to original
             System.IO.File.Copy(tempPath,path,overwrite:true);
         }
+
+        private class LogProgressReporter : IProgressReporter
+        {
+            public void ReportProgress(string operation, long currentPosition, long total)
+            {
+                Log.Verbose($"opertaion: {operation}, currentPosition: {currentPosition}, total: {total}");
+            }
+
+            public static IProgressReporter Get() => new LogProgressReporter();
+        }
     }
+
+    
 }

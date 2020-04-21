@@ -24,29 +24,23 @@ namespace Pi.Replicate.Application.Files.Processing
 			_folder = folder;
 		}
 
-		public async Task<List<System.IO.FileInfo>> GetNewFiles()
+		public List<System.IO.FileInfo> NewFiles { get; private set; }
+		public List<System.IO.FileInfo> ChangedFiles { get; private set; }
+
+		public async Task CollectFiles()
 		{
 			(var rawFiles, var previousFilesInFolder) = await GetFiles();
 			//exclude all files that are allready in the database
-			var newFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
+			NewFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 
-			Log.Verbose($"{newFiles.Count} new files found in folder '{_folder.Name}'");
+			Log.Verbose($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
-			return newFiles;
-		}
-
-		public async Task<List<System.IO.FileInfo>> GetChangedFiles()
-		{
-			(var rawFiles, var previousFilesInFolder) = await GetFiles();
-			//only include the files that are already processed
-			var changed = rawFiles
+			ChangedFiles = rawFiles
 					.Where(x => previousFilesInFolder
 						.Any(y => y.Status == FileStatus.Handled && x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
 
-			Log.Verbose($"{changed.Count} changed files found in folder '{_folder.Name}'");
-
-			return changed;
+			Log.Verbose($"{ChangedFiles.Count} changed files found in folder '{_folder.Name}'");
 		}
 
 		private async Task<(IList<System.IO.FileInfo> AllFiles, ICollection<File> ProcessedFiles)> GetFiles()

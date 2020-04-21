@@ -28,7 +28,7 @@ namespace Pi.Replicate.Application.FileChanges.Commands.AddFileChange
         public async Task<Unit> Handle(AddFileChangeCommand request, CancellationToken cancellationToken)
         {
             using (_database)
-                await _database.Execute(_insertStatement, new { request.FileChange.Id, request.FileChange.VersionNo, request.FileChange.AmountOfChunks, request.FileChange.Signature, request.FileChange.LastModifiedDate });
+                await _database.Execute(_insertStatement, new { request.FileChange.Id, request.FileChange.VersionNo, request.FileChange.AmountOfChunks, Signature = request.FileChange.Signature.ToArray(), request.FileChange.LastModifiedDate });
 
             return Unit.Value;
         }

@@ -10,6 +10,7 @@ using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,7 +36,6 @@ namespace Pi.Replicate.Workers
             _workerQueueFactory = workerQueueFactory;
         }
 
-        //todo move to application
         public override Thread DoWork(CancellationToken cancellationToken)
         {
             var workingThread = new Thread(async () =>
@@ -47,8 +47,9 @@ namespace Pi.Replicate.Workers
                     {
                         Log.Information($"Crawling through folder '{folder.Name}'");
                         var collector = _fileCollectorFactory.Get(folder);
-                        await ProcessNewFiles(folder, collector);
-                        await ProcessChangedFiles(collector);
+                        await collector.CollectFiles();
+                        await ProcessNewFiles(folder,collector.NewFiles);
+                        await ProcessChangedFiles(collector.ChangedFiles);
                     }
 
                     Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
@@ -60,10 +61,9 @@ namespace Pi.Replicate.Workers
             return workingThread;
         }
 
-        private async Task ProcessNewFiles(Folder folder, FileCollector collector)
+        private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
         {
-            var newFoundFiles = await collector.GetNewFiles();
-            var createdFiles = await _mediator.Send(new AddNewFilesCommand(newFoundFiles, folder));
+            var createdFiles = await _mediator.Send(new AddNewFilesCommand(newFiles, folder));
             var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var file in createdFiles)
             {
@@ -75,9 +75,8 @@ namespace Pi.Replicate.Workers
             }
         }
 
-         private async Task ProcessChangedFiles(FileCollector collector)
+         private async Task ProcessChangedFiles(List<System.IO.FileInfo> changedFiles)
         {
-            var changedFiles = await collector.GetChangedFiles();
             var updatedFiles = await _mediator.Send(new UpdateChangedFilesCommand{ Files = changedFiles });
             var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var file in updatedFiles)

@@ -34,6 +34,7 @@ namespace Pi.Replicate.Workers
             var thread = new Thread(async () =>
             {
                 await RetryFailedFiles();
+                await RetryFaileFileChanges();
                 await RetryFailedSentChunks();
 
                 Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
@@ -42,6 +43,11 @@ namespace Pi.Replicate.Workers
 
             thread.Start();
             return thread;
+        }
+
+        private Task RetryFaileFileChanges()
+        {
+            throw new NotImplementedException();
         }
 
         private async Task RetryFailedFiles()

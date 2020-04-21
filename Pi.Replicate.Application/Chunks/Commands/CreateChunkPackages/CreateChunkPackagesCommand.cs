@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Chunks.CreateChunkPackages
+namespace Pi.Replicate.Application.Chunks.Commands.CreateChunkPackages
 {
     public class CreateChunkPackagesCommand : IRequest<ICollection<ChunkPackage>>
     {

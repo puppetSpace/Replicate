@@ -17,7 +17,7 @@ namespace Pi.Replicate.Application.FileChanges.Queries.GetHighestChangeVersionNo
     public class GetHighestChangeVersionNoQueryHandler : IRequestHandler<GetHighestChangeVersionNoQuery, int>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "select coalesce(max(versiono),0) from dbo.FileChange where FileId = @FileId";
+        private const string _selectStatement = "select coalesce(max(versionno),0) from dbo.FileChange where FileId = @FileId";
 
         public GetHighestChangeVersionNoQueryHandler(IDatabase database)
         {

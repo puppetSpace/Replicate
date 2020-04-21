@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
@@ -25,17 +26,22 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
     public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, ICollection<File>>
     {
         private readonly IDatabase _database;
+        private readonly IMapper _mapper;
         private const string _selectStatement = "SELECT Id, FolderId,AmountOfChunks, LastModifiedDate, Name,Path, Signature,Size,Status,Source FROM dbo.[File] WHERE FolderId = @FolderId";
 
-        public GetFilesForFolderQueryHandler(IDatabase database)
+        public GetFilesForFolderQueryHandler(IDatabase database, IMapper mapper)
         {
             _database = database;
+            _mapper = mapper;
         }
 
         public async Task<ICollection<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
         {
-            using(_database)
-                return await _database.Query<File>(_selectStatement, new { request.FolderId });
+            using (_database)
+            {
+                var result = await _database.Query<GetFilesForFolderDto>(_selectStatement, new { request.FolderId });
+                return _mapper.Map<ICollection<File>>(result);
+            }
         }
     }
 }

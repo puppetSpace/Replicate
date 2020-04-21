@@ -48,7 +48,7 @@ namespace Pi.Replicate.Domain
             AmountOfChunks = amountOfChunks;
         }
 
-        public static File BuildPartial(System.IO.FileInfo file, Guid folderId, string basePath, ReadOnlyMemory<byte> signature, DateTime? customLastModified = null)
+        public static File BuildPartial(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
         {
             if (file is null || !file.Exists)
                 throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
@@ -61,7 +61,6 @@ namespace Pi.Replicate.Domain
                 Name = file.Name,
                 Path = file.FullName.Replace(basePath+"\\",""), //must be relative to base
                 Size = file.Length,
-                Signature = signature,
                 Status = FileStatus.New,
                 Source = FileSource.Local
             };
@@ -69,7 +68,7 @@ namespace Pi.Replicate.Domain
 
 		public void SetSignature(ReadOnlyMemory<byte> newSignature)
 		{
-			throw new NotImplementedException();
+            Signature = newSignature;
 		}
 	}
 }

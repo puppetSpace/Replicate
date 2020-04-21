@@ -33,7 +33,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
             using (_database)
             {
                 if(request.AlsoUpdateSignature)
-                    await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate, request.File.Signature });
+                    await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
                 else
                     await _database.Execute(_updateStatement, new { request.File.Id, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate });
             }

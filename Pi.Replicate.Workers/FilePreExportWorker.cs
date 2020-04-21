@@ -78,9 +78,12 @@ namespace Pi.Replicate.Workers
 		private async Task ProcessNewItem(File processItem)
 		{
 			var amountOfChunks = await _chunkService.SplitFileIntoChunks(processItem);
+			var deltaservice = new DeltaService();
+			var signature = deltaservice.CreateSignature(_pathBuilder.BuildPath(processItem.Path));
 			processItem.SetAmountOfChunks(amountOfChunks);
+			processItem.SetSignature(signature);
 			processItem.MarkAsProcessed();
-			await _mediator.Send(new UpdateFileCommand { File = processItem });
+			await _mediator.Send(new UpdateFileCommand { File = processItem, AlsoUpdateSignature = true });
 		}
 
 		private async Task<FileChange> ProcessChangedItem(File processItem)

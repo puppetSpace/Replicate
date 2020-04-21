@@ -44,7 +44,7 @@ namespace Pi.Replicate.Test.Processors
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
+			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
@@ -77,7 +77,7 @@ namespace Pi.Replicate.Test.Processors
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
+			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 
 			Assert.AreEqual(0, amountOfCalls);

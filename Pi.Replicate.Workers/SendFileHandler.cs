@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Chunks.CreateChunkPackages;
+using Pi.Replicate.Application.Chunks.Commands.CreateChunkPackages;
 using Pi.Replicate.Application.Chunks.Queries.GetChunksForFile;
 using Pi.Replicate.Application.Chunks.Queries.GetChunksForFileChange;
 using Pi.Replicate.Application.Files.Commands.UpdateFile;

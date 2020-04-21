@@ -30,7 +30,7 @@ namespace Pi.Replicate.Test.Shared
 			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
-			File file = File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "FileFolder", "test1.txt")), System.Guid.Empty, @"D:\Test", ReadOnlyMemory<byte>.Empty);
+			File file = File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "FileFolder", "test1.txt")), System.Guid.Empty, @"D:\Test");
 			var filePath = pathBuilder.BuildPath(file.Path);
 
 			Assert.AreEqual(file.Path, filePath);
@@ -83,7 +83,7 @@ namespace Pi.Replicate.Test.Shared
 			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
-			File file = File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(rootPath, "FileFolder", "test1.txt")), System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty);
+			File file = File.BuildPartial(new System.IO.FileInfo(System.IO.Path.Combine(rootPath, "FileFolder", "test1.txt")), System.Guid.Empty, pathBuilder.BasePath);
 			var filePath = pathBuilder.BuildPath(file.Path);
 
 			Assert.AreEqual(System.IO.Path.Combine(rootPath, file.Path), filePath);
