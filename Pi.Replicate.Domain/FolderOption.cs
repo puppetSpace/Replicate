@@ -9,6 +9,5 @@ namespace Pi.Replicate.Domain
     public class FolderOption
     {
         public static FolderOption Empty { get; } = new FolderOption();
-        public bool DeleteAfterSent { get; set; }
     }
 }

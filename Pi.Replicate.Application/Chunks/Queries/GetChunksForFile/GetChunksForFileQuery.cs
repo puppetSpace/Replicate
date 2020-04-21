@@ -8,9 +8,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Chunks.Queries.GetForFile
+namespace Pi.Replicate.Application.Chunks.Queries.GetChunksForFile
 {
-    public class GetForFileQuery : IRequest<ICollection<FileChunk>>
+    public class GetChunksForFileQuery : IRequest<ICollection<FileChunk>>
     {
         public Guid FileId { get; set; }
 
@@ -19,17 +19,17 @@ namespace Pi.Replicate.Application.Chunks.Queries.GetForFile
         public int MaxSequenceNo { get; set; } = int.MaxValue;
     }
 
-    public class GetForFileQueryHandler : IRequestHandler<GetForFileQuery, ICollection<FileChunk>>
+    public class GetChunksForFileQueryHandler : IRequestHandler<GetChunksForFileQuery, ICollection<FileChunk>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
+        private const string _selectStatement = "SELECT Id, FileId,SequenceNo,Value,ChunkSource FROM dbo.FileChunk WHERE FileId = @FileId and ChunkSource = 0 and SequenceNo between @MinSequenceNo and @MaxSequenceNo";
 
-        public GetForFileQueryHandler(IDatabase database)
+        public GetChunksForFileQueryHandler(IDatabase database)
         {
             _database = database;
         }
 
-        public async Task<ICollection<FileChunk>> Handle(GetForFileQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<FileChunk>> Handle(GetChunksForFileQuery request, CancellationToken cancellationToken)
         {
             using (_database)
                 return await _database.Query<FileChunk>(_selectStatement, new { request.FileId, request.MinSequenceNo, request.MaxSequenceNo });

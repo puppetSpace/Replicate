@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Commands.UpdateFileAsProcessed;
+using Pi.Replicate.Application.FileChanges.Commands.AddFileChange;
+using Pi.Replicate.Application.FileChanges.Queries.GetHighestChangeVersionNo;
+using Pi.Replicate.Application.Files.Commands.UpdateFile;
 using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
@@ -20,27 +22,27 @@ namespace Pi.Replicate.Workers
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IMediator _mediator;
 		private readonly PathBuilder _pathBuilder;
-		private readonly ChunkService _fileSplitterService;
+		private readonly ChunkService _chunkService;
 
 		public FilePreExportWorker(IConfiguration configuration
 		, WorkerQueueFactory workerQueueFactory
 		, IMediator mediator
 		, PathBuilder pathBuilder
-		, ChunkService fileSplitterService)
+		, ChunkService chunkService)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_mediator = mediator;
 			_pathBuilder = pathBuilder;
-			_fileSplitterService = fileSplitterService;
+			_chunkService = chunkService;
 		}
 
 		public override Thread DoWork(CancellationToken cancellationToken)
 		{
 			var thread = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(Replicate.Workers.FilePreExportWorker)}");
-				var incomingQueue = _workerQueueFactory.Get<ProcessItem<File, FolderOption>>((WorkerQueueType)WorkerQueueType.ToProcessFiles);
-				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+				Log.Information($"Starting {nameof(FilePreExportWorker)}");
+				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+				var outgoingQueue = _workerQueueFactory.Get<FilePreExportQueueItem>(WorkerQueueType.ToSendFiles);
 				var runningTasks = new List<Task>();
 				var semaphore = new SemaphoreSlim(10); //todo create setting for this
 				while (!incomingQueue.IsCompleted && !cancellationToken.IsCancellationRequested)
@@ -50,17 +52,18 @@ namespace Pi.Replicate.Workers
 					runningTasks.Add(Task.Run(async () =>
 					{
 						await semaphore.WaitAsync();
-						Log.Information($"'{processItem.Item.Path}' is being processed");
-						if (processItem.Item.Status == FileStatus.New)
+						Log.Information($"'{processItem.Path}' is being processed");
+						if (processItem.Status == FileStatus.New)
 						{
 							await ProcessNewItem(processItem);
+							outgoingQueue.Add(new FilePreExportQueueItem<File>(processItem));
 						}
 						else
 						{
-							await ProcessChangedItem(processItem);
+							var fileChange = await ProcessChangedItem(processItem);
+							outgoingQueue.Add(new FilePreExportQueueItem<FileChange>(fileChange));
 						}
-						outgoingQueue.Add(processItem.Item);
-						Log.Information($"'{processItem.Item.Path}' is processed");
+						Log.Information($"'{processItem.Path}' is processed");
 						semaphore.Release();
 					}));
 
@@ -72,33 +75,32 @@ namespace Pi.Replicate.Workers
 			return thread;
 		}
 
-		private async Task ProcessNewItem(ProcessItem<File, FolderOption> processItem)
+		private async Task ProcessNewItem(File processItem)
 		{
-			var amountOfChunks = await _fileSplitterService.SplitFileIntoChunksAndProduceHash(processItem.Item);
-//move delta to splitfile service???
-			var delta = new Delta();
-			var signature = delta.CreateSignature(_pathBuilder.BuildPath(processItem.Item.Path));
-			await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Signature = signature, AmountOfChunks = amountOfChunks });
-
-			if (processItem.Metadata.DeleteAfterSent)
-			{
-				var path = _pathBuilder.BuildPath(processItem.Item.Path);
-				System.IO.File.Delete(path);
-			}
+			var amountOfChunks = await _chunkService.SplitFileIntoChunks(processItem);
+			processItem.SetAmountOfChunks(amountOfChunks);
+			processItem.MarkAsProcessed();
+			await _mediator.Send(new UpdateFileCommand { File = processItem });
 		}
 
-		private async Task ProcessChangedItem(ProcessItem<File, FolderOption> processItem)
+		private async Task<FileChange> ProcessChangedItem(File processItem)
 		{
-			//todo maybe don't use hash???
-			var path = _pathBuilder.BuildPath(processItem.Item.Path);
-			var delta = new Delta(); //todo create service of this
-			var deltaChange = delta.CreateDelta(path,processItem.Item.Signature);
-			var newSignature = delta.CreateSignature(path);
+			//todo refactor
+			var path = _pathBuilder.BuildPath(processItem.Path);
+			var deltaservice = new DeltaService();
+			var delta = deltaservice.CreateDelta(path, processItem.Signature);
+			var newSignature = deltaservice.CreateSignature(path);
+			var highestVersionNo = await _mediator.Send(new GetHighestChangeVersionNoQuery { FileId = processItem.Id });
+			highestVersionNo += 1;
+			var amountOfChunks = await _chunkService.SplitMemoryIntoChunks(processItem, highestVersionNo, delta);
+			var fileChange = FileChange.Build(processItem, highestVersionNo, amountOfChunks, processItem.Signature, processItem.LastModifiedDate);
+			await _mediator.Send(new AddFileChangeCommand { FileChange = fileChange });
 
-			//todo split up deltaChange into chunks
+			processItem.SetSignature(newSignature);
+			processItem.MarkAsProcessed();
+			await _mediator.Send(new UpdateFileCommand { File = processItem, AlsoUpdateSignature = true });
+			return fileChange;
 
-			//await _mediator.Send(new UpdateFileAsProcessedCommand { File = processItem.Item, Signature = newSignature, AmountOfChunks = result.amountOfChunks });
-			
 		}
 	}
 }

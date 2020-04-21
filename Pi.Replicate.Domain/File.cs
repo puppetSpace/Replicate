@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Pi.Replicate.Domain
 {
@@ -14,7 +16,7 @@ namespace Pi.Replicate.Domain
 
         public long AmountOfChunks { get; private set; }
 
-        public byte[] Signature { get; private set; }
+        public ReadOnlyMemory<byte> Signature { get; private set; }
 
         public FileSource Source { get; private set; }
 
@@ -29,6 +31,11 @@ namespace Pi.Replicate.Domain
             Status = FileStatus.Handled;
         }
 
+        public void MarkAsProcessed()
+        {
+            Status = FileStatus.Processed;
+        }
+
         public void UpdateForChange(System.IO.FileInfo file)
         {
             LastModifiedDate = file.LastWriteTimeUtc;
@@ -36,14 +43,12 @@ namespace Pi.Replicate.Domain
             Status = FileStatus.Changed;
         }
 
-        public void UpdateAfterProcessesing(int amountOfChunks, byte[] signature)
+        public void SetAmountOfChunks(int amountOfChunks)
         {
             AmountOfChunks = amountOfChunks;
-            Signature = signature;
-            Status = FileStatus.Processed;
         }
 
-        public static File BuildPartial(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
+        public static File BuildPartial(System.IO.FileInfo file, Guid folderId, string basePath, ReadOnlyMemory<byte> signature, DateTime? customLastModified = null)
         {
             if (file is null || !file.Exists)
                 throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
@@ -56,9 +61,15 @@ namespace Pi.Replicate.Domain
                 Name = file.Name,
                 Path = file.FullName.Replace(basePath+"\\",""), //must be relative to base
                 Size = file.Length,
+                Signature = signature,
                 Status = FileStatus.New,
                 Source = FileSource.Local
             };
         }
+
+		public void SetSignature(ReadOnlyMemory<byte> newSignature)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

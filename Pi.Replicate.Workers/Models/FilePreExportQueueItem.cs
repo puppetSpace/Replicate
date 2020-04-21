@@ -5,18 +5,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Common
+namespace Pi.Replicate.Workers
 {
-    public struct ProcessItem<TE,TMeta>
+    internal abstract class FilePreExportQueueItem
     {
-        public ProcessItem(TE item, TMeta metadata)
+
+    }
+
+    internal class FilePreExportQueueItem<TE> : FilePreExportQueueItem
+    {
+        public FilePreExportQueueItem(TE item)
         {
             Item = item;
-            Metadata = metadata;
         }
 
         public TE Item { get; }
-
-        public TMeta Metadata { get;  }
     }
 }

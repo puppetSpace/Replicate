@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.Files.Processing
 			_pathBuilder = pathBuilder;
 		}
 
-		public async Task ProcessFile(File file, Func<byte[],Task> chunkCreatedDelegate)
+		public async Task ProcessFile(File file, Func<ReadOnlyMemory<byte>,Task> chunkCreatedDelegate)
 		{
 			var path = _pathBuilder.BuildPath(file.Path);
 
@@ -44,7 +44,7 @@ namespace Pi.Replicate.Application.Files.Processing
 			}
 		}
 
-		//todo move to seperate class
+		//todo move to seperate class??
 		private async Task<string> CompressFile(string path)
 		{
 			var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
@@ -57,14 +57,13 @@ namespace Pi.Replicate.Application.Files.Processing
 			return tempPath;
 		}
 
-		private async Task SplitStream(System.IO.Stream stream, Func<byte[],Task> chunkCreatedDelegate)
+		private async Task SplitStream(System.IO.Stream stream, Func<ReadOnlyMemory<byte>,Task> chunkCreatedDelegate)
 		{
-			var buffer = ArrayPool<byte>.Shared.Rent(_sizeofChunkInBytes);
-			while ((await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+			var sharedmemory = MemoryPool<byte>.Shared.Rent(_sizeofChunkInBytes);
+			while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
 			{
-				await chunkCreatedDelegate(buffer);
+				await chunkCreatedDelegate(sharedmemory.Memory);
 			}
-			ArrayPool<byte>.Shared.Return(buffer);
 		}
 
 	}

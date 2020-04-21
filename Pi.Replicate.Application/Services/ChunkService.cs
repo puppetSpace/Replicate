@@ -1,9 +1,12 @@
-﻿using Pi.Replicate.Application.Common.Interfaces;
+﻿using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,17 +17,19 @@ namespace Pi.Replicate.Application.Services
     {
         private readonly FileSplitterFactory _fileSplitterFactory;
         private readonly IDatabaseFactory _databaseFactory;
+        private readonly IConfiguration _configuration;
         private const string _insertStatement = "INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value,ChunkSource) VALUES (@Id,@FileId,@SequenceNo,@Value,@ChunkSource)";
 
-        public ChunkService(FileSplitterFactory fileSplitterFactory, IDatabaseFactory databaseFactory)
+
+        public ChunkService(FileSplitterFactory fileSplitterFactory, IDatabaseFactory databaseFactory, IConfiguration configuration)
         {
             _fileSplitterFactory = fileSplitterFactory;
             _databaseFactory = databaseFactory;
+            _configuration = configuration;
         }
 
-        public async Task<int> SplitFileIntoChunksAndProduceHash(File file)
+        public async Task<int> SplitFileIntoChunks(File file)
         {
-            byte[] fileHash;
             int sequenceNo = 0;
             var fileSplitter = _fileSplitterFactory.Get();
             var database = _databaseFactory.Get();
@@ -42,9 +47,28 @@ namespace Pi.Replicate.Application.Services
             return sequenceNo;
         }
 
-        public async Task SplitByteArrayIntoChunks(byte[] bytes)
+        public async Task<int> SplitMemoryIntoChunks(File forFile,int startofSequenceNo,ReadOnlyMemory<byte> memory)
         {
+            var sizeofChunkInBytes = int.Parse(_configuration[Constants.FileSplitSizeOfChunksInBytes]);
+            var database = _databaseFactory.Get();
+            var indexOfSlice = 0;
+            double sequenceNo = startofSequenceNo;
+            var amountOfChunks = 0;
+            using (database)
+            {
+                database.Connection.Open();
+                while (indexOfSlice < memory.Length)
+                {
+                    sequenceNo = sequenceNo + 0.1;
+                    var builtChunk = FileChunk.Build(forFile.Id, sequenceNo, memory.Slice(indexOfSlice,sizeofChunkInBytes), ChunkSource.FromChangedFile);
+                    Log.Verbose($"Inserting delta chunk {builtChunk.SequenceNo} from changed '{forFile.Path}' into database");
+                    await database.Execute(_insertStatement, new { builtChunk.Id, builtChunk.FileId, builtChunk.SequenceNo, builtChunk.Value, builtChunk.ChunkSource });
+                    indexOfSlice += sizeofChunkInBytes;
+                    amountOfChunks++;
+                }
+            }
 
+            return amountOfChunks;
         }
     }
 }

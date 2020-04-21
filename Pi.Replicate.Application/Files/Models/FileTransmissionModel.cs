@@ -16,9 +16,7 @@ namespace Pi.Replicate.Application.Files.Models
 
         public long AmountOfChunks { get; set; }
 
-        public byte[] Hash { get; set; }
-
-        public byte[] Signature { get; set; }
+        public ReadOnlyMemory<byte> Signature { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
 

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
+using Pi.Replicate.Application.FileChanges.Commands.AddFaileFileChange;
+using Pi.Replicate.Application.FileChanges.Models;
 using Pi.Replicate.Application.Files.Commands.AddFailedFile;
 using Pi.Replicate.Application.Files.Models;
 using Pi.Replicate.Application.Folders.Queries.GetFolderName;
@@ -16,8 +18,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-    public class CommunicationService
-    {
+	public class CommunicationService
+	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IMediator _mediator;
 		private readonly IMapper _mapper;
@@ -30,17 +32,17 @@ namespace Pi.Replicate.Application.Services
 		}
 
 		public async Task<bool> SendFile(File file, Recipient recipient)
-        {
+		{
 			try
 			{
-				Log.Information($"Sending '{file.Path}' metadata to {recipient.Name} so that the file can be created remote");
+				Log.Information($"Sending '{file.Path}' metadata to {recipient.Name}");
 
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var endpoint = $"{recipient.Address}/api/file";
 				var folderName = await _mediator.Send(new GetFolderNameQuery { FolderId = file.FolderId });
 				var fileTransmissionModel = _mapper.Map<FileTransmissionModel>(file);
 				fileTransmissionModel.FolderName = folderName;
-				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok:true);
+				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 				return true;
 			}
 			catch (System.Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
@@ -51,5 +53,28 @@ namespace Pi.Replicate.Application.Services
 			}
 		}
 
-    }
+		public async Task<bool> SendFileChange(FileChange fileChange, Recipient recipient)
+		{
+			try
+			{
+				Log.Information($"Sending changes to metadata of '{fileChange.File.Path}' to  {recipient.Name}");
+
+				var httpClient = _httpClientFactory.CreateClient("default");
+				var endpoint = $"{recipient.Address}/api/filechange";
+				var fileChangeTransmissionModel = _mapper.Map<FileChangeTransmissionModel>(fileChange);
+				fileChangeTransmissionModel.FileSignature = fileChange.File.Signature;
+				fileChangeTransmissionModel.FilePath = fileChange.File.Path;
+				fileChangeTransmissionModel.FileSize = fileChange.File.Size;
+				await httpClient.PostAsync(endpoint, fileChangeTransmissionModel, throwErrorOnResponseNok: true);
+				return true;
+			}
+			catch (System.Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
+			{
+				Log.Error(ex, $"Failed to send filechange metadata of '{fileChange.File.Path}' to '{recipient.Name}'. Adding change to FailedFileChanges and retrying later");
+				await _mediator.Send(new AddFailedFileChangeCommand { FileChange = fileChange, Recipient = recipient });
+				return false;
+			}
+		}
+
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Pi.Replicate.Application.FileChanges.Models;
 using Pi.Replicate.Application.Files.Models;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace Pi.Replicate.Application.Common
         private void InitializeMappings()
         {
             CreateMap<Domain.File, FileTransmissionModel>();
+            CreateMap<Domain.FileChange, FileChangeTransmissionModel>();
         }
     }
 }

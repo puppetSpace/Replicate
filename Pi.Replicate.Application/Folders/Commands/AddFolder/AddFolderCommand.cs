@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 	{
 		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
-		private const string _insertStatementFolder = "INSERT INTO dbo.Folder(Id,Name,FolderOptions_DeleteAfterSent) VALUES(@Id,@Name,@DeleteAfterSent)";
+		private const string _insertStatementFolder = "INSERT INTO dbo.Folder(Id,Name) VALUES(@Id,@Name)";
 		private const string _insertStatementFolderRecipient = "INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,@RecipientId)";
 		private readonly IBroker _broker;
 
@@ -43,14 +43,14 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 			{
 				Id = Guid.NewGuid(),
 				Name = request.Name,
-				FolderOptions = new FolderOption { DeleteAfterSent = request.DeleteAfterSend },
+				FolderOptions = new FolderOption { },
 			};
 
 			folder.Recipients = request.Recipients;
 
 			using (_database)
 			{
-				await _database.Execute(_insertStatementFolder, new { folder.Id, folder.Name, folder.FolderOptions.DeleteAfterSent });
+				await _database.Execute(_insertStatementFolder, new { folder.Id, folder.Name });
 				foreach (var recipient in folder.Recipients)
 					await _database.Execute(_insertStatementFolderRecipient, new { FolderId = folder.Id, RecipientId = recipient.Id });
 			}

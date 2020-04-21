@@ -64,14 +64,14 @@ namespace Pi.Replicate.Workers
         {
             var newFoundFiles = await collector.GetNewFiles();
             var createdFiles = await _mediator.Send(new AddNewFilesCommand(newFoundFiles, folder));
-            var queue = _workerQueueFactory.Get<ProcessItem<File,FolderOption>>(WorkerQueueType.ToProcessFiles);
+            var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var file in createdFiles)
             {
                 Log.Verbose($"Adding '{file.Path}' to queue");
-                if (queue.Any(x => string.Equals(x.Item.Path, file.Path)))
+                if (queue.Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{file.Path} already present in queue for processing");
                 else
-                    queue.Add(new ProcessItem<File,FolderOption>(file,folder.FolderOptions));
+                    queue.Add(file);
             }
         }
 
@@ -79,14 +79,14 @@ namespace Pi.Replicate.Workers
         {
             var changedFiles = await collector.GetChangedFiles();
             var updatedFiles = await _mediator.Send(new UpdateChangedFilesCommand{ Files = changedFiles });
-            var queue = _workerQueueFactory.Get<ProcessItem<File,FolderOption>>(WorkerQueueType.ToProcessFiles);
+            var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var file in updatedFiles)
             {
                 Log.Verbose($"Adding '{file.Path}' to queue");
-                if (queue.Any(x => string.Equals(x.Item.Path, file.Path)))
+                if (queue.Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{file.Path} already present in queue for processing");
                 else
-                    queue.Add(new ProcessItem<File,FolderOption>(file,FolderOption.Empty));
+                    queue.Add(file);
             }
         }
     }

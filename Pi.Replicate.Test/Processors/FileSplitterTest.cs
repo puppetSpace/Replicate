@@ -19,7 +19,7 @@ namespace Pi.Replicate.Test.Processors
 		//}
 
 		[TestMethod]
-		public async Task ProcessFile_CorrectAmountOfChunksShoundBeCreated()
+		public async Task ProcessFile_CorrectAmountOfChunksShouldBeCreated()
 		{
 			int minimumAmountOfBytesRentedByArrayPool = 128;
 			var configurationMock = new Mock<IConfiguration>();
@@ -37,41 +37,17 @@ namespace Pi.Replicate.Test.Processors
 			int amountOfCalls = 0;
 
 
-			var chunkCreated = new Func<byte[],Task>(x =>
+			var chunkCreated = new Func<ReadOnlyMemory<byte>,Task>(x =>
 			{
 				amountOfCalls++;
 				return Task.CompletedTask;
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
 
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
-
-		}
-
-		[TestMethod]
-		public async Task ProcessFile_ShouldProduceCorrectHash()
-		{
-			int minimumAmountOfBytesRentedByArrayPool = 128;
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[It.IsAny<string>()]).Returns<string>(x =>
-				x switch
-				{
-					"ReplicateBasePath" => System.IO.Directory.GetCurrentDirectory(),
-					"FileSplitSizeOfChunksInBytes" => minimumAmountOfBytesRentedByArrayPool.ToString(),
-					_ => ""
-				});
-			var pathBuilder = new PathBuilder(configurationMock.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath), null);
-			var createdHashOfFile = Helper.CreateBase64HashForFile(compressedFile.FullName);
-
-
-			Assert.AreEqual(createdHashOfFile, Convert.ToBase64String(result));
 
 		}
 
@@ -94,18 +70,17 @@ namespace Pi.Replicate.Test.Processors
 			using var fs = fileInfo.OpenWrite();
 
 			int amountOfCalls = 0;
-			var chunkCreated = new Func<byte[], Task>(x =>
+			var chunkCreated = new Func<ReadOnlyMemory<byte>, Task>(x =>
 			{
 				amountOfCalls++;
 				return Task.CompletedTask;
 			});
 
 			var fileSplitter = new FileSplitter(configurationMock.Object, pathBuilder);
-			var result = await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			await fileSplitter.ProcessFile(File.BuildPartial(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
 
 
 			Assert.AreEqual(0, amountOfCalls);
-			Assert.AreEqual(0, result.Length);
 
 		}
 	}

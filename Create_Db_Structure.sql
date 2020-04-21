@@ -38,6 +38,28 @@ create table dbo.[File](
 );
 GO
 
+create table dbo.FileChange(
+	Id uniqueidentifier NOT NULL,
+	FileId uniqueidentifier NOT NULL,
+	VersionNo int NOT NULL,
+	AmountOfChunks int NULL,
+	[Signature] varbinary(max),
+	[LastModifiedDate] datetime NOT NULL,
+	CONSTRAINT PK_FileChange PRIMARY KEY(Id),
+	CONSTRAINT FK_FileChange_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
+);
+GO
+
+create table dbo.FailedFileChange(
+	FileChangeId uniqueidentifier NOT NULL,
+	RecipientId uniqueidentifier NOT NULL,
+	CONSTRAINT PK_FailedFileChange PRIMARY KEY(FileChangeId,RecipientId),
+	CONSTRAINT FK_FailedFileChange_FileChange FOREIGN KEY(FileChangeId) REFERENCES dbo.FileChange(Id),
+	CONSTRAINT FK_FailedFileChange_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+);
+GO
+
+
 create table dbo.FailedFile(
 	FileId uniqueidentifier NOT NULL,
 	RecipientId uniqueidentifier NOT NULL,
