@@ -33,14 +33,14 @@ namespace Pi.Replicate.Application.Files.Processing
 			//exclude all files that are allready in the database
 			NewFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 
-			Log.Verbose($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
+			Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
 			ChangedFiles = rawFiles
 					.Where(x => previousFilesInFolder
 						.Any(y => y.Status == FileStatus.Handled && x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
 
-			Log.Verbose($"{ChangedFiles.Count} changed files found in folder '{_folder.Name}'");
+			Log.Information($"{ChangedFiles.Count} changed files found in folder '{_folder.Name}'");
 		}
 
 		private async Task<(IList<System.IO.FileInfo> AllFiles, ICollection<File> ProcessedFiles)> GetFiles()
@@ -53,12 +53,12 @@ namespace Pi.Replicate.Application.Files.Processing
 			}
 
 			var previousFilesInFolder = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
-			Log.Verbose($"{previousFilesInFolder.Count} files already processed for folder '{_folder.Name}'.");
+			Log.Information($"{previousFilesInFolder.Count} files already processed for folder '{_folder.Name}'.");
 
 			var folderCrawler = new FolderCrawler();
-			folderCrawler.GetFiles(folderPath);
+			var files = folderCrawler.GetFiles(folderPath);
 
-			return (folderCrawler.GetFiles(folderPath), previousFilesInFolder);
+			return (files, previousFilesInFolder);
 		}
 
 	}

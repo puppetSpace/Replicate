@@ -1,13 +1,8 @@
 ﻿using AutoMapper;
 using Pi.Replicate.Application.FileChanges.Models;
-using Pi.Replicate.Application.Files.Commands.UpdateChangedFiles;
 using Pi.Replicate.Application.Files.Models;
-using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Pi.Replicate.Application.Common
 {
@@ -20,9 +15,11 @@ namespace Pi.Replicate.Application.Common
 
         private void InitializeMappings()
         {
-            CreateMap<Domain.File, FileTransmissionModel>();
-            CreateMap<Domain.FileChange, FileChangeTransmissionModel>();
-            CreateMap<FileDto, Domain.File>()
+            CreateMap<Domain.File, FileTransmissionModel>()
+				.ForMember(x=>x.Signature,opt=> opt.MapFrom((x,y)=> x.Signature.ToArray()));
+            CreateMap<Domain.FileChange, FileChangeTransmissionModel>()
+				.ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.ToArray()));
+			CreateMap<FileDto, Domain.File>()
                 .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
         }
     }

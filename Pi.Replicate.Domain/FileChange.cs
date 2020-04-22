@@ -18,11 +18,9 @@ namespace Pi.Replicate.Domain
 
         public int AmountOfChunks { get; set; }
 
-        public ReadOnlyMemory<byte> Signature { get; set; }
-
         public DateTime LastModifiedDate { get; set; }
 
-        public static FileChange Build(File file, int versionNo, int amountOfChunks, ReadOnlyMemory<byte> signature, DateTime lastModifiedDate)
+        public static FileChange Build(File file, int versionNo, int amountOfChunks, DateTime lastModifiedDate)
         {
             return new FileChange
             {
@@ -31,7 +29,6 @@ namespace Pi.Replicate.Domain
                 File = file,
                 VersionNo = versionNo,
                 AmountOfChunks = amountOfChunks,
-                Signature = signature,
                 LastModifiedDate = lastModifiedDate
             };
         }

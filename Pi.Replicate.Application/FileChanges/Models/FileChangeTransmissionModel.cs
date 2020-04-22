@@ -11,7 +11,7 @@ namespace Pi.Replicate.Application.FileChanges.Models
 
         public string FilePath { get; set; }
 
-        public ReadOnlyMemory<byte> FileSignature { get; set; }
+        public byte[] FileSignature { get; set; }
 
         public long FileSize { get; set; }
 
@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.FileChanges.Models
 
         public int AmountOfChunks { get; set; }
 
-        public ReadOnlyMemory<byte> Signature { get; set; }
+        public byte[] Signature { get; set; }
 
         public DateTime LastModifiedDate { get; set; }
     }

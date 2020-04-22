@@ -43,7 +43,6 @@ create table dbo.FileChange(
 	FileId uniqueidentifier NOT NULL,
 	VersionNo int NOT NULL,
 	AmountOfChunks int NULL,
-	[Signature] varbinary(max),
 	[LastModifiedDate] datetime NOT NULL,
 	CONSTRAINT PK_FileChange PRIMARY KEY(Id),
 	CONSTRAINT FK_FileChange_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
@@ -72,7 +71,7 @@ GO
 create table dbo.FileChunk(
 	Id uniqueidentifier NOT NULL,
 	FileId uniqueidentifier NOT NULL,
-	SequenceNo decimal NOT NULL,
+	SequenceNo decimal(8,4) NOT NULL,
 	[Value] varbinary(max) NOT NULL,
 	ChunkSource int NOT NULL,
 	CONSTRAINT PK_FileChunk PRIMARY KEY(Id),

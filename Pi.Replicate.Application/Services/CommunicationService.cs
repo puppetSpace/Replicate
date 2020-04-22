@@ -62,7 +62,7 @@ namespace Pi.Replicate.Application.Services
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var endpoint = $"{recipient.Address}/api/filechange";
 				var fileChangeTransmissionModel = _mapper.Map<FileChangeTransmissionModel>(fileChange);
-				fileChangeTransmissionModel.FileSignature = fileChange.File.Signature;
+				fileChangeTransmissionModel.FileSignature = fileChange.File.Signature.ToArray();
 				fileChangeTransmissionModel.FilePath = fileChange.File.Path;
 				fileChangeTransmissionModel.FileSize = fileChange.File.Size;
 				await httpClient.PostAsync(endpoint, fileChangeTransmissionModel, throwErrorOnResponseNok: true);

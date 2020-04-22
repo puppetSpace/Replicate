@@ -39,7 +39,7 @@ namespace Pi.Replicate.Application.Services
                  await fileSplitter.ProcessFile(file, async x =>
                 {
                     var builtChunk = FileChunk.Build(file.Id, ++sequenceNo, x, ChunkSource.FromNewFile);
-                    Log.Verbose($"Inserting chunk {builtChunk.SequenceNo} from '{file.Path}' into database");
+                    Log.Debug($"Inserting chunk {builtChunk.SequenceNo} from '{file.Path}' into database");
                     await database.Execute(_insertStatement, new { builtChunk.Id, builtChunk.FileId, builtChunk.SequenceNo, Value = builtChunk.Value.ToArray(), builtChunk.ChunkSource });
                 });
             }
@@ -62,7 +62,7 @@ namespace Pi.Replicate.Application.Services
                 {
                     sequenceNo = sequenceNo + 0.0001;
                     var builtChunk = FileChunk.Build(forFile.Id, sequenceNo, memory.Slice(indexOfSlice,sizeofChunkInBytes), ChunkSource.FromChangedFile);
-                    Log.Verbose($"Inserting delta chunk {builtChunk.SequenceNo} from changed '{forFile.Path}' into database");
+                    Log.Debug($"Inserting delta chunk {builtChunk.SequenceNo} from changed '{forFile.Path}' into database");
                     await database.Execute(_insertStatement, new { builtChunk.Id, builtChunk.FileId, builtChunk.SequenceNo, Value = builtChunk.Value.ToArray(), builtChunk.ChunkSource });
                     indexOfSlice += sizeofChunkInBytes;
                     amountOfChunks++;

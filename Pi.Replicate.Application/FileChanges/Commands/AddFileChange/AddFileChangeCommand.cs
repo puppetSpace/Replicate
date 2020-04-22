@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.FileChanges.Commands.AddFileChange
     public class AddFileChangeCommandHandler : IRequestHandler<AddFileChangeCommand>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "insert into dbo.FileChange(Id,FileId,VersionNo,AmountOfChunks,Signature,LastModifiedDate) values(@Id,@VersionNo,@AmountOfChunks,@Signature,@LastModifiedDate)";
+        private const string _insertStatement = "insert into dbo.FileChange(Id,FileId,VersionNo,AmountOfChunks,Signature,LastModifiedDate) values(@Id,@FileId,@VersionNo,@AmountOfChunks,@Signature,@LastModifiedDate)";
 
         public AddFileChangeCommandHandler(IDatabase database)
         {
@@ -28,7 +28,7 @@ namespace Pi.Replicate.Application.FileChanges.Commands.AddFileChange
         public async Task<Unit> Handle(AddFileChangeCommand request, CancellationToken cancellationToken)
         {
             using (_database)
-                await _database.Execute(_insertStatement, new { request.FileChange.Id, request.FileChange.VersionNo, request.FileChange.AmountOfChunks, Signature = request.FileChange.Signature.ToArray(), request.FileChange.LastModifiedDate });
+                await _database.Execute(_insertStatement, new { request.FileChange.Id,request.FileChange.FileId, request.FileChange.VersionNo, request.FileChange.AmountOfChunks, Signature = request.FileChange.Signature.ToArray(), request.FileChange.LastModifiedDate });
 
             return Unit.Value;
         }

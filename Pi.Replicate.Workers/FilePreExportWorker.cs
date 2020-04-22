@@ -96,7 +96,7 @@ namespace Pi.Replicate.Workers
 			var highestVersionNo = await _mediator.Send(new GetHighestChangeVersionNoQuery { FileId = processItem.Id });
 			highestVersionNo += 1;
 			var amountOfChunks = await _chunkService.SplitMemoryIntoChunks(processItem, highestVersionNo, delta);
-			var fileChange = FileChange.Build(processItem, highestVersionNo, amountOfChunks, processItem.Signature, processItem.LastModifiedDate);
+			var fileChange = FileChange.Build(processItem, highestVersionNo, amountOfChunks, processItem.LastModifiedDate);
 			await _mediator.Send(new AddFileChangeCommand { FileChange = fileChange });
 
 			processItem.SetSignature(newSignature);

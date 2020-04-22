@@ -33,7 +33,7 @@ namespace Pi.Replicate.Workers
 					var chunkPackage = queue.Take();
 					var client = _httpClientFactory.CreateClient("default");
 
-					Log.Verbose($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' of file with Id '{chunkPackage.FileChunk.FileId}' to '{chunkPackage.Recipient.Name}'");
+					Log.Information($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' to '{chunkPackage.Recipient.Name}'");
 					try
 					{
 						await client.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);

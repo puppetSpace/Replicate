@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Common.Queues
                 var workerQueueTypeName = Enum.GetName(typeof(WorkerQueueType), workerQueueType);
                 if (_queues.ContainsKey(workerQueueType))
                 {
-                    Log.Verbose($"Getting existing queue for type {workerQueueTypeName}");
+                    Log.Debug($"Getting existing queue for type {workerQueueTypeName}");
                     if (_queues.TryGetValue(workerQueueType, out var queue))
                         return queue as BlockingCollection<TE>;
                     else
@@ -34,7 +34,7 @@ namespace Pi.Replicate.Application.Common.Queues
                 }
                 else
                 {
-                    Log.Verbose($"Creating new queue for type {workerQueueTypeName}");
+                    Log.Debug($"Creating new queue for type {workerQueueTypeName}");
                     var workerQueue = new BlockingCollection<TE>();
                     _queues.Add(workerQueueType, workerQueue);
                     return workerQueue;

@@ -71,7 +71,7 @@ namespace Pi.Replicate.Workers
             {
                 var file = File.BuildPartial(newFile, folder.Id, _pathBuilder.BasePath);
                 await _mediator.Send(new AddNewFileCommand { File = file });
-                Log.Verbose($"Adding '{file.Path}' to queue");
+                Log.Debug($"Adding '{file.Path}' to queue");
                 if (queue.Any(x => string.Equals(x.Path, file.Path)))
                     Log.Information($"{file.Path} already present in queue for processing");
                 else
@@ -81,6 +81,7 @@ namespace Pi.Replicate.Workers
 
         private async Task ProcessChangedFiles(List<System.IO.FileInfo> changedFiles)
         {
+            //can't save changes to file here. If creating delta fails, I can't rollback to previous change
             var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
             foreach (var file in changedFiles)
             {
@@ -89,7 +90,7 @@ namespace Pi.Replicate.Workers
                 if (foundFile is object)
                 {
                     foundFile.UpdateForChange(file);
-                    Log.Verbose($"Adding '{foundFile.Path}' to queue");
+                    Log.Debug($"Adding '{foundFile.Path}' to queue");
                     if (queue.Any(x => string.Equals(x.Path, foundFile.Path)))
                         Log.Information($"{foundFile.Path} already present in queue for processing");
                     else

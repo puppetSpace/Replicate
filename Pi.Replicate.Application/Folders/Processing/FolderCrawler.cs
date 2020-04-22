@@ -15,13 +15,13 @@ namespace Pi.Replicate.Application.Folders.Processing
                 return files;
             }
 
-            Log.Verbose($"Traversing '{path}'");
+            Log.Debug($"Traversing '{path}'");
 
             foreach (var file in System.IO.Directory.GetFiles(path))
                 files.Add(new System.IO.FileInfo(file));
 
             foreach (var dir in System.IO.Directory.GetDirectories(path))
-                files.AddRange(GetFiles(path));
+                files.AddRange(GetFiles(dir));
 
             return files;
         }

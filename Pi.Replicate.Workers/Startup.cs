@@ -1,4 +1,8 @@
-﻿using Pi.Replicate.Application.Common.Interfaces;
+﻿using MediatR;
+using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Queries.GetFilesByStatus;
+using Pi.Replicate.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,18 +14,30 @@ namespace Pi.Replicate.Workers
     public class Startup
     {
         private readonly IDatabase _database;
+		private readonly IMediator _mediator;
+		private readonly WorkerQueueFactory _workerQueueFactory;
 
-        public Startup(IDatabase database)
+		public Startup(IDatabase database, IMediator mediator, WorkerQueueFactory workerQueueFactory)
         {
             _database = database;
-        }
+			_mediator = mediator;
+			_workerQueueFactory = workerQueueFactory;
+		}
         public async Task Initialize()
         {
-            await _database.Execute("DELETE FROM dbo.FileChunk where fileId in (select id from dbo.[File] where status in (0,1))", null);
-            await _database.Execute("DELETE FROM dbo.ChunkPackage where fileChunkId in (select id from dbo.FileChunk where fileId in (select id from dbo.[File] where status in (2)))", null);
-            await _database.Execute("DELETE FROM dbo.[File] where status in (0,1)", null);
+            using (_database)
+            {
+                await _database.Execute("DELETE FROM dbo.FileChunk where fileId in (select id from dbo.[File] where status in (0,1))", null);
+                await _database.Execute("DELETE FROM dbo.ChunkPackage where fileChunkId in (select id from dbo.FileChunk where fileId in (select id from dbo.[File] where status in (2)))", null);
+                await _database.Execute("DELETE FROM dbo.[File] where status in (0,1)", null);
+            }
 
-            //todo add filechunks to queue for file that has been processed
+			var outgoingQueue = _workerQueueFactory.Get<FilePreExportQueueItem>(WorkerQueueType.ToSendFiles);
+			var processedFiles = await _mediator.Send(new GetFilesByStatusQuery { Status = Domain.FileStatus.Processed });
+			foreach (var file in processedFiles)
+				outgoingQueue.Add(new FilePreExportQueueItem<File>(file));
+
+            
         }
     }
 }

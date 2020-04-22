@@ -73,7 +73,7 @@ namespace Pi.Replicate.Application.Services
         {
             public void ReportProgress(string operation, long currentPosition, long total)
             {
-                Log.Verbose($"opertaion: {operation}, currentPosition: {currentPosition}, total: {total}");
+                Log.Verbose($"operation: {operation}, currentPosition: {currentPosition}, total: {total}");
             }
 
             public static IProgressReporter Get() => new LogProgressReporter();
