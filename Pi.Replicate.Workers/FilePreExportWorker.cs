@@ -75,6 +75,7 @@ namespace Pi.Replicate.Workers
 			return thread;
 		}
 
+		//todo these should be in a fileservice
 		private async Task ProcessNewItem(File processItem)
 		{
 			var amountOfChunks = await _chunkService.SplitFileIntoChunks(processItem);

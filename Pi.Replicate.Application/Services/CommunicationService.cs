@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
+using Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage;
 using Pi.Replicate.Application.FileChanges.Commands.AddFaileFileChange;
 using Pi.Replicate.Application.FileChanges.Models;
 using Pi.Replicate.Application.Files.Commands.AddFailedFile;
@@ -73,6 +74,22 @@ namespace Pi.Replicate.Application.Services
 				Log.Error(ex, $"Failed to send filechange metadata of '{fileChange.File.Path}' to '{recipient.Name}'. Adding change to FailedFileChanges and retrying later");
 				await _mediator.Send(new AddFailedFileChangeCommand { FileChange = fileChange, Recipient = recipient });
 				return false;
+			}
+		}
+
+		public async Task SendChunkPackage(ChunkPackage chunkPackage)
+		{
+			Log.Information($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' to '{chunkPackage.Recipient.Name}'");
+			try
+			{
+				var httpClient = _httpClientFactory.CreateClient("default");
+				//todo create filechunktransmissionmodel
+				await httpClient.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);
+				await _mediator.Send(new DeleteChunkPackageCommand { RecipientId = chunkPackage.Recipient.Id, FileChunkId = chunkPackage.FileChunk.Id });
+			}
+			catch (Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
+			{
+				Log.Error(ex, "Failed to send chunk");
 			}
 		}
 

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
@@ -13,14 +14,12 @@ namespace Pi.Replicate.Workers
 	public class ChunkExportWorker : WorkerBase
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
-		private readonly IMediator _mediator;
-		private readonly IHttpClientFactory _httpClientFactory;
+		private readonly CommunicationService _communicationService;
 
-		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, IMediator mediator, IHttpClientFactory httpClientFactory)
+		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, CommunicationService communicationService)
 		{
 			_workerQueueFactory = workerQueueFactory;
-			_mediator = mediator;
-			_httpClientFactory = httpClientFactory;
+			_communicationService = communicationService;
 		}
 
 		public override Thread DoWork(CancellationToken cancellationToken)
@@ -31,18 +30,7 @@ namespace Pi.Replicate.Workers
 				while (!queue.IsCompleted || !cancellationToken.IsCancellationRequested)
 				{
 					var chunkPackage = queue.Take();
-					var client = _httpClientFactory.CreateClient("default");
-
-					Log.Information($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' to '{chunkPackage.Recipient.Name}'");
-					try
-					{
-						await client.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);
-						await _mediator.Send(new DeleteChunkPackageCommand { RecipientId = chunkPackage.Recipient.Id, FileChunkId = chunkPackage.FileChunk.Id });
-					}
-					catch (Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
-					{
-						Log.Error(ex, "Failed to send chunk");
-					}
+					await _communicationService.SendChunkPackage(chunkPackage);
 				}
 
 			});
