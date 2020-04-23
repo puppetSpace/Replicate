@@ -19,9 +19,9 @@ namespace Pi.Replicate.Workers
         private readonly int _triggerInterval;
         private readonly IMediator _mediator;
         private readonly WorkerQueueFactory _workerQueueFactory;
-        private readonly CommunicationService _communicationService;
+        private readonly TransmissionService _communicationService;
 
-        public RetryWorker(IConfiguration configuration, IMediator mediator, WorkerQueueFactory workerQueueFactory, CommunicationService communicationService)
+        public RetryWorker(IConfiguration configuration, IMediator mediator, WorkerQueueFactory workerQueueFactory, TransmissionService communicationService)
         {
             _triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
             _mediator = mediator;

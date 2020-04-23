@@ -17,9 +17,9 @@ namespace Pi.Replicate.Workers
 	internal class SendFileHandler
 	{
 		private readonly IMediator _mediator;
-		private readonly CommunicationService _communicationService;
+		private readonly TransmissionService _communicationService;
 
-		public SendFileHandler(IMediator mediator, CommunicationService communicationService)
+		public SendFileHandler(IMediator mediator, TransmissionService communicationService)
 		{
 			_mediator = mediator;
 			_communicationService = communicationService;

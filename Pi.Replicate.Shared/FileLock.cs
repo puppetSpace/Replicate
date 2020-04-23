@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,8 +18,9 @@ namespace Pi.Replicate.Shared
             {
                 using (var fs = System.IO.File.Open(filePath, System.IO.FileMode.OpenOrCreate)) { }
             }
-            catch (System.IO.IOException)
+            catch(Exception ex)
             {
+				Log.Error(ex, "unable to open file for read");
                 isLocked = true;
             }
 

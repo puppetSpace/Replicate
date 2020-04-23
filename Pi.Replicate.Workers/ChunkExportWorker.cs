@@ -14,9 +14,9 @@ namespace Pi.Replicate.Workers
 	public class ChunkExportWorker : WorkerBase
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
-		private readonly CommunicationService _communicationService;
+		private readonly TransmissionService _communicationService;
 
-		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, CommunicationService communicationService)
+		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService communicationService)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_communicationService = communicationService;

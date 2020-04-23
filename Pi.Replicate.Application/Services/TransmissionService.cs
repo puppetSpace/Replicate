@@ -19,13 +19,13 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-	public class CommunicationService
+	public class TransmissionService
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IMediator _mediator;
 		private readonly IMapper _mapper;
 
-		public CommunicationService(IHttpClientFactory httpClientFactory, IMediator mediator, IMapper mapper)
+		public TransmissionService(IHttpClientFactory httpClientFactory, IMediator mediator, IMapper mapper)
 		{
 			_httpClientFactory = httpClientFactory;
 			_mediator = mediator;

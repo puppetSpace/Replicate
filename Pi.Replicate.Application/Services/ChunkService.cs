@@ -28,15 +28,17 @@ namespace Pi.Replicate.Application.Services
             _configuration = configuration;
         }
 
-        public async Task<int> SplitFileIntoChunks(File file)
+        public async Task<(int amountOfChunks,bool isSucessfullySplitted)> SplitFileIntoChunks(File file)
         {
             int sequenceNo = 0;
             var fileSplitter = _fileSplitterFactory.Get();
             var database = _databaseFactory.Get();
-            using (database)
+			bool isSucessfullySplitted = false;
+
+			using (database)
             {
                 database.Connection.Open();
-                 await fileSplitter.ProcessFile(file, async x =>
+				isSucessfullySplitted = await fileSplitter.ProcessFile(file, async x =>
                 {
                     var builtChunk = FileChunk.Build(file.Id, ++sequenceNo, x, ChunkSource.FromNewFile);
                     Log.Debug($"Inserting chunk {builtChunk.SequenceNo} from '{file.Path}' into database");
@@ -44,7 +46,7 @@ namespace Pi.Replicate.Application.Services
                 });
             }
 
-            return sequenceNo;
+            return (sequenceNo,isSucessfullySplitted);
         }
 
         public async Task<int> SplitMemoryIntoChunks(File forFile,int startofSequenceNo,ReadOnlyMemory<byte> memory)

@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.Files.Processing
 			_pathBuilder = pathBuilder;
 		}
 
-		public async Task ProcessFile(File file, Func<ReadOnlyMemory<byte>,Task> chunkCreatedDelegate)
+		public async Task<bool> ProcessFile(File file, Func<ReadOnlyMemory<byte>,Task> chunkCreatedDelegate)
 		{
 			var path = _pathBuilder.BuildPath(file.Path);
 
@@ -37,10 +37,12 @@ namespace Pi.Replicate.Application.Files.Processing
 
 				Log.Information($"'compressed file of {path}' is being deleted");
 				System.IO.File.Delete(pathOfCompressed);
+				return true;
 			}
 			else
 			{
-				Log.Warning($"File '{path}' does not exist or is locked. File will not be processedd");
+				Log.Warning($"File '{path}' does not exist or is locked. File will not be processed");
+				return false;
 			}
 		}
 

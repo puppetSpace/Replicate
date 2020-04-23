@@ -19,8 +19,6 @@ namespace Pi.Replicate.Application.FileChanges.Models
 
         public int AmountOfChunks { get; set; }
 
-        public byte[] Signature { get; set; }
-
         public DateTime LastModifiedDate { get; set; }
     }
 }

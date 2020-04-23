@@ -23,7 +23,8 @@ namespace Pi.Replicate.Application
             services.AddTransient<FileCollectorFactory>();
             services.AddTransient<FileSplitterFactory>();
             services.AddTransient<ChunkService>();
-            services.AddTransient<CommunicationService>();
-        }
+            services.AddTransient<TransmissionService>();
+            services.AddTransient<FileService>();
+		}
     }
 }

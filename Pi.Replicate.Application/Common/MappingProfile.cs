@@ -17,8 +17,7 @@ namespace Pi.Replicate.Application.Common
         {
             CreateMap<Domain.File, FileTransmissionModel>()
 				.ForMember(x=>x.Signature,opt=> opt.MapFrom((x,y)=> x.Signature.ToArray()));
-            CreateMap<Domain.FileChange, FileChangeTransmissionModel>()
-				.ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.ToArray()));
+			CreateMap<Domain.FileChange, FileChangeTransmissionModel>();
 			CreateMap<FileDto, Domain.File>()
                 .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
         }

@@ -1,16 +1,7 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.Common;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.FileChanges.Commands.AddFileChange;
-using Pi.Replicate.Application.FileChanges.Queries.GetHighestChangeVersionNo;
-using Pi.Replicate.Application.Files.Commands.UpdateFile;
-using Pi.Replicate.Application.Files.Processing;
+﻿using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
-using Pi.Replicate.Shared;
 using Serilog;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,20 +11,12 @@ namespace Pi.Replicate.Workers
 	public class FilePreExportWorker : WorkerBase
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
-		private readonly IMediator _mediator;
-		private readonly PathBuilder _pathBuilder;
-		private readonly ChunkService _chunkService;
+		private readonly FileService _fileService;
 
-		public FilePreExportWorker(IConfiguration configuration
-		, WorkerQueueFactory workerQueueFactory
-		, IMediator mediator
-		, PathBuilder pathBuilder
-		, ChunkService chunkService)
+		public FilePreExportWorker(WorkerQueueFactory workerQueueFactory, FileService fileService)
 		{
 			_workerQueueFactory = workerQueueFactory;
-			_mediator = mediator;
-			_pathBuilder = pathBuilder;
-			_chunkService = chunkService;
+			_fileService = fileService;
 		}
 
 		public override Thread DoWork(CancellationToken cancellationToken)
@@ -55,12 +38,12 @@ namespace Pi.Replicate.Workers
 						Log.Information($"'{processItem.Path}' is being processed");
 						if (processItem.Status == FileStatus.New)
 						{
-							await ProcessNewItem(processItem);
+							await _fileService.ProcessNewFile(processItem);
 							outgoingQueue.Add(new FilePreExportQueueItem<File>(processItem));
 						}
 						else
 						{
-							var fileChange = await ProcessChangedItem(processItem);
+							var fileChange = await _fileService.ProcessChangedFile(processItem);
 							outgoingQueue.Add(new FilePreExportQueueItem<FileChange>(fileChange));
 						}
 						Log.Information($"'{processItem.Path}' is processed");
@@ -75,36 +58,5 @@ namespace Pi.Replicate.Workers
 			return thread;
 		}
 
-		//todo these should be in a fileservice
-		private async Task ProcessNewItem(File processItem)
-		{
-			var amountOfChunks = await _chunkService.SplitFileIntoChunks(processItem);
-			var deltaservice = new DeltaService();
-			var signature = deltaservice.CreateSignature(_pathBuilder.BuildPath(processItem.Path));
-			processItem.SetAmountOfChunks(amountOfChunks);
-			processItem.SetSignature(signature);
-			processItem.MarkAsProcessed();
-			await _mediator.Send(new UpdateFileCommand { File = processItem, AlsoUpdateSignature = true });
-		}
-
-		private async Task<FileChange> ProcessChangedItem(File processItem)
-		{
-			//todo refactor
-			var path = _pathBuilder.BuildPath(processItem.Path);
-			var deltaservice = new DeltaService();
-			var delta = deltaservice.CreateDelta(path, processItem.Signature);
-			var newSignature = deltaservice.CreateSignature(path);
-			var highestVersionNo = await _mediator.Send(new GetHighestChangeVersionNoQuery { FileId = processItem.Id });
-			highestVersionNo += 1;
-			var amountOfChunks = await _chunkService.SplitMemoryIntoChunks(processItem, highestVersionNo, delta);
-			var fileChange = FileChange.Build(processItem, highestVersionNo, amountOfChunks, processItem.LastModifiedDate);
-			await _mediator.Send(new AddFileChangeCommand { FileChange = fileChange });
-
-			processItem.SetSignature(newSignature);
-			processItem.MarkAsProcessed();
-			await _mediator.Send(new UpdateFileCommand { File = processItem, AlsoUpdateSignature = true });
-			return fileChange;
-
-		}
 	}
 }

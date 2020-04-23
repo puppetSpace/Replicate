@@ -33,14 +33,15 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Task.FromResult((ICollection<File>)new List<File>()));
 
             var fileCollector = new FileCollector(new PathBuilder(configurationMock.Object), mockMediator.Object, folder);
-            var files = await fileCollector.GetNewFiles();
+            await fileCollector.CollectFiles();
 
-            Assert.AreEqual(5, files.Count);
-            Assert.IsTrue(files.Any(x => x.Name == "test1.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test3.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test4.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test5.txt"));
+
+            Assert.AreEqual(5, fileCollector.NewFiles.Count);
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test2.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test3.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test4.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test5.txt"));
         }
 
         [TestMethod]
@@ -55,7 +56,7 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Task.FromResult((ICollection<File>)new List<File>()));
 
             var fileCollector = new FileCollector(new PathBuilder(configurationMock.Object), mockMediator.Object, folder);
-            var files = await fileCollector.GetNewFiles();
+            await fileCollector.CollectFiles();
 
         }
 
@@ -77,12 +78,12 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Task.FromResult(existingFiles));
 
             var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
-            var files = await fileCollector.GetNewFiles();
+            await fileCollector.CollectFiles();
 
-            Assert.AreEqual(3, files.Count);
-            Assert.IsTrue(files.Any(x => x.Name == "test3.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test4.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test5.txt"));
+            Assert.AreEqual(3, fileCollector.NewFiles.Count);
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test3.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test4.txt"));
+            Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test5.txt"));
         }
 
         [TestMethod]
@@ -105,11 +106,11 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Task.FromResult(existingFiles));
 
             var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
-            var files = await fileCollector.GetChangedFiles();
+			await fileCollector.CollectFiles();
 
-            Assert.AreEqual(2, files.Count);
-            Assert.IsTrue(files.Any(x => x.Name == "test1.txt"));
-            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
+            Assert.AreEqual(2, fileCollector.ChangedFiles.Count);
+            Assert.IsTrue(fileCollector.ChangedFiles.Any(x => x.Name == "test1.txt"));
+            Assert.IsTrue(fileCollector.ChangedFiles.Any(x => x.Name == "test2.txt"));
         }
 
         [TestMethod]
@@ -132,10 +133,10 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Task.FromResult(existingFiles));
 
             var fileCollector = new FileCollector(pathBuilder, mockMediator.Object, folder);
-            var files = await fileCollector.GetChangedFiles();
+            await fileCollector.CollectFiles();
 
-            Assert.AreEqual(1, files.Count);
-            Assert.IsTrue(files.Any(x => x.Name == "test2.txt"));
+            Assert.AreEqual(1, fileCollector.ChangedFiles.Count);
+            Assert.IsTrue(fileCollector.ChangedFiles.Any(x => x.Name == "test2.txt"));
         }
     }
 }

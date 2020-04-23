@@ -29,12 +29,12 @@ namespace Pi.Replicate.Worker.Console
         {
             var cancellationToken = new CancellationTokenSource();
             await _startupCleanup.Initialize();
-            _folderWorker.DoWork(cancellationToken.Token);
-            _filePreExportWorker.DoWork(cancellationToken.Token);
-            _fileExportWorker.DoWork(cancellationToken.Token);
-            //_chunkExportWorker.DoWork(cancellationToken.Token);
+			_folderWorker.DoWork(cancellationToken.Token);
+			_filePreExportWorker.DoWork(cancellationToken.Token);
+			//_fileExportWorker.DoWork(cancellationToken.Token);
+			//_chunkExportWorker.DoWork(cancellationToken.Token);
 
-            await Task.Delay(Timeout.Infinite);
+			await Task.Delay(Timeout.Infinite);
         }
     }
 }

@@ -15,9 +15,9 @@ namespace Pi.Replicate.Workers
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly IMediator _mediator;
-		private readonly CommunicationService _communicationService;
+		private readonly TransmissionService _communicationService;
 
-		public FileExportWorker(IMediator mediator, CommunicationService communicationService, WorkerQueueFactory workerQueueFactory)
+		public FileExportWorker(IMediator mediator, TransmissionService communicationService, WorkerQueueFactory workerQueueFactory)
 		{
 			_mediator = mediator;
 			_communicationService = communicationService;
