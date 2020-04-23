@@ -16,7 +16,7 @@ namespace Pi.Replicate.Shared
 
             try
             {
-                using (var fs = System.IO.File.Open(filePath, System.IO.FileMode.OpenOrCreate)) { }
+                using (var fs = System.IO.File.OpenRead(filePath)) { }
             }
             catch(Exception ex)
             {

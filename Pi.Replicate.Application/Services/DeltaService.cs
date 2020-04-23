@@ -43,7 +43,7 @@ namespace Pi.Replicate.Application.Services
 
         public ReadOnlyMemory<byte> CreateDelta(string path, ReadOnlyMemory<byte> signature)
         {
-            using (var fs = new FileStream(path, FileMode.Open))
+            using (var fs = System.IO.File.OpenRead(path))
                 return CreateDelta(fs, signature);
         }
 
@@ -57,13 +57,14 @@ namespace Pi.Replicate.Application.Services
         public void ApplyDelta(string path, ReadOnlyMemory<byte> delta)
         {
             var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
-            using (var fs = new FileStream(path, FileMode.Open))
-            {
-                using (var fsout = new FileStream(tempPath, FileMode.Create))
-                {
-                    ApplyDelta(fs,delta,fsout);
-                }
-            }
+			using (var fs = System.IO.File.OpenRead(path))
+
+			{
+				using (var fsout = new FileStream(tempPath, FileMode.Create))
+				{
+					ApplyDelta(fs, delta, fsout);
+				}
+			}
 
             //move temp to original
             System.IO.File.Copy(tempPath,path,overwrite:true);
