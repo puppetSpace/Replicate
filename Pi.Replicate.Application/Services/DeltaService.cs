@@ -26,8 +26,8 @@ namespace Pi.Replicate.Application.Services
 
         public ReadOnlyMemory<byte> CreateSignature(string path)
         {
-            using (var fs = new FileStream(path, FileMode.Open))
-                return CreateSignature(fs);
+			using (var fs = System.IO.File.OpenRead(path))
+				return CreateSignature(fs);
         }
 
         public ReadOnlyMemory<byte> CreateDelta(Stream input, ReadOnlyMemory<byte> signature)

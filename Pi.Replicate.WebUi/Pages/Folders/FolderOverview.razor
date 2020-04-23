@@ -6,14 +6,19 @@
         <h3>@FolderOverviewModel.FolderName</h3>
         <div class="metadata">
             <span>
-                Files:
-                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @FolderOverviewModel.AmountOfFilesSent
-                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.AmountOfFilesReceived
+                New:
+                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @FolderOverviewModel.LocalNewFiles
+                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.RemoteNewFiles
             </span>
             <span>
-                Data:
-                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @FolderOverviewModel.GetTotalAmountOfBytesSentDisplay()
-                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.GetTotalAmountOfBytesReceivedDisplay()
+                Processed:
+                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @FolderOverviewModel.LocalProcessedFiles
+                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.RemoteProcessedFiles
+            </span>
+            <span>
+                Handled:
+                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @FolderOverviewModel.LocalHandledFiles
+                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @FolderOverviewModel.RemoteHandledFiles
             </span>
         </div>
         <div class="metadata">
@@ -26,26 +31,26 @@
         </NavLink>
     </div>
     <div class="folder-overview-recipients">
-        @foreach(var recipient in FolderOverviewModel.Recipients.OrderBy(x=>x.RecipientName))
+        @foreach (var recipient in FolderOverviewModel.Recipients.OrderBy(x => x.RecipientName))
         {
-        <div class="recipient" @onclick="@(()=>RecipientClicked(recipient.RecipientId))">
-            <div class="recipient-header">
-                <h4 title="@recipient.RecipientName">@recipient.RecipientName</h4>
-                <p title="@recipient.RecipientAddress" class="recipient-address">@recipient.RecipientAddress</p>
+            <div class="recipient" @onclick="@(()=>RecipientClicked(recipient.RecipientId))">
+                <div class="recipient-header">
+                    <h4 title="@recipient.RecipientName">@recipient.RecipientName</h4>
+                    <p title="@recipient.RecipientAddress" class="recipient-address">@recipient.RecipientAddress</p>
+                </div>
+                <div class="metadata">
+                    <span>
+                        Files:
+                        <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountOfFilesSent
+                        <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.AmountOfFilesReceived
+                    </span>
+                    <span>
+                        Data:
+                        <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesSentDisplay()
+                        <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesReceivedDisplay()
+                    </span>
+                </div>
             </div>
-            <div class="metadata">
-                <span>
-                    Files:
-                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountOfFilesSent
-                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.AmountOfFilesReceived
-                </span>
-                <span>
-                    Data:
-                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesSentDisplay()
-                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesReceivedDisplay()
-                </span>
-            </div>
-        </div>
-            }
-        </div>
+        }
+    </div>
 </div>
