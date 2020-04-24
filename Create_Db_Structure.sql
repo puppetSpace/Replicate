@@ -26,8 +26,8 @@ create table dbo.[File](
 	Id uniqueidentifier NOT NULL,
 	FolderId uniqueidentifier NOT NULL,
 	[Name] varchar(255) NOT NULL,
+	[Version] int NOT NULL,
 	Size bigint NOT NULL,
-	AmountOfChunks int NULL,
 	[Status] int NOT NULL,
 	[LastModifiedDate] datetime NOT NULL,
 	[Path] varchar(max) NOT NULL,
@@ -38,33 +38,12 @@ create table dbo.[File](
 );
 GO
 
-create table dbo.FileChange(
+create table dbo.EofMessage(
 	Id uniqueidentifier NOT NULL,
 	FileId uniqueidentifier NOT NULL,
-	VersionNo int NOT NULL,
 	AmountOfChunks int NULL,
-	[LastModifiedDate] datetime NOT NULL,
-	CONSTRAINT PK_FileChange PRIMARY KEY(Id),
-	CONSTRAINT FK_FileChange_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
-);
-GO
-
-create table dbo.FailedFileChange(
-	FileChangeId uniqueidentifier NOT NULL,
-	RecipientId uniqueidentifier NOT NULL,
-	CONSTRAINT PK_FailedFileChange PRIMARY KEY(FileChangeId,RecipientId),
-	CONSTRAINT FK_FailedFileChange_FileChange FOREIGN KEY(FileChangeId) REFERENCES dbo.FileChange(Id),
-	CONSTRAINT FK_FailedFileChange_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
-);
-GO
-
-
-create table dbo.FailedFile(
-	FileId uniqueidentifier NOT NULL,
-	RecipientId uniqueidentifier NOT NULL,
-	CONSTRAINT PK_FailedFile PRIMARY KEY(FileId,RecipientId),
-	CONSTRAINT FK_FailedFile_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
-	CONSTRAINT FK_FailedFile_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+	CONSTRAINT PK_EofMessage PRIMARY KEY(Id),
+	CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 );
 GO
 
@@ -79,14 +58,21 @@ create table dbo.FileChunk(
 );
 GO
 
-create table dbo.ChunkPackage(
-	FileChunkId uniqueidentifier NOT NULL,
+create table dbo.FailedTransmission(
+	Id uniqueidentifier NOT NULL,
+	FileId uniqueIdentifier NULL,
+	EofMessageId uniqueidentifier NULL,
+	FileChunkId uniqueidentifier NULL,
 	RecipientId uniqueidentifier NOT NULL,
-	CONSTRAINT PK_ChunkPackage PRIMARY KEY(FileChunkId,RecipientId),
-	CONSTRAINT FK_ChunkPackage_File FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
-	CONSTRAINT FK_ChunkPackage_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+	CONSTRAINT PK_FailedTransmission PRIMARY KEY(Id),
+	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
+	CONSTRAINT FK_FailedTransmission_EofMessage FOREIGN KEY(EofMessageId) REFERENCES dbo.EofMessage(Id),
+	CONSTRAINT FK_FailedTransmission_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
+	CONSTRAINT FK_FailedTransmission_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
 );
 GO
+
+
 create table dbo.SystemSetting(
 	Id uniqueidentifier NOT NULL,
 	[Key] varchar(255) NOT NULL,

@@ -21,10 +21,11 @@ namespace Pi.Replicate.Application
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
             services.AddTransient<FileCollectorFactory>();
-            services.AddTransient<FileSplitterFactory>();
-            services.AddTransient<ChunkService>();
+            services.AddTransient<FileProcessService>();
             services.AddTransient<TransmissionService>();
             services.AddTransient<FileService>();
+            services.AddTransient<DeltaService>();
+            services.AddTransient<CompressionService>();
 		}
     }
 }

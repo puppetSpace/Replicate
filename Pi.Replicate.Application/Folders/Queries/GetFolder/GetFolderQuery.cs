@@ -8,29 +8,29 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Folders.Queries.GetFolderName
+namespace Pi.Replicate.Application.Folders.Queries.GetFolder
 {
-    public class GetFolderNameQuery : IRequest<string>
+    public class GetFolderQuery : IRequest<Folder>
     {
         public Guid FolderId { get; set; }
 
     }
 
-    public class GetFolderQueryHandler : IRequestHandler<GetFolderNameQuery, string>
+    public class GetFolderQueryHandler : IRequestHandler<GetFolderQuery, Folder>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Name FROM dbo.Folder WHERE Id = @Id";
+        private const string _selectStatement = "SELECT Id, Name FROM dbo.Folder WHERE Id = @Id";
 
         public GetFolderQueryHandler(IDatabase database)
         {
             _database = database;
         }
 
-        public async Task<string> Handle(GetFolderNameQuery request, CancellationToken cancellationToken)
+        public async Task<Folder> Handle(GetFolderQuery request, CancellationToken cancellationToken)
         {
             using (_database)
             {
-                return await _database.QuerySingle<string>(_selectStatement, new { Id = request.FolderId });
+                return await _database.QuerySingle<Folder>(_selectStatement, new { Id = request.FolderId });
             }
         }
     }

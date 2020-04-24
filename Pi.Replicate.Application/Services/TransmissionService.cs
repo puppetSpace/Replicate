@@ -1,20 +1,13 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Storage;
-using Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage;
-using Pi.Replicate.Application.FileChanges.Commands.AddFaileFileChange;
-using Pi.Replicate.Application.FileChanges.Models;
-using Pi.Replicate.Application.Files.Commands.AddFailedFile;
-using Pi.Replicate.Application.Files.Models;
-using Pi.Replicate.Application.Folders.Queries.GetFolderName;
+using Pi.Replicate.Application.Common.Models;
+using Pi.Replicate.Application.FailedTransmissions.AddFailedTransmission;
+using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
@@ -22,17 +15,17 @@ namespace Pi.Replicate.Application.Services
 	public class TransmissionService
 	{
 		private readonly IHttpClientFactory _httpClientFactory;
-		private readonly IMediator _mediator;
 		private readonly IMapper _mapper;
+		private readonly IMediator _mediator;
 
-		public TransmissionService(IHttpClientFactory httpClientFactory, IMediator mediator, IMapper mapper)
+		public TransmissionService(IHttpClientFactory httpClientFactory,IMapper mapper, IMediator mediator)
 		{
 			_httpClientFactory = httpClientFactory;
-			_mediator = mediator;
 			_mapper = mapper;
+			_mediator = mediator;
 		}
 
-		public async Task<bool> SendFile(File file, Recipient recipient)
+		public async Task<bool> SendFile(Folder folder,File file, Recipient recipient)
 		{
 			try
 			{
@@ -40,56 +33,54 @@ namespace Pi.Replicate.Application.Services
 
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var endpoint = $"{recipient.Address}/api/file";
-				var folderName = await _mediator.Send(new GetFolderNameQuery { FolderId = file.FolderId });
 				var fileTransmissionModel = _mapper.Map<FileTransmissionModel>(file);
-				fileTransmissionModel.FolderName = folderName;
+				fileTransmissionModel.FolderName = folder.Name;
 				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 				return true;
 			}
-			catch (System.Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
+			catch (System.Exception ex)
 			{
-				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to FailedFiles and retrying later");
-				await _mediator.Send(new AddFailedFileCommand { File = file, Recipient = recipient });
+				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				await _mediator.Send(new AddFailedFileTransmissionCommand { FileId = file.Id, RecipientId = recipient.Id });
 				return false;
 			}
 		}
 
-		public async Task<bool> SendFileChange(FileChange fileChange, Recipient recipient)
+		public async Task<bool> SendEofMessage(EofMessage message, Recipient recipient)
 		{
 			try
 			{
-				Log.Information($"Sending changes to metadata of '{fileChange.File.Path}' to  {recipient.Name}");
+				Log.Information($"Sending Eot message for file '{message.File.Path}' to {recipient.Name}");
 
 				var httpClient = _httpClientFactory.CreateClient("default");
-				var endpoint = $"{recipient.Address}/api/filechange";
-				var fileChangeTransmissionModel = _mapper.Map<FileChangeTransmissionModel>(fileChange);
-				fileChangeTransmissionModel.FileSignature = fileChange.File.Signature.ToArray();
-				fileChangeTransmissionModel.FilePath = fileChange.File.Path;
-				fileChangeTransmissionModel.FileSize = fileChange.File.Size;
-				await httpClient.PostAsync(endpoint, fileChangeTransmissionModel, throwErrorOnResponseNok: true);
+				var endpoint = $"{recipient.Address}/api/file/{message.FileId}/eot";
+				var eotModel = _mapper.Map<EofMessageTransmissionModel>(message);
+				await httpClient.PostAsync(endpoint, eotModel, throwErrorOnResponseNok: true);
 				return true;
 			}
-			catch (System.Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
+			catch (System.Exception ex)
 			{
-				Log.Error(ex, $"Failed to send filechange metadata of '{fileChange.File.Path}' to '{recipient.Name}'. Adding change to FailedFileChanges and retrying later");
-				await _mediator.Send(new AddFailedFileChangeCommand { FileChange = fileChange, Recipient = recipient });
+				Log.Error(ex, $"Failed to send Eot message of '{message.File.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessage = message, RecipientId = recipient.Id });
 				return false;
 			}
 		}
 
-		public async Task SendChunkPackage(ChunkPackage chunkPackage)
+		public async Task<bool> SendFileChunk(FileChunk fileChunk, Recipient recipient)
 		{
-			Log.Information($"Sending chunk '{chunkPackage.FileChunk.SequenceNo}' to '{chunkPackage.Recipient.Name}'");
+			Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
 			try
 			{
 				var httpClient = _httpClientFactory.CreateClient("default");
-				//todo create filechunktransmissionmodel
-				await httpClient.PostAsync($"{chunkPackage.Recipient.Address}/Api/Chunk", chunkPackage.FileChunk, throwErrorOnResponseNok: true);
-				await _mediator.Send(new DeleteChunkPackageCommand { RecipientId = chunkPackage.Recipient.Id, FileChunkId = chunkPackage.FileChunk.Id });
+				var chunkModel = _mapper.Map<FileChunkTransmissionModel>(fileChunk);
+				await httpClient.PostAsync($"{recipient.Address}/Api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
+				return true;
 			}
-			catch (Exception ex) when (ex is InvalidOperationException || ex is HttpRequestException)
+			catch (Exception ex)
 			{
-				Log.Error(ex, "Failed to send chunk");
+				Log.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunk = fileChunk, RecipientId = recipient.Id });
+				return false;
 			}
 		}
 

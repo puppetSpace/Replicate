@@ -13,7 +13,7 @@ namespace Pi.Replicate.Application.Files.Models
 
         public long Size { get; set; }
 
-        public long AmountOfChunks { get; set; }
+        public int Version { get; set; }
 
         public byte[] Signature { get; set; }
 

@@ -1,11 +1,11 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Chunks.Commands.DeleteChunkPackage;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 
@@ -26,11 +26,11 @@ namespace Pi.Replicate.Workers
 		{
 			var thread = new Thread(async () =>
 			{
-				var queue = _workerQueueFactory.Get<ChunkPackage>(WorkerQueueType.ToSendChunks);
+				var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
 				while (!queue.IsCompleted || !cancellationToken.IsCancellationRequested)
 				{
 					var chunkPackage = queue.Take();
-					await _communicationService.SendChunkPackage(chunkPackage);
+					await _communicationService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
 				}
 
 			});

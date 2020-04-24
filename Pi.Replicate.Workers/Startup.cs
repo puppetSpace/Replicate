@@ -30,15 +30,14 @@ namespace Pi.Replicate.Workers
             {
 				Log.Information("Deleting unprocessed files from database");
                 await _database.Execute("DELETE FROM dbo.FileChunk where fileId in (select id from dbo.[File] where status in (0,1))", null);
-                await _database.Execute("DELETE FROM dbo.ChunkPackage where fileChunkId in (select id from dbo.FileChunk where fileId in (select id from dbo.[File] where status in (2)))", null);
                 await _database.Execute("DELETE FROM dbo.[File] where status in (0,1)", null);
             }
 
-			Log.Information("Queing processed files that are not sent yet");
-			var outgoingQueue = _workerQueueFactory.Get<FilePreExportQueueItem>(WorkerQueueType.ToSendFiles);
-			var processedFiles = await _mediator.Send(new GetFilesByStatusQuery { Status = Domain.FileStatus.Processed });
-			foreach (var file in processedFiles)
-				outgoingQueue.Add(new FilePreExportQueueItem<File>(file));
+			//Log.Information("Queing processed files that are not sent yet");
+			//var outgoingQueue = _workerQueueFactory.Get<FilePreExportQueueItem>(WorkerQueueType.ToSendFiles);
+			//var processedFiles = await _mediator.Send(new GetFilesByStatusQuery { Status = Domain.FileStatus.Processed });
+			//foreach (var file in processedFiles)
+			//	outgoingQueue.Add(new FilePreExportQueueItem<File>(file));
 
             
         }

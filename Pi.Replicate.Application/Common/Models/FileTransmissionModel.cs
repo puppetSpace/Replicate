@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Files.Models
+namespace Pi.Replicate.Application.Common.Models
 {
     public class FileTransmissionModel
     {
@@ -14,7 +14,7 @@ namespace Pi.Replicate.Application.Files.Models
 
         public long Size { get; set; }
 
-        public long AmountOfChunks { get; set; }
+        public int Version { get; set; }
 
         public byte[] Signature { get; set; }
 

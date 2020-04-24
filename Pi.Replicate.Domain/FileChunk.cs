@@ -27,23 +27,6 @@ namespace Pi.Replicate.Domain
         }
     }
 
-
-    public class ChunkPackage
-    {
-        public FileChunk FileChunk { get; set; }
-
-        public Recipient Recipient { get; set; }
-
-        public static ChunkPackage Build(FileChunk fileChunk, Recipient recipient)
-        {
-            return new ChunkPackage
-            {
-                FileChunk = fileChunk,
-                Recipient = recipient
-            };
-        }
-    }
-
     public enum ChunkSource
     {
         FromNewFile = 0,

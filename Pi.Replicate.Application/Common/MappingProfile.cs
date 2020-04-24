@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Pi.Replicate.Application.FileChanges.Models;
+using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.Files.Models;
 using System;
 using System.Security.Cryptography.X509Certificates;
@@ -17,9 +17,11 @@ namespace Pi.Replicate.Application.Common
         {
             CreateMap<Domain.File, FileTransmissionModel>()
 				.ForMember(x=>x.Signature,opt=> opt.MapFrom((x,y)=> x.Signature.ToArray()));
-			CreateMap<Domain.FileChange, FileChangeTransmissionModel>();
+			CreateMap<Domain.FileChunk, FileChunkTransmissionModel>()
+	.ForMember(x => x.Value, opt => opt.MapFrom((x, y) => x.Value.ToArray()));
 			CreateMap<FileDto, Domain.File>()
                 .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
+			CreateMap<Domain.EofMessage, EofMessageTransmissionModel>();
         }
     }
 }

@@ -46,7 +46,7 @@ namespace Pi.Replicate.Worker.Console
 
 			services.AddTransient<Startup>();
 			services.AddTransient<FolderWorker>();
-			services.AddTransient<FilePreExportWorker>();
+			services.AddTransient<FileProcessWorker>();
 			services.AddTransient<FileExportWorker>();
 			services.AddTransient<ChunkExportWorker>();
 

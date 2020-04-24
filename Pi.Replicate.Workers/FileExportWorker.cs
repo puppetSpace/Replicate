@@ -1,5 +1,7 @@
 using MediatR;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.FailedTransmissions.AddFailedTransmission;
+using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
@@ -27,55 +29,23 @@ namespace Pi.Replicate.Workers
 		{
 			var thread = new Thread(async () =>
 			{
-				var incomingQueue = _workerQueueFactory.Get<FilePreExportQueueItem>(WorkerQueueType.ToSendFiles);
-				var outgoingQueue = _workerQueueFactory.Get<ChunkPackage>(WorkerQueueType.ToSendChunks);
-				var sendFileHandler = new SendFileHandler(_mediator, _communicationService);
+				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
 				while (!incomingQueue.IsCompleted || !cancellationToken.IsCancellationRequested)
 				{
-					var queueItem = incomingQueue.Take();
-					File file = null;
-					FileChange fileChange = null;
-					if (queueItem is FilePreExportQueueItem<File> fileItem)
-					{
-						file = fileItem.Item;
-					}
-					else if (queueItem is FilePreExportQueueItem<FileChange> fileChangeItem)
-					{
-						file = fileChangeItem.Item.File;
-						fileChange = fileChangeItem.Item;
-					}
-
+					var file = incomingQueue.Take();
 					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-					if (fileChange is null)
-						await HandleNewFile(sendFileHandler,file, recipients, outgoingQueue);
-					else
-						await HandleFileChange(sendFileHandler, fileChange, recipients, outgoingQueue);
-					
-
-
+					var folder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
+					foreach (var recipient in recipients)
+					{
+						await _communicationService.SendFile(folder,file, recipient);
+						outgoingQueue.Add(file);
+					}
 				}
 			});
 
 			thread.Start();
 			return thread;
-		}
-
-		private async Task HandleFileChange(SendFileHandler sendFileHandler, FileChange fileChange, ICollection<Recipient> recipients, BlockingCollection<ChunkPackage> outgoingQueue)
-		{
-			foreach (var recipient in recipients)
-			{
-				//todo try todo this in parallel
-				await sendFileHandler.Handle(fileChange, recipient, outgoingQueue);
-			}
-		}
-
-		private async Task HandleNewFile(SendFileHandler sendFileHandler, File file, ICollection<Recipient> recipients, System.Collections.Concurrent.BlockingCollection<ChunkPackage> outgoingQueue)
-		{
-			foreach (var recipient in recipients)
-			{
-				//todo try todo this in parallel
-				await sendFileHandler.Handle(file, recipient, outgoingQueue);
-			}
 		}
 	}
 }

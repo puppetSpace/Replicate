@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Common\Models\" />
+    <Folder Include="FileChunks\" />
   </ItemGroup>
 
 </Project>

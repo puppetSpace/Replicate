@@ -12,11 +12,11 @@ namespace Pi.Replicate.Worker.Console
     {
         private readonly Startup _startupCleanup;
         private readonly FolderWorker _folderWorker;
-        private readonly FilePreExportWorker _filePreExportWorker;
+        private readonly FileProcessWorker _filePreExportWorker;
         private readonly FileExportWorker _fileExportWorker;
         private readonly ChunkExportWorker _chunkExportWorker;
 
-        public App(Startup startupCleanup, FolderWorker folderWorker, FilePreExportWorker filePreExportWorker, FileExportWorker fileExportWorker, ChunkExportWorker chunkExportWorker)
+        public App(Startup startupCleanup, FolderWorker folderWorker, FileProcessWorker filePreExportWorker, FileExportWorker fileExportWorker, ChunkExportWorker chunkExportWorker)
         {
             _startupCleanup = startupCleanup;
             _folderWorker = folderWorker;

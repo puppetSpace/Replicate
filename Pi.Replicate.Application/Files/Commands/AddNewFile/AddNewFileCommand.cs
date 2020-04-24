@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFile
     {
         private readonly IDatabase _database;
         private readonly PathBuilder _pathBuilder;
-        private const string _insertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,AmountOfChunks,Status,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @AmountOfChunks, @Status, @LastModifiedDate,@Path, @Signature, @Source)";
+        private const string _insertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,Status,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @Status, @LastModifiedDate,@Path, @Signature, @Source)";
 
         public AddNewFileCommandHandler(IDatabase database, PathBuilder pathBuilder)
         {
@@ -30,7 +30,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFile
         public async Task<Unit> Handle(AddNewFileCommand request, CancellationToken cancellationToken)
         {
             using (_database)
-                await _database.Execute(_insertStatement, new { request.File.Id, request.File.FolderId, request.File.Name, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate, request.File.Path, Signature = request.File.Signature.ToArray(), request.File.Source });
+                await _database.Execute(_insertStatement, new { request.File.Id, request.File.FolderId, request.File.Name, request.File.Size, request.File.Version, request.File.Status, request.File.LastModifiedDate, request.File.Path, Signature = request.File.Signature.ToArray(), request.File.Source });
 
             return Unit.Value;
         }
