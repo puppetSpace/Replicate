@@ -28,7 +28,6 @@ create table dbo.[File](
 	[Name] varchar(255) NOT NULL,
 	[Version] int NOT NULL,
 	Size bigint NOT NULL,
-	[Status] int NOT NULL,
 	[LastModifiedDate] datetime NOT NULL,
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
@@ -60,15 +59,24 @@ GO
 
 create table dbo.FailedTransmission(
 	Id uniqueidentifier NOT NULL,
+	RecipientId uniqueidentifier NOT NULL,
 	FileId uniqueIdentifier NULL,
 	EofMessageId uniqueidentifier NULL,
 	FileChunkId uniqueidentifier NULL,
-	RecipientId uniqueidentifier NOT NULL,
 	CONSTRAINT PK_FailedTransmission PRIMARY KEY(Id),
 	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_FailedTransmission_EofMessage FOREIGN KEY(EofMessageId) REFERENCES dbo.EofMessage(Id),
 	CONSTRAINT FK_FailedTransmission_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
 	CONSTRAINT FK_FailedTransmission_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+);
+GO
+
+create table dbo.TransmissionResult(
+	RecipientId uniqueidentifier NOT NULL,
+	FileChunkId uniqueIdentifier NOT NULL,
+	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileChunkId),
+	CONSTRAINT FK_TransmissionResult_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
+	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
 );
 GO
 

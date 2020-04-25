@@ -76,8 +76,6 @@ namespace Pi.Replicate.Workers
 
 		private async Task FinializeFileProcess(File file, EofMessage eofMessage, ICollection<Recipient> recipients)
 		{
-			file.MarkAsProcessed();
-			await _mediator.Send(new UpdateFileCommand { File = file });
 			foreach (var recipient in recipients)
 				await _transmissionService.SendEofMessage(eofMessage, recipient);
 		}

@@ -14,12 +14,12 @@ namespace Pi.Replicate.Workers
 	public class ChunkExportWorker : WorkerBase
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
-		private readonly TransmissionService _communicationService;
+		private readonly TransmissionService _transmissionService;
 
-		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService communicationService)
+		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService transmissionService)
 		{
 			_workerQueueFactory = workerQueueFactory;
-			_communicationService = communicationService;
+			_transmissionService = transmissionService;
 		}
 
 		public override Thread DoWork(CancellationToken cancellationToken)
@@ -30,7 +30,7 @@ namespace Pi.Replicate.Workers
 				while (!queue.IsCompleted || !cancellationToken.IsCancellationRequested)
 				{
 					var chunkPackage = queue.Take();
-					await _communicationService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
+					await _transmissionService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
 				}
 
 			});

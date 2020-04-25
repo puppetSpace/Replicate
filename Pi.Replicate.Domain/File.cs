@@ -22,21 +22,9 @@ namespace Pi.Replicate.Domain
 
 		public FileSource Source { get; private set; }
 
-        public FileStatus Status { get; private set; }
-
         public DateTime LastModifiedDate { get; private set; }
 
         public string Path { get; private set; }
-
-        public void MarkAsHandled()
-        {
-            Status = FileStatus.Handled;
-        }
-
-        public void MarkAsProcessed()
-        {
-            Status = FileStatus.Processed;
-        }
 
 		public bool IsNew()
 		{
@@ -48,7 +36,6 @@ namespace Pi.Replicate.Domain
             LastModifiedDate = file.LastWriteTimeUtc;
             Size = file.Length;
 			Version++;
-            Status = FileStatus.Changed;
 			PreviousSignature = Signature;
 			Signature = signature;
         }
@@ -66,7 +53,6 @@ namespace Pi.Replicate.Domain
 				Name = file.Name,
 				Path = file.FullName.Replace(basePath + "\\", ""), //must be relative to base
 				Size = file.Length,
-				Status = FileStatus.New,
 				Source = FileSource.Local,
 				Signature = signature,
 				Version = 1

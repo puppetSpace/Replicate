@@ -20,8 +20,8 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
     public class UpdateFileHandler : IRequestHandler<UpdateFileCommand>
     {
         private readonly IDatabase _database;
-        private const string _updateStatement = "UPDATE dbo.[File] SET Size = @Size,  AmountOfChunks = @AmountOfChunks, Status = @Status, LastModifiedDate = @LastModifiedDate where Id = @Id";
-        private const string _updateStatementWithSignature = "UPDATE dbo.[File] SET Size = @Size,  AmountOfChunks = @AmountOfChunks, Status = @Status, LastModifiedDate = @LastModifiedDate, Signature = @Signature where Id = @Id";
+        private const string _updateStatement = "UPDATE dbo.[File] SET Size = @Size,Version = @Version,LastModifiedDate = @LastModifiedDate where Id = @Id";
+        private const string _updateStatementWithSignature = "UPDATE dbo.[File] SET Size = @Size,Version = @Version, LastModifiedDate = @LastModifiedDate, Signature = @Signature where Id = @Id";
 
         public UpdateFileHandler(IDatabase database)
         {
@@ -33,9 +33,9 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
             using (_database)
             {
                 if(request.AlsoUpdateSignature)
-                    await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
+                    await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size,request.File.Version,request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
                 else
-                    await _database.Execute(_updateStatement, new { request.File.Id, request.File.Size, request.File.AmountOfChunks, request.File.Status, request.File.LastModifiedDate });
+                    await _database.Execute(_updateStatement, new { request.File.Id, request.File.Size, request.File.Version, request.File.LastModifiedDate });
             }
 
 
