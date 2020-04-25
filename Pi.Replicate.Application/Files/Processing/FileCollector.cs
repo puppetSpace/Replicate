@@ -29,21 +29,22 @@ namespace Pi.Replicate.Application.Files.Processing
 
 		public async Task CollectFiles()
 		{
-			(var rawFiles, var previousFilesInFolder) = await GetFiles();
-			//exclude all files that are allready in the database
-			NewFiles = rawFiles.Where(x => !previousFilesInFolder.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
-
+			var filesFromSystem=  GetFilesFromSystem();
+			var filesInDb = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
+			Log.Information($"{filesInDb?.Count} files already processed for folder '{_folder.Name}'.");
+			
+			NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 			Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
-			ChangedFiles = rawFiles
-					.Where(x => previousFilesInFolder
-						.Any(y => y.Status == FileStatus.Handled && x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
+			ChangedFiles = filesFromSystem
+					.Where(x => filesInDb
+						.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
 					.ToList();
 
 			Log.Information($"{ChangedFiles.Count} changed files found in folder '{_folder.Name}'");
 		}
 
-		private async Task<(IList<System.IO.FileInfo> AllFiles, ICollection<File> ProcessedFiles)> GetFiles()
+		private IList<System.IO.FileInfo> GetFilesFromSystem()
 		{
 			var folderPath = _pathBuilder.BuildPath(_folder.Name);
 			if (_folder is null || !System.IO.Directory.Exists(folderPath))
@@ -52,13 +53,10 @@ namespace Pi.Replicate.Application.Files.Processing
 				throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
 			}
 
-			var previousFilesInFolder = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
-			Log.Information($"{previousFilesInFolder.Count} files already processed for folder '{_folder.Name}'.");
-
 			var folderCrawler = new FolderCrawler();
 			var files = folderCrawler.GetFiles(folderPath);
 
-			return (files, previousFilesInFolder);
+			return files;
 		}
 
 	}

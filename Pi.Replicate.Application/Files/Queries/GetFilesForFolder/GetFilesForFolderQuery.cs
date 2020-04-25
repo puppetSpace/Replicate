@@ -28,7 +28,15 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
     {
         private readonly IDatabase _database;
         private readonly IMapper _mapper;
-        private const string _selectStatement = "SELECT Id, FolderId,AmountOfChunks, LastModifiedDate, Name,Path, Signature,Size,Status,Source FROM dbo.[File] WHERE FolderId = @FolderId";
+        private const string _selectStatement = @"
+			select Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Signature,Source
+			from (
+				select *,ROW_NUMBER() over(partition by Name order by Version desc)  rnk
+				from dbo.[File]
+				where folderId = @FolderId
+			) a
+			where rnk = 1
+";
 
         public GetFilesForFolderQueryHandler(IDatabase database, IMapper mapper)
         {
