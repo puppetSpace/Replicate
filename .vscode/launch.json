@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/Pi.Replicate.Worker.Console/bin/debug/netcoreapp3.1/Pi.Replicate.Worker.dll",
+            "program": "${workspaceFolder}/Pi.Replicate.Worker.Console/bin/Debug/netcoreapp3.1/Pi.Replicate.Worker.Console.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Pi.Replicate.WebUi",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window

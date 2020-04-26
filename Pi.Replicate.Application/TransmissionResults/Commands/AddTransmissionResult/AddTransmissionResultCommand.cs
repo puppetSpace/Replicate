@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -8,15 +9,17 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
 {
     public class AddTransmissionResultCommand : IRequest
     {
-        public FileChunk FileChunk { get; set; }
+        public Guid FileId { get; set; }
 
-        public Recipient Recipient { get; set; }
+		public double FileChunkSequenceNo { get; set; }
+
+        public Guid RecipientId { get; set; }
     }
 
     public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(RecipientId, FileChunkId) VALUES(@RecipientId,@FileChunkId)";
+        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(RecipientId, FileId,FileChunkSequenceNo) VALUES(@RecipientId,@FileId, @FileChunkSequenceNo)";
 
         public AddTransmissionResultCommandHandler(IDatabase database)
         {
@@ -26,7 +29,7 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
         {
             using (_database)
             {
-                await _database.Execute(_insertStatement, new { RecipientId = request.Recipient.Id, FileChunkId = request.FileChunk.Id });
+                await _database.Execute(_insertStatement, new { request.RecipientId,request.FileId,request.FileChunkSequenceNo });
             }
 
 			return Unit.Value;
