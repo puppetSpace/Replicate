@@ -1,7 +1,6 @@
 create table dbo.Folder(
 	Id uniqueidentifier NOT NULL,
 	[Name] varchar(30) NOT NULL,
-	FolderOptions_DeleteAfterSent bit NOT NULL DEFAULT 0,
 	CONSTRAINT PK_Folder PRIMARY KEY(Id),
 	CONSTRAINT UQ_Folder_Name UNIQUE([Name])
 );
@@ -10,6 +9,7 @@ create table dbo.Recipient(
 	Id uniqueidentifier NOT NULL,
 	[Name] varchar(30) NOT NULL,
 	[Address] varchar(max) NOT NULL,
+	Confirmed bit NOT NULL DEFAULT 0
 	CONSTRAINT PK_Recipient PRIMARY KEY(Id)
 );
 GO
@@ -41,7 +41,7 @@ create table dbo.EofMessage(
 	Id uniqueidentifier NOT NULL,
 	FileId uniqueidentifier NOT NULL,
 	AmountOfChunks int NULL,
-	CreationTime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_EofMessage PRIMARY KEY(Id),
 	CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 );
@@ -64,7 +64,7 @@ create table dbo.FailedTransmission(
 	FileId uniqueIdentifier NULL,
 	EofMessageId uniqueidentifier NULL,
 	FileChunkId uniqueidentifier NULL,
-		CreationTime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+		CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_FailedTransmission PRIMARY KEY(Id),
 	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_FailedTransmission_EofMessage FOREIGN KEY(EofMessageId) REFERENCES dbo.EofMessage(Id),
@@ -76,7 +76,7 @@ GO
 create table dbo.TransmissionResult(
 	RecipientId uniqueidentifier NOT NULL,
 	FileChunkId uniqueIdentifier NOT NULL,
-		CreationTime datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+		CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileChunkId),
 	CONSTRAINT FK_TransmissionResult_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)

@@ -19,8 +19,6 @@ namespace Pi.Replicate.Application.Files.Models
 
         public FileSource Source { get; set; }
 
-        public FileStatus Status { get; set; }
-
         public DateTime LastModifiedDate { get; set; }
 
         public string Path { get; set; }

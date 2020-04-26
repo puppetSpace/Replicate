@@ -42,8 +42,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 			var folder = new Folder
 			{
 				Id = Guid.NewGuid(),
-				Name = request.Name,
-				FolderOptions = new FolderOption { },
+				Name = request.Name
 			};
 
 			folder.Recipients = request.Recipients;

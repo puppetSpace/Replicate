@@ -10,8 +10,6 @@ namespace Pi.Replicate.Domain
 
         public string Name { get; set; }
 
-        public FolderOption FolderOptions { get; set; }
-
         public List<Recipient> Recipients { get; set; }
 
     }

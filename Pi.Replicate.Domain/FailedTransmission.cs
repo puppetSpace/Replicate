@@ -17,5 +17,7 @@ namespace Pi.Replicate.Domain
 		public Guid? FileChunkId { get; private set; }
 
 		public Guid RecipientId { get; private set; }
+
+		public DateTime CreationTime { get; private set; }
 	}
 }

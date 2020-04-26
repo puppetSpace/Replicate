@@ -25,7 +25,7 @@ namespace Pi.Replicate.Test.Processors
         [TestMethod]
         public async Task GetNewFiles_ShouldFind5NewFiles()
         {
-            var folder = new Folder { Name = "FileFolder", FolderOptions = FolderOption.Empty };
+            var folder = new Folder { Name = "FileFolder"};
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
             var mockMediator = new Mock<IMediator>();
@@ -48,7 +48,7 @@ namespace Pi.Replicate.Test.Processors
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task GetNewFiles_FolderDoesNotExists_ShouldThrowException()
         {
-            var folder = new Folder { Name = "DoesNotExists", FolderOptions =FolderOption.Empty };
+            var folder = new Folder { Name = "DoesNotExists"};
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
             var mockMediator = new Mock<IMediator>();
@@ -63,14 +63,14 @@ namespace Pi.Replicate.Test.Processors
         [TestMethod]
         public async Task GetNewFiles_2Changed_ShouldFind3NewFiles()
         {
-            var folder = new Folder { Name = "FileFolder", FolderOptions = FolderOption.Empty };
+            var folder = new Folder { Name = "FileFolder"};
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty)
             };
 
             var mockMediator = new Mock<IMediator>();
@@ -89,17 +89,15 @@ namespace Pi.Replicate.Test.Processors
         [TestMethod]
         public async Task GetChanged_2Existing_ShouldFind2ChangedFiles()
         {
-            var folder = new Folder { Name = "FileFolder", FolderOptions = FolderOption.Empty };
+            var folder = new Folder { Name = "FileFolder"};
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now)
             };
-
-            existingFiles.ToList().ForEach(x=>x.MarkAsHandled());
 
             var mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<IRequest<ICollection<File>>>(), It.IsAny<CancellationToken>()))
@@ -116,17 +114,17 @@ namespace Pi.Replicate.Test.Processors
         [TestMethod]
         public async Task GetChanged_2Existing_ShouldFind1ChangedFiles()
         {
-            var folder = new Folder { Name = "FileFolder", FolderOptions = FolderOption.Empty };
+            var folder = new Folder { Name = "FileFolder"};
             var configurationMock = new Mock<IConfiguration>();
             configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(System.IO.Directory.GetCurrentDirectory());
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now)
             };
 
-            existingFiles.Last().MarkAsHandled();
+            existingFiles.Last();
 
             var mockMediator = new Mock<IMediator>();
             mockMediator.Setup(x => x.Send(It.IsAny<IRequest<ICollection<File>>>(), It.IsAny<CancellationToken>()))

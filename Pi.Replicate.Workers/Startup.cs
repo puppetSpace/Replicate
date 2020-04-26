@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Queries.GetFilesByStatus;
 using Pi.Replicate.Domain;
 using Serilog;
 using System;
@@ -29,8 +28,8 @@ namespace Pi.Replicate.Workers
             using (_database)
             {
 				Log.Information("Deleting unprocessed files from database");
-                await _database.Execute("DELETE FROM dbo.FileChunk where fileId in (select id from dbo.[File] where status in (0,1))", null);
-                await _database.Execute("DELETE FROM dbo.[File] where status in (0,1)", null);
+                // await _database.Execute("DELETE FROM dbo.FileChunk where fileId in (select id from dbo.[File] where status in (0,1))", null);
+                // await _database.Execute("DELETE FROM dbo.[File] where status in (0,1)", null);
             }
 
 			//Log.Information("Queing processed files that are not sent yet");
