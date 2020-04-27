@@ -10,6 +10,9 @@
   font-size: larger;
   padding: 5px;
 }
+.nav {
+  display: block;
+}
 .sidebar {
   display: flex;
   flex-direction: column;
@@ -33,10 +36,6 @@
 .sidebar .nav-item:first-of-type {
   padding-top: 1rem;
   padding-bottom: 0.4rem;
-}
-.sidebar .nav-item:last-of-type {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
 }
 .sidebar-bottom {
   margin-top: auto;
@@ -67,7 +66,7 @@
   font-weight: bolder;
 }
 .main h4 {
-  font-size: medium;
+  font-size: larger;
   margin-top: 15px;
   font-weight: bolder;
 }
@@ -159,6 +158,22 @@
   background-color: rgba(255, 255, 255, 0.2);
   color: #d7d7d7;
   cursor: pointer;
+}
+.settings-overview {
+  margin-top: 15px;
+  margin-left: 15px;
+  display: flex;
+  flex-direction: row;
+}
+.settings-overview h4 {
+  border-bottom: 2px solid #ffffff;
+}
+.settings-overview #triggerIntervalFolderCrawl,
+.settings-overview #triggerIntervalRetry {
+  width: 6rem;
+}
+.settings-overview #chunkSize {
+  width: 8rem;
 }
 .checkboxlistview {
   overflow-y: auto;

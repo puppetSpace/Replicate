@@ -15,8 +15,6 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 	{
 		public string Name { get; set; }
 
-		public bool DeleteAfterSend { get; set; }
-
 		public bool CreateOnDisk { get; set; }
 
 		public List<Recipient> Recipients { get; set; }

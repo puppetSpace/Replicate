@@ -19,12 +19,8 @@ namespace Pi.Replicate.WebUi.Pages.Folders
         protected ICollection<string> AvailableFolderNames { get; set; } = new List<string>();
         protected string SelectedFolder { get; set; }
         protected FolderCreationOption SelectedFolderCreationOption { get; set; } = FolderCreationOption.CreateNew;
-        protected bool DeleteAfterSend { get; set; }
         protected List<CheckItem<Domain.Recipient>> Recipients { get; set; } = new List<CheckItem<Domain.Recipient>>();
         protected List<string> ValidationMessages { get; set; } = new List<string>();
-        protected List<string> RecipientValidationMessages { get; set; } = new List<string>();
-        protected bool ShowCreateRecipientDialog { get; set; }
-        protected RecipientModel RecipientModel { get; set; } = new RecipientModel();
 
 
         [Inject]
@@ -46,7 +42,6 @@ namespace Pi.Replicate.WebUi.Pages.Folders
             var command = new AddFolderCommand
             {
                 Name = SelectedFolder,
-                DeleteAfterSend = DeleteAfterSend,
                 Recipients = Recipients.Where(x => x.IsChecked).Select(x => x.Data).ToList(),
                 CreateOnDisk = SelectedFolderCreationOption == FolderCreationOption.CreateNew
             };
@@ -61,27 +56,7 @@ namespace Pi.Replicate.WebUi.Pages.Folders
             }
         }
 
-        protected async Task CreateRecipient()
-        {
-            var command = new AddRecipientCommand
-            {
-                Name = RecipientModel.Name,
-                Address = RecipientModel.Address,
-            };
-            try
-            {
-                var createdRecipient = await Mediator.Send(command);
-                Recipients.Add(new CheckItem<Domain.Recipient> { Data = createdRecipient, DisplayText = createdRecipient.Name, IsChecked = true });
-                RecipientModel = new RecipientModel();
-                RecipientValidationMessages.Clear();
-                ShowCreateRecipientDialog = false;
-            }
-            catch (ValidationException ex)
-            {
-                RecipientValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
-            }
-        }
-
+       
         private void ClearForm()
         {
             var toRemovefolder = AvailableFolderNames.FirstOrDefault(x => string.Equals(x, SelectedFolder, StringComparison.OrdinalIgnoreCase));
@@ -90,7 +65,6 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
             ValidationMessages.Clear();
             Recipients.ForEach(x => x.IsChecked = false);
-            DeleteAfterSend = false;
             SelectedFolder = null;
             SelectedFolderCreationOption = FolderCreationOption.CreateNew;
 
@@ -100,12 +74,5 @@ namespace Pi.Replicate.WebUi.Pages.Folders
     {
         CreateNew = 0,
         SelectExisting = 1
-    }
-
-    public class RecipientModel
-    {
-        public string Name { get; set; }
-
-        public string Address { get; set; }
     }
 }

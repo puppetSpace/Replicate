@@ -29,7 +29,7 @@
     }
 
     h4 {
-        font-size: medium;
+        font-size: larger;
         margin-top: 15px;
         font-weight: bolder;
     }
@@ -140,5 +140,24 @@
             width: 13rem;
             margin: 10px;
         }
+    }
+}
+
+.settings-overview {
+    margin-top: 15px;
+    margin-left: 15px;
+    display: flex;
+    flex-direction: row;
+
+    h4{
+        border-bottom:2px solid @color-white;
+    }
+
+    #triggerIntervalFolderCrawl, #triggerIntervalRetry {
+        width: 6rem;
+    }
+
+    #chunkSize{
+        width:8rem;
     }
 }

@@ -35,8 +35,8 @@ namespace Pi.Replicate.Worker.Console
 			services.AddSingleton(config);
 
 			services.AddApplication();
-			services.AddData(config, ServiceLifetime.Transient);
-			services.AddSystemSettings(config);
+			services.AddData();
+			services.AddSystemSettingsFromDatabase(config);
 			services.AddHttpClient("default", client =>
 			{
 				client.DefaultRequestHeaders.Accept.Clear();

@@ -8,10 +8,15 @@ namespace Pi.Replicate.Domain
 {
     public class SystemSetting
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; private set; }
 
-        public string Key { get; set; }
+        public string Key { get; private set; }
 
-        public string Value { get; set; }
+        public string Value { get; private set; }
+
+		public static SystemSetting Build(string key,string value)
+		{
+			return new SystemSetting { Id = Guid.NewGuid(), Key = key, Value = value };
+		}
     }
 }

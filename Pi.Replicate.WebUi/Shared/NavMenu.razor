@@ -4,14 +4,14 @@
 <div class="sidebar flex-column">
     <div class="nav-folder scrollbar">
         <ul class="nav">
-            <li class="nav-item px-3">
+            <li class="nav-item">
                 <NavLink class="nav-link" href='folder/add'>
                     <span class="oi oi-plus" aria-hidden="true"></span> Add folder
                 </NavLink>
             </li>
             @foreach (var folder in Folders)
             {
-                <li class="nav-item px-3">
+                <li class="nav-item">
                     <NavLink class="nav-link" href='@("folder/"+ folder.Id)'>
                         <span class="oi oi-folder" aria-hidden="true"></span> @folder.Name
                     </NavLink>
@@ -19,7 +19,7 @@
             }
         </ul>
     </div>
-    <div class="nav-item px-3 sidebar-bottom">
+    <div class="nav-item sidebar-bottom">
         <NavLink class="nav-link" href="settings">
             <span class="oi oi-cog" aria-hidden="true"></span> Settings
         </NavLink>

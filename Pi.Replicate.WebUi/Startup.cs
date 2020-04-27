@@ -30,10 +30,10 @@ namespace Pi.Replicate.WebUi
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IDatabase>()); ;
             services.AddServerSideBlazor();
             services.AddApplication();
-            services.AddData(Configuration, ServiceLifetime.Transient);
+            services.AddData();
             services.AddObservr();
             services.AddHttpClient();
-            services.AddSystemSettings(Configuration);
+            services.AddSystemSettingsFromDatabase(Configuration);
 
         }
 

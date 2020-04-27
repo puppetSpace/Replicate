@@ -1,0 +1,71 @@
+﻿@page "/settings"
+@inherits SettingsOverviewBase
+<h3>Settings</h3>
+<div class="settings-overview">
+    <form>
+        <h4>General</h4>
+        <div class="form-group">
+            <label for="rootFolderSetting">Root folder</label>
+            <input type="text" class="form-control form-text" id="rootFolderSetting" @bind="RootFolder.Value" />
+            <small>This is the folder that will contain all the folders you create within the application + the files that need to be synced</small>
+        </div>
+        <div class="form-group">
+            <label for="triggerIntervalFolderCrawl">Trigger interval: folder crawl <small>(in minutes)</small></label>
+            <input type="number" class="form-control form-text" id="triggerIntervalFolderCrawl" @bind="TriggerIntervalFolderCrawl.Value" />
+            <small>The amount of time to wait to between each moment the application crawls to the folders to search for new and changed files</small>
+        </div>
+        <div class="form-group">
+            <label for="triggerIntervalRetry">Trigger interval: retry <small>(in minutes)</small></label>
+            <input type="number" class="form-control form-text" id="triggerIntervalRetry" @bind="TriggerIntervalRetry.Value" />
+            <small>The amount of time to wait to between each moment the application retries sending failed data to the recipients</small>
+        </div>
+        <div class="form-group">
+            <label for="chunkSize">Chunk size <small>(in bytes)</small></label>
+            <input type="number" class="form-control form-text" id="chunkSize" @bind="ChunkSize.Value" />
+            <small>A file will be split up into chunks. This setting defines the size of that chunk</small>
+        </div>
+
+        <h4>Recipients</h4>
+        <div class="form-group">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Address</th>
+                        <th scope="col">Verified</th>
+                        <th scope="col"></th>
+                        <th scope="col"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(var recipient in Recipients)
+                    {
+                    <tr>
+                        <td>@recipient.Name</td>
+                        <td><input type="text" class="form-control form-text" @bind="recipient.Address" /></td>
+                        <td><input type="checkbox" class="form-control" @bind="recipient.Verified" /></td>
+                        <td>
+                            @if (recipient.Verified)
+                            {
+                                <span class="oi oi-check"></span>
+                            }
+                            else
+                            {
+                                <span class="oi oi-ban"></span>
+                                <a><span class="oi oi-reload"></span></a>
+                            }
+
+                        </td>
+                        <td>
+                            <a><span class="oi oi-trash"></span></a>
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+    </form>
+</div>
+
+

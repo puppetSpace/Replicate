@@ -9,24 +9,24 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientList
+namespace Pi.Replicate.Application.Recipients.Queries.GetRecipients
 {
-    public class GetRecipientListQuery : IRequest<ICollection<Recipient>>
+    public class GetRecipientsQuery : IRequest<ICollection<Recipient>>
     {
         
     }
 
-    public class GetRecipientsListQueryHandler : IRequestHandler<GetRecipientListQuery, ICollection<Recipient>>
+    public class GetRecipientsQueryHandler : IRequestHandler<GetRecipientsQuery, ICollection<Recipient>>
     {
         private readonly IDatabase _database;
-        private const string _selectStatement = "SELECT Id,Name,Address FROM dbo.Recipient";
+        private const string _selectStatement = "SELECT Id,Name,Address,Verified FROM dbo.Recipient";
 
-        public GetRecipientsListQueryHandler(IDatabase database)
+        public GetRecipientsQueryHandler(IDatabase database)
         {
             _database = database;
         }
 
-        public async Task<ICollection<Recipient>> Handle(GetRecipientListQuery request, CancellationToken cancellationToken)
+        public async Task<ICollection<Recipient>> Handle(GetRecipientsQuery request, CancellationToken cancellationToken)
         {
             using(_database)
                 return await _database.Query<Recipient>(_selectStatement, null);

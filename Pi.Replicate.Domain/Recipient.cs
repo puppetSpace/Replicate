@@ -10,15 +10,15 @@ namespace Pi.Replicate.Domain
 
         public string Address { get; private set; }
 
-		public bool Confirmed { get; private set; }
+		public bool Verified { get; private set; }
 
-		public void ConfirmExistence(){
-			Confirmed = true;
+		public void IsVerified(){
+			Verified = true;
 		}
 
-        public static Recipient Build(string name, string address)
+        public static Recipient Build(string name, string address, bool verified)
         {
-            return new Recipient { Id = Guid.NewGuid(), Name = name, Address = address };
+            return new Recipient { Id = Guid.NewGuid(), Name = name, Address = address, Verified = verified };
         }
     }
 }

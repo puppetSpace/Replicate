@@ -1,4 +1,7 @@
-﻿.sidebar {
+﻿.nav {
+  display: block;
+}
+.sidebar {
   display: flex;
   flex-direction: column;
   width: 225px;
@@ -21,10 +24,6 @@
 .sidebar .nav-item:first-of-type {
   padding-top: 1rem;
   padding-bottom: 0.4rem;
-}
-.sidebar .nav-item:last-of-type {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
 }
 .sidebar-bottom {
   margin-top: auto;

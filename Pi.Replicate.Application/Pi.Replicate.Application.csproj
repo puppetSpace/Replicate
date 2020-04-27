@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Recipients\Commands\AddNewRecipient\AddRecipientCommand.cs" />
-    <Compile Include="Recipients\Commands\AddNewRecipient\AddRecipientValidator.cs" />
+    <Compile Include="Recipients\Commands\UpsertRecipient\UpsertRecipientCommand.cs" />
   </ItemGroup>
 
   <ItemGroup>

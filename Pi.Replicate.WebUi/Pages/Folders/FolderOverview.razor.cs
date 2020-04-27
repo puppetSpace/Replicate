@@ -25,7 +25,7 @@ namespace Pi.Replicate.WebUi.Pages.Folders
         {
             if (Guid.TryParse(FolderId, out var result))
             {
-                FolderOverviewModel = await Mediator.Send(new GetFolderOverviewQuery { FolderId = result });
+                //FolderOverviewModel = await Mediator.Send(new GetFolderOverviewQuery { FolderId = result });
             }
         }
 
