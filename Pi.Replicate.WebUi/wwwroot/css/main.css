@@ -16,6 +16,7 @@
 }
 .main {
   width: 100%;
+  overflow: auto;
 }
 .main h3 {
   font-size: x-large;
@@ -131,4 +132,10 @@
 }
 .settings-overview #chunkSize {
   width: 8rem;
+}
+.settings-overview table {
+  color: #ffffff;
+}
+.settings-overview table th {
+  border-top: 0;
 }

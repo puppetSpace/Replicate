@@ -3,8 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Components;
 using Pi.Replicate.Application.Folders.Commands.AddFolder;
 using Pi.Replicate.Application.Folders.Queries.GetAvailableFolders;
-using Pi.Replicate.Application.Recipients.Commands.AddRecipient;
-using Pi.Replicate.Application.Recipients.Queries.GetRecipientList;
+using Pi.Replicate.Application.Recipients.Queries.GetRecipients;
 using Pi.Replicate.WebUi.Components;
 using System;
 using System.Collections.Generic;
@@ -33,7 +32,7 @@ namespace Pi.Replicate.WebUi.Pages.Folders
         {
             var folderNames = await Mediator.Send(new GetAvailableFoldersQuery());
             AvailableFolderNames = folderNames;
-            var recipients = await Mediator.Send(new GetRecipientListQuery());
+            var recipients = await Mediator.Send(new GetRecipientsQuery());
             Recipients = recipients.OrderBy(x=>x.Name).Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
         }
 

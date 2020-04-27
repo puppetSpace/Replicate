@@ -27,13 +27,12 @@
 
         <h4>Recipients</h4>
         <div class="form-group">
-            <table class="table">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th scope="col">Name</th>
                         <th scope="col">Address</th>
                         <th scope="col">Verified</th>
-                        <th scope="col"></th>
                         <th scope="col"></th>
                     </tr>
                 </thead>
@@ -43,7 +42,6 @@
                     <tr>
                         <td>@recipient.Name</td>
                         <td><input type="text" class="form-control form-text" @bind="recipient.Address" /></td>
-                        <td><input type="checkbox" class="form-control" @bind="recipient.Verified" /></td>
                         <td>
                             @if (recipient.Verified)
                             {
