@@ -1,6 +1,5 @@
 using MediatR;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.FailedTransmissions.AddFailedTransmission;
 using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;

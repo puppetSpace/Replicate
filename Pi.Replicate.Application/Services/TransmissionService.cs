@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using Pi.Replicate.Application.Common.Models;
-using Pi.Replicate.Application.FailedTransmissions.AddFailedTransmission;
+using Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmission;
 using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;

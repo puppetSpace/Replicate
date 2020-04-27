@@ -43,8 +43,11 @@ namespace Pi.Replicate.Test.Processors
                 amountOfCalls++;
             });
 
-            //todo mediator
-            var processService = new FileProcessService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), null);
+			var mockMediator = new Mock<IMediator>();
+			mockMediator.Setup(x => x.Send(It.IsAny<IRequest>(), It.IsAny<CancellationToken>()))
+				.Returns(Unit.Task);
+
+			var processService = new FileProcessService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), mockMediator.Object);
             await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
 
             Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
@@ -80,7 +83,7 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Unit.Task);
 
             //todo mediator
-            var processService = new FileProcessService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), null);
+            var processService = new FileProcessService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), mockMediator.Object);
             await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
 
 
