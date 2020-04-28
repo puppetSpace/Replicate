@@ -71,16 +71,6 @@
   margin-top: 15px;
   font-weight: bolder;
 }
-.validation-summary {
-  border: 2px solid red;
-  border-radius: 5px;
-  color: red;
-  padding: 10px;
-  margin-bottom: 20px;
-}
-.validation-summary ul {
-  overflow-wrap: break-word;
-}
 .folder-add-form {
   padding: 1rem;
   display: flex;
@@ -166,21 +156,16 @@
   display: flex;
   flex-direction: row;
 }
-.settings-overview h4 {
-  border-bottom: 2px solid #ffffff;
+.settings-overview .settings-submit {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
 }
-.settings-overview #triggerIntervalFolderCrawl,
-.settings-overview #triggerIntervalRetry {
-  width: 6rem;
+.settings-overview .settings-submit a {
+  width: 10rem;
 }
-.settings-overview #chunkSize {
-  width: 8rem;
-}
-.settings-overview table {
-  color: #ffffff;
-}
-.settings-overview table th {
-  border-top: 0;
+.settings-overview .settings-submit a:hover {
+  cursor: pointer;
 }
 .checkboxlistview {
   overflow-y: auto;
@@ -193,6 +178,66 @@
 }
 .checkboxlistview li {
   list-style: none;
+}
+.modal-content {
+  background-color: #484848;
+}
+.modal-content button {
+  color: #ffffff;
+}
+.validation-summary {
+  border: 2px solid red;
+  border-radius: 5px;
+  color: red;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.validation-summary ul {
+  overflow-wrap: break-word;
+}
+@keyframes rotationAnimation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.settings-recipients .recipient-header {
+  border-bottom: 2px solid #ffffff;
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+}
+.settings-recipients .recipient-header a {
+  margin-left: auto;
+}
+.settings-recipients .recipient-header a:hover {
+  cursor: pointer;
+}
+.settings-recipients .recipient-section {
+  height: 500px;
+  overflow: auto;
+}
+.settings-recipients .recipient-section table {
+  color: #ffffff;
+  max-height: 500px;
+}
+.settings-recipients .recipient-section table th,
+.settings-recipients .recipient-section table td {
+  border-top: 0;
+  vertical-align: middle !important;
+}
+.settings-recipients .recipient-section table th span:hover,
+.settings-recipients .recipient-section table td span:hover {
+  cursor: pointer;
+}
+.settings-general #triggerIntervalFolderCrawl,
+.settings-general #triggerIntervalRetry {
+  width: 6rem;
+}
+.settings-general #chunkSize {
+  width: 8rem;
 }
 .scrollbar {
   overflow: auto;
@@ -281,10 +326,4 @@ app {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   cursor: pointer;
-}
-.modal-content {
-  background-color: #484848;
-}
-.modal-content button {
-  color: #ffffff;
 }

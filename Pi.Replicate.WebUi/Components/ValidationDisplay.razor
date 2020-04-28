@@ -1,0 +1,13 @@
+﻿@inherits ValidationDisplayBase;
+
+@if (ValidationMessages.Any())
+{
+    <div class="validation-summary">
+        <ul>
+            @foreach (var message in ValidationMessages)
+            {
+                <li>@message</li>
+            }
+        </ul>
+    </div>
+}

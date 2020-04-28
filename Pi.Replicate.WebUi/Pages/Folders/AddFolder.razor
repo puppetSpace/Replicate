@@ -1,20 +1,11 @@
 ﻿@page "/folder/add"
+@using Pi.Replicate.WebUi.Components
 @inherits AddFolderBase
 
 <h3>Add new folder</h3>
 
 <form class="folder-add-form">
-    @if (ValidationMessages.Any())
-    {
-        <div class="validation-summary">
-            <ul>
-                @foreach (var message in ValidationMessages)
-                {
-                    <li>@message</li>
-                }
-            </ul>
-        </div>
-    }
+   <ValidationDisplay ValidationMessages="ValidationMessages" />
     <div class="form-group">
         <input type="radio" class="form-check-input" id="create" name="creationOption" value="create"
                @onchange="@(()=> SelectedFolderCreationOption = FolderCreationOption.CreateNew)"

@@ -1,0 +1,54 @@
+﻿@inherits RecipientsBase
+
+<div class="settings-recipients">
+    <div class="recipient-header">
+        <h4>Recipients</h4>
+        <a @onclick="ShowAddRecipientDialog" title="add new recipient"><span class="oi oi-plus"></span></a>
+    </div>
+    <div class="form-group scrollbar recipient-section">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Verified</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var recipient in Recipients)
+                {
+                    <tr>
+                        <td>@recipient.Name</td>
+                        <td><input type="text" class="form-control form-text" @bind="recipient.Address" /></td>
+                        <td class="verification-section">
+                            @if (recipient.Verified)
+                            {
+                                <span title="Recipient is verified" class="oi oi-check"></span>
+                            }
+                            else
+                            {
+                                <a @onclick=@(()=>VerifyRecipient(recipient))><span title="Contact the recipient to verify its existince" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
+                                @if (!string.IsNullOrWhiteSpace(recipient.VerifyResult))
+                                {
+                                    <span title="@recipient.VerifyResult" class="oi oi-warning"></span>
+                                }
+                            }
+
+                        </td>
+                        <td>
+                            <a @onclick="@(()=>DeleteRecipient(recipient))"><span title="Delete the recipient" class="oi oi-trash"></span></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <Dialog @ref="Dialog" Title="Add new recipient" OnClose="@(()=>Dialog.Close())" OnSubmit="AddRecipient" TextSubmitButton="Add">
+        <ValidationDisplay ValidationMessages="ValidationMessages" />
+        <form>
+            <input type="text" class="form-control form-text" placeholder="Name" @bind="NewRecipient.Name" />
+            <input type="text" class="form-control form-text" placeholder="Address" @bind="NewRecipient.Address" />
+        </form>
+    </Dialog>
+</div>

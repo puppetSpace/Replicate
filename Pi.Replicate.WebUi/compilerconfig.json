@@ -1,38 +1,42 @@
-﻿[
+[
   {
     "outputFile": "wwwroot/css/site.css",
-    "inputFile": "wwwroot/css/site.sass"
+    "inputFile": "wwwroot/css/site.sass",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/site.css",
-    "inputFile": "wwwroot/css/site.scss"
+    "inputFile": "wwwroot/css/site.scss",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/darkTheme_colors.css",
-    "inputFile": "wwwroot/css/darkTheme_colors.scss"
+    "inputFile": "wwwroot/css/darkTheme_colors.scss",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/darkTheme_colors.css",
-    "inputFile": "wwwroot/css/darkTheme_colors.less"
+    "inputFile": "wwwroot/css/darkTheme_colors.less",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/site.css",
-    "inputFile": "wwwroot/css/site.less"
-  },
-  {
-    "outputFile": "wwwroot/css/Components/CheckBoxListView.css",
-    "inputFile": "wwwroot/css/Components/CheckBoxListView.less"
+    "inputFile": "wwwroot/css/site.less",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/main.css",
-    "inputFile": "wwwroot/css/main.less"
+    "inputFile": "wwwroot/css/main.less",
+    "sourceMap": false
   },
   {
     "outputFile": "wwwroot/css/sidebar.css",
-    "inputFile": "wwwroot/css/sidebar.less"
+    "inputFile": "wwwroot/css/sidebar.less",
+    "sourceMap": false
   },
   {
     "outputFile": "Pages/Folders/AddFolder.razor.css",
-    "inputFile": "Pages/Folders/AddFolder.razor.less"
+    "inputFile": "Pages/Folders/AddFolder.razor.less",
+    "sourceMap": false
   }
 ]
