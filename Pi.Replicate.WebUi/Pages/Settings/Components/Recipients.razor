@@ -3,7 +3,7 @@
 <div class="settings-recipients">
     <div class="recipient-header">
         <h4>Recipients</h4>
-        <a @onclick="ShowAddRecipientDialog" title="add new recipient"><span class="oi oi-plus"></span></a>
+        <a @onclick="ShowAddRecipientDialog" title="add new recipient" class="selectable"><span class="oi oi-plus"></span></a>
     </div>
     <div class="form-group scrollbar recipient-section">
         <table class="table table-striped">
@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var recipient in Recipients)
+                @foreach (var recipient in Recipients.OrderBy(x=>x.Name))
                 {
                     <tr>
                         <td>@recipient.Name</td>
@@ -28,7 +28,7 @@
                             }
                             else
                             {
-                                <a @onclick=@(()=>VerifyRecipient(recipient))><span title="Contact the recipient to verify its existince" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
+                                <a @onclick=@(()=>VerifyRecipient(recipient)) class="selectable"><span title="Contact the recipient to verify its existince" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
                                 @if (!string.IsNullOrWhiteSpace(recipient.VerifyResult))
                                 {
                                     <span title="@recipient.VerifyResult" class="oi oi-warning"></span>
@@ -37,7 +37,7 @@
 
                         </td>
                         <td>
-                            <a @onclick="@(()=>DeleteRecipient(recipient))"><span title="Delete the recipient" class="oi oi-trash"></span></a>
+                            <a @onclick="@(()=>DeleteRecipient(recipient))" class="selectable"><span title="Delete the recipient" class="oi oi-trash"></span></a>
                         </td>
                     </tr>
                 }

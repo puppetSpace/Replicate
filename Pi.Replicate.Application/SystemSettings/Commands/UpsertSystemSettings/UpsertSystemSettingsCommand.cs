@@ -21,13 +21,13 @@ namespace Pi.Replicate.Application.SystemSettings.Commands.UpsertSystemSettings
 	{
 		private readonly IDatabase _database;
 		private const string _insertStatement = @"
-			IF EXISTS(SELECT 1 FROM dbo.SystemSetting where Key = @Key)
+			IF EXISTS(SELECT 1 FROM dbo.SystemSetting where [Key] = @Key)
 				BEGIN
-				UPDATE dbo.SystemSetting Set Value = @Value WHERE Key = @Name;
+				UPDATE dbo.SystemSetting Set [Value] = @Value WHERE [Key] = @Key;
 				END
 			ELSE
 				BEGIN
-					INSERT INTO dbo.SystemSetting(Id,Key,Value) VALUES (@Id,@Key,@Value);
+					INSERT INTO dbo.SystemSetting(Id,[Key],[Value]) VALUES (@Id,@Key,@Value);
 				END";
 
 		public UpsertSystemSettingsCommandHandler(IDatabase database)

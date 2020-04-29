@@ -174,7 +174,8 @@
   border-radius: 5px;
 }
 .checkboxlistview ul {
-  padding-left: 25px;
+  padding-left: 10px;
+  padding-top: 10px;
 }
 .checkboxlistview li {
   list-style: none;
@@ -203,6 +204,14 @@
     transform: rotate(360deg);
   }
 }
+@keyframes warningflash {
+  from {
+    color: yellow;
+  }
+  to {
+    color: #ffffff;
+  }
+}
 .settings-recipients .recipient-header {
   border-bottom: 2px solid #ffffff;
   display: flex;
@@ -212,12 +221,12 @@
 .settings-recipients .recipient-header a {
   margin-left: auto;
 }
-.settings-recipients .recipient-header a:hover {
-  cursor: pointer;
-}
 .settings-recipients .recipient-section {
-  height: 500px;
+  max-height: 500px;
   overflow: auto;
+}
+.settings-recipients .recipient-section .oi-warning {
+  animation: warningflash 2s linear infinite;
 }
 .settings-recipients .recipient-section table {
   color: #ffffff;
@@ -228,16 +237,15 @@
   border-top: 0;
   vertical-align: middle !important;
 }
-.settings-recipients .recipient-section table th span:hover,
-.settings-recipients .recipient-section table td span:hover {
-  cursor: pointer;
-}
 .settings-general #triggerIntervalFolderCrawl,
 .settings-general #triggerIntervalRetry {
   width: 6rem;
 }
 .settings-general #chunkSize {
   width: 8rem;
+}
+.selectable:hover {
+  cursor: pointer;
 }
 .scrollbar {
   overflow: auto;

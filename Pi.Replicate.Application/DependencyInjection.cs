@@ -26,6 +26,7 @@ namespace Pi.Replicate.Application
             services.AddTransient<FileService>();
             services.AddTransient<DeltaService>();
             services.AddTransient<CompressionService>();
+            services.AddTransient<ProbeService>();
 		}
     }
 }

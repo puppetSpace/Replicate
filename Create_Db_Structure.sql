@@ -17,8 +17,8 @@ create table dbo.FolderRecipient(
 	FolderId uniqueidentifier NOT NULL,
 	RecipientId uniqueidentifier NOT NULL,
 	CONSTRAINT PK_FolderRecipient PRIMARY KEY(FolderId,RecipientId),
-	CONSTRAINT FK_FolderRecipient_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
-	CONSTRAINT FK_FolderRecipient_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+	CONSTRAINT FK_FolderRecipient_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id) ON DELETE CASCADE,
+	CONSTRAINT FK_FolderRecipient_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
 
@@ -69,7 +69,7 @@ create table dbo.FailedTransmission(
 	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_FailedTransmission_EofMessage FOREIGN KEY(EofMessageId) REFERENCES dbo.EofMessage(Id),
 	CONSTRAINT FK_FailedTransmission_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
-	CONSTRAINT FK_FailedTransmission_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+	CONSTRAINT FK_FailedTransmission_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
 
@@ -80,7 +80,7 @@ create table dbo.TransmissionResult(
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileId),
 	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
-	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id)
+	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
 

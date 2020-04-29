@@ -19,7 +19,8 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder
 		private const string _selectStatement = @"
 			SELECT re.Id,re.Name,re.Address 
 			FROM dbo.Recipient re
-			INNER JOIN dbo.FolderRecipient fr on fr.RecipientId = re.Id and fr.FolderId = @FolderId";
+			INNER JOIN dbo.FolderRecipient fr on fr.RecipientId = re.Id and fr.FolderId = @FolderId
+			WHERE re.Verified = 1";
 
 		public GetRecipientsForFolderQueryHandler(IDatabase database)
 		{

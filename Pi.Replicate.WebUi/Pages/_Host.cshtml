@@ -34,3 +34,8 @@
     <script src="_framework/blazor.server.js"></script>
 </body>
 </html>
+<script>
+    window.scrollIntoView = (element)=> {
+        document.getElementById(element).scrollIntoView({ behavior: 'smooth' });
+    }
+</script>

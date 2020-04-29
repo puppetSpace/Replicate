@@ -10,6 +10,16 @@
     }
 }
 
+@keyframes warningflash {
+    from {
+        color:yellow;
+    }
+
+    to {
+        color: @color-white;
+    }
+}
+
 
 .settings-recipients {
     .recipient-header {
@@ -20,16 +30,16 @@
 
         a {
             margin-left: auto;
-
-            &:hover {
-                cursor: pointer;
-            }
         }
     }
 
     .recipient-section {
-        height: 500px;
+        max-height: 500px;
         overflow: auto;
+
+        .oi-warning {
+            animation: warningflash 2s linear infinite;
+        }
 
         table {
             color: @color-white;
@@ -38,10 +48,6 @@
             th, td {
                 border-top: 0;
                 vertical-align: middle !important;
-
-                span:hover {
-                    cursor: pointer;
-                }
             }
         }
     }

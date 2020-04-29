@@ -1,6 +1,9 @@
-﻿using MediatR;
+﻿using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Components;
 using Observr;
+using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
+using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipients;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
@@ -39,21 +42,36 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 
 		protected RecipientModel NewRecipient { get; set; }
 
-		public Task Handle(SettingsSaveNotificationMessage value, CancellationToken cancellationToken)
+		public async Task Handle(SettingsSaveNotificationMessage value, CancellationToken cancellationToken)
 		{
-			Log.Information("Save engaged");
-			return Task.CompletedTask;
+			ValidationMessages.Clear();
+			var saveTasks = new List<Task>();
+			foreach(var recipient in Recipients)
+			{
+				if (recipient.IsChanged)
+					saveTasks.Add(Mediator.Send(new UpsertRecipientCommand { Address = recipient.Address, Name = recipient.Name, Verified = recipient.Verified }));
+			}
+			foreach (var deleted in _toDeleteRecipients)
+				saveTasks.Add(Mediator.Send(new DeleteRecipientCommand { Name = deleted.Name }));
+			try
+			{
+				await Task.WhenAll(saveTasks);
+				_toDeleteRecipients.Clear();
+				Recipients.ForEach(x => x.IsChanged = false);
+			}
+			catch (ValidationException ex)
+			{
+				ValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
+			}
 		}
 
 		public void Dispose()
 		{
-			Log.Information("Subscription destroyed");
 			_saveNotificationSubscription?.Dispose();
 		}
 
 		protected override async Task OnInitializedAsync()
 		{
-			Log.Information("Subscription created");
 			_saveNotificationSubscription = SaveNotifier.Subscribe(this);
 			var recipients = await Mediator.Send(new GetRecipientsQuery());
 			Recipients = recipients.Select(x => new RecipientModel(x)).ToList();
@@ -84,6 +102,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 			recipientModel.Verified = result.IsSuccessful;
 			recipientModel.VerifyResult = result.IsSuccessful ? string.Empty : result.Message;
 			recipientModel.IsVerifying = false;
+			StateHasChanged();
 		}
 
 		protected void DeleteRecipient(RecipientModel recipientModel)

@@ -11,7 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Recipients\Commands\DeleteRecipient\DeleteRecipientCommand.cs" />
     <Compile Include="Recipients\Commands\UpsertRecipient\UpsertRecipientCommand.cs" />
+    <Compile Include="Recipients\Commands\UpsertRecipient\UpsertRecipientCommandValidator.cs" />
   </ItemGroup>
 
   <ItemGroup>
