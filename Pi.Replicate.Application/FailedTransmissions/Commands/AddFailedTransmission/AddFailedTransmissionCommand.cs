@@ -53,7 +53,9 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 		{
 			using (_database)
 			{
-				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, request.FileId });
+				string eofMessageId = null;
+				string fileChunkId = null;
+				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, request.FileId, EofMessageId = eofMessageId, FileChunkId = fileChunkId });
 			}
 
 			return Unit.Value;
@@ -63,8 +65,10 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 		{
 			using (_database)
 			{
+				string fileId = null;
+				string fileChunkId = null;
 				await _database.Execute(_insertStatementEofMessage, new { request.EofMessage.Id, request.EofMessage.FileId, request.EofMessage.AmountOfChunks });
-				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, EofMessageId = request.EofMessage.Id });
+				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, EofMessageId = request.EofMessage.Id, FileId = fileId, FileChunkId = fileChunkId });
 			}
 
 			return Unit.Value;
@@ -74,8 +78,11 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 		{
 			using (_database)
 			{
+				string fileId = null;
+				string eofMessageId = null;
+
 				await _database.Execute(_insertStatementFileChunk, new { request.FileChunk.Id, request.FileChunk.FileId, request.FileChunk.SequenceNo, Value = request.FileChunk.Value.ToArray(), request.FileChunk.ChunkSource });
-				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, FileChunkId = request.FileChunk.Id });
+				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, FileChunkId = request.FileChunk.Id, FileId = fileId, EofMessageId = eofMessageId });
 			}
 
 			return Unit.Value;

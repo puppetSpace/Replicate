@@ -11,7 +11,7 @@ namespace Pi.Replicate.Application.Common.Models
     {
 		public double SequenceNo { get; set; }
 
-		public ReadOnlyMemory<byte> Value { get; set; }
+		public byte[] Value { get; set; }
 
 		public ChunkSource ChunkSource { get; set; }
 	}

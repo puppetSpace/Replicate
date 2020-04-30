@@ -12,7 +12,7 @@ namespace Pi.Replicate.Worker.Console
     {
         private readonly Startup _startupCleanup;
         private readonly FolderWorker _folderWorker;
-        private readonly FileProcessWorker _filePreExportWorker;
+        private readonly FileProcessWorker _fileProcessWorker;
         private readonly FileExportWorker _fileExportWorker;
         private readonly ChunkExportWorker _chunkExportWorker;
 
@@ -20,7 +20,7 @@ namespace Pi.Replicate.Worker.Console
         {
             _startupCleanup = startupCleanup;
             _folderWorker = folderWorker;
-            _filePreExportWorker = filePreExportWorker;
+            _fileProcessWorker = filePreExportWorker;
             _fileExportWorker = fileExportWorker;
             _chunkExportWorker = chunkExportWorker;
         }
@@ -30,9 +30,9 @@ namespace Pi.Replicate.Worker.Console
             var cancellationToken = new CancellationTokenSource();
             await _startupCleanup.Initialize();
 			_folderWorker.DoWork(cancellationToken.Token);
-			// _filePreExportWorker.DoWork(cancellationToken.Token);
-			//_fileExportWorker.DoWork(cancellationToken.Token);
-			//_chunkExportWorker.DoWork(cancellationToken.Token);
+			_fileExportWorker.DoWork(cancellationToken.Token);
+			_fileProcessWorker.DoWork(cancellationToken.Token);
+			_chunkExportWorker.DoWork(cancellationToken.Token);
 
 			await Task.Delay(Timeout.Infinite);
         }

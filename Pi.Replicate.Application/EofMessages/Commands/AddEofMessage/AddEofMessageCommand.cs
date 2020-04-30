@@ -14,7 +14,7 @@ namespace Pi.Replicate.Application.EofMessages.Commands.AddEofMessage
     public class AddEofMessageCommandHandler : IRequestHandler<AddEofMessageCommand>
     {
         private readonly IDatabase _database;
-		private const string _insertStatement = "INSERT INTO dbo.EofMessage(Id,FileId,AmmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)";
+		private const string _insertStatement = "INSERT INTO dbo.EofMessage(Id,FileId,AmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)";
 
         public AddEofMessageCommandHandler(IDatabase database)
         {

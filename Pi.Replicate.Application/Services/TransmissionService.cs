@@ -61,7 +61,7 @@ namespace Pi.Replicate.Application.Services
 			}
 			catch (System.Exception ex)
 			{
-				Log.Error(ex, $"Failed to send Eot message of '{message.File.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				Log.Error(ex, $"Failed to send Eof message of '{message.File.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
 				await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessage = message, RecipientId = recipient.Id });
 				return false;
 			}
