@@ -26,14 +26,15 @@
                 </div>
                 <div class="metadata">
                     <span>
-                        Files:
-                        <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountOfFilesSent
-                        <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.AmountOfFilesReceived
+                        Chunks:
+                        <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountOfChunksUploaded
+                        <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.AmountOfChunksDownloaded
                     </span>
                     <span>
-                        Data:
-                        <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesSentDisplay()
-                        <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> @recipient.GetTotalAmountOfBytesReceivedDisplay()
+                        Failed <br />
+                        Metadata: @recipient.AmountOfFailedFileMetadata <br />
+                        Chunks: @recipient.AmountOfFailedFileChunks <br />
+                        Eof: @recipient.AmountOfFailedEofMessages
                     </span>
                 </div>
             </div>

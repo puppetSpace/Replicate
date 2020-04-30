@@ -38,6 +38,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 		, count(trtr.FileChunkSequenceNo) AmountOfChunksDownloaded
 		, count(ftn.fileId) AmountOfFailedFileMetadata
 		, count(ftn.FileChunkId) AmountOfFailedFileChunks
+		, count(ftn.EofMessageId) AmountOfFailedEofMessages
 		from dbo.Recipient re
 		inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id  ---and fre.FolderId = @FolderId
 		left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
