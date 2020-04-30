@@ -8,7 +8,9 @@ namespace Pi.Replicate.Application.Common.Models
 {
     public class FileTransmissionModel
     {
-        public string FolderName { get; set; }
+		public Guid Id { get; set; }
+
+		public string FolderName { get; set; }
 
         public string Name { get; set; }
 

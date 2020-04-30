@@ -12,21 +12,18 @@ namespace Pi.Replicate.Domain
 
         public Guid FileId { get; private set; }
 
-        public File File { get; private set; }
-
         public int AmountOfChunks { get; private set; }
 
         public DateTime CreationTime { get; private set; }
 
-        public static EofMessage Build(File file, int amountOfChunksCreated)
-        {
-            return new EofMessage
-            {
-                Id = Guid.NewGuid(),
-                File = file,
-                FileId = file.Id,
-                AmountOfChunks = amountOfChunksCreated
-            };
-        }
-    }
+		public static EofMessage Build(Guid fileId, int amountOfChunksCreated)
+		{
+			return new EofMessage
+			{
+				Id = Guid.NewGuid(),
+				FileId = fileId,
+				AmountOfChunks = amountOfChunksCreated
+			};
+		}
+	}
 }

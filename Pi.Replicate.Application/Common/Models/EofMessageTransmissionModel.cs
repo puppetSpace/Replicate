@@ -8,6 +8,7 @@ namespace Pi.Replicate.Application.Common.Models
 {
     public class EofMessageTransmissionModel
     {
-		public int AmmountOfChunks { get; set; }
+
+		public int AmountOfChunks { get; set; }
 	}
 }

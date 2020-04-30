@@ -18,13 +18,11 @@ namespace Pi.Replicate.Application.Files.Commands.AddNewFile
     public class AddNewFileCommandHandler : IRequestHandler<AddNewFileCommand>
     {
         private readonly IDatabase _database;
-        private readonly PathBuilder _pathBuilder;
         private const string _insertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
 
-        public AddNewFileCommandHandler(IDatabase database, PathBuilder pathBuilder)
+        public AddNewFileCommandHandler(IDatabase database)
         {
             _database = database;
-            _pathBuilder = pathBuilder;
         }
 
         public async Task<Unit> Handle(AddNewFileCommand request, CancellationToken cancellationToken)

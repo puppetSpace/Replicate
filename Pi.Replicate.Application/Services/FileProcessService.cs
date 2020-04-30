@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.EofMessages.Commands.AddEofMessage;
+using Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
@@ -50,8 +50,7 @@ namespace Pi.Replicate.Application.Services
             }
 
             Log.Information($"Creating eof message for '{file.Path}'");
-            var eofMessage = EofMessage.Build(file, amountOfChunks);
-            await _mediator.Send(new AddEofMessageCommand { EofMessage = eofMessage });
+            var eofMessage = await _mediator.Send(new AddToSendEofMessageCommand { FileId = file.Id, AmountOfChunks = amountOfChunks});
 
             return eofMessage;
         }
