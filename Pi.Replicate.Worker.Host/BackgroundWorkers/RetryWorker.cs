@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.EofMessages.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.FileChunks.Queries.GetFailedTransmissions;
@@ -13,36 +14,30 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Workers
+namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-    public class RetryWorker : WorkerBase
+    public class RetryWorker : BackgroundService
     {
         private readonly int _triggerInterval;
         private readonly IMediator _mediator;
         private readonly TransmissionService _transmissionService;
 
-        public RetryWorker(IConfiguration configuration, IMediator mediator, WorkerQueueFactory workerQueueFactory, TransmissionService transmissionService)
+        public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService)
         {
             _triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
             _mediator = mediator;
             _transmissionService = transmissionService;
         }
 
-        public override Thread DoWork(CancellationToken cancellationToken)
-        {
-            var thread = new Thread(async () =>
-            {
-                await RetryFailedFiles();
-                await RetryFailedEofMessages();
-                await RetryFailedChunks();
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		{
+			await RetryFailedFiles();
+			await RetryFailedEofMessages();
+			await RetryFailedChunks();
 
-				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
-                await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
-            });
-
-            thread.Start();
-            return thread;
-        }
+			Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
+			await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+		}
 
 		private async Task RetryFailedFiles()
         {
@@ -67,5 +62,7 @@ namespace Pi.Replicate.Workers
 			foreach(var fc in failedChunks)
 				await _transmissionService.SendFileChunk(fc.FileChunk,fc.Recipient);
 		}
-    }
+
+
+	}
 }

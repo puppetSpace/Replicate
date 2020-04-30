@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Commands.UpdateFile;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
@@ -11,9 +12,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Workers
+namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	public class FileProcessWorker : WorkerBase
+	public class FileProcessWorker : BackgroundService
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly FileProcessService _fileProcessService;
@@ -29,38 +30,32 @@ namespace Pi.Replicate.Workers
 			_transmissionService = transmissionService;
 		}
 
-		public override Thread DoWork(CancellationToken cancellationToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var thread = new Thread(async () =>
+			Log.Information($"Starting {nameof(FileProcessWorker)}");
+			var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+			var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
+			var runningTasks = new List<Task>();
+			var semaphore = new SemaphoreSlim(10); //todo create setting for this
+			while (!incomingQueue.IsCompleted && !stoppingToken.IsCancellationRequested)
 			{
-				Log.Information($"Starting {nameof(FileProcessWorker)}");
-				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-				var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient,FileChunk>>(WorkerQueueType.ToSendChunks);
-				var runningTasks = new List<Task>();
-				var semaphore = new SemaphoreSlim(10); //todo create setting for this
-				while (!incomingQueue.IsCompleted && !cancellationToken.IsCancellationRequested)
+				runningTasks.RemoveAll(x => x.IsCompleted);
+				var file = incomingQueue.Take(stoppingToken);
+
+				runningTasks.Add(Task.Run(async () =>
 				{
-					runningTasks.RemoveAll(x => x.IsCompleted);
-					var file = incomingQueue.Take(cancellationToken);
+					await semaphore.WaitAsync();
+					Log.Information($"'{file.Path}' is being processed");
+					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
+					var eofMessage = await SplitFile(file, recipients, outgoingQueue);
+					await FinializeFileProcess(file, eofMessage, recipients);
 
-					runningTasks.Add(Task.Run(async () =>
-					{
-						await semaphore.WaitAsync();
-						Log.Information($"'{file.Path}' is being processed");
-						var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-						var eofMessage = await SplitFile(file,recipients, outgoingQueue);
-						await FinializeFileProcess(file, eofMessage, recipients);
-						
-						Log.Information($"'{file.Path}' is processed");
-						semaphore.Release();
-					}));
+					Log.Information($"'{file.Path}' is processed");
+					semaphore.Release();
+				}));
 
-				}
-				await Task.WhenAll(runningTasks);
-			});
-
-			thread.Start();
-			return thread;
+			}
+			await Task.WhenAll(runningTasks);
 		}
 
 		private async Task<EofMessage> SplitFile(File file,ICollection<Recipient> recipients, BlockingCollection<KeyValuePair<Recipient, FileChunk>> queue)
@@ -80,6 +75,6 @@ namespace Pi.Replicate.Workers
 				await _transmissionService.SendEofMessage(eofMessage, recipient);
 		}
 
-
+		
 	}
 }

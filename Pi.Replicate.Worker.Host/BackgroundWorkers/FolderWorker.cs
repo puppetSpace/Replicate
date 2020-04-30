@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
@@ -13,9 +14,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Workers
+namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	public class FolderWorker : WorkerBase
+	public class FolderWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
 		private readonly IMediator _mediator;
@@ -36,29 +37,23 @@ namespace Pi.Replicate.Workers
 			_fileService = fileService;
 		}
 
-		public override Thread DoWork(CancellationToken cancellationToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var workingThread = new Thread(async () =>
+			while (!stoppingToken.IsCancellationRequested)
 			{
-				while (!cancellationToken.IsCancellationRequested)
+				var folders = await _mediator.Send(new GetFoldersToCrawlQuery(), stoppingToken);
+				foreach (var folder in folders)
 				{
-					var folders = await _mediator.Send(new GetFoldersToCrawlQuery(), cancellationToken);
-					foreach (var folder in folders)
-					{
-						Log.Information($"Crawling through folder '{folder.Name}'");
-						var collector = _fileCollectorFactory.Get(folder);
-						await collector.CollectFiles();
-						await ProcessNewFiles(folder, collector.NewFiles);
-						await ProcessChangedFiles(folder, collector.ChangedFiles);
-					}
-
-					Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
-					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+					Log.Information($"Crawling through folder '{folder.Name}'");
+					var collector = _fileCollectorFactory.Get(folder);
+					await collector.CollectFiles();
+					await ProcessNewFiles(folder, collector.NewFiles);
+					await ProcessChangedFiles(folder, collector.ChangedFiles);
 				}
 
-			});
-			workingThread.Start();
-			return workingThread;
+				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+			}
 		}
 
 		private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
@@ -95,5 +90,7 @@ namespace Pi.Replicate.Workers
 				}
 			}
 		}
+
+		
 	}
 }

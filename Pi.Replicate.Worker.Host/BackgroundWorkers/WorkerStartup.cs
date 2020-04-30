@@ -9,15 +9,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Workers
+namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-    public class Startup
+    public class WorkerStartup
     {
         private readonly IDatabase _database;
 		private readonly IMediator _mediator;
 		private readonly WorkerQueueFactory _workerQueueFactory;
 
-		public Startup(IDatabase database, IMediator mediator, WorkerQueueFactory workerQueueFactory)
+		public WorkerStartup(IDatabase database, IMediator mediator, WorkerQueueFactory workerQueueFactory)
         {
             _database = database;
 			_mediator = mediator;

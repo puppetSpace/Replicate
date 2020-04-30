@@ -74,7 +74,7 @@ namespace Pi.Replicate.Application.Services
 			{
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var chunkModel = _mapper.Map<FileChunkTransmissionModel>(fileChunk);
-				await httpClient.PostAsync($"{recipient.Address}/Api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
+				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
 				await _mediator.Send(new AddTransmissionResultCommand{FileId = fileChunk.FileId, FileChunkSequenceNo = fileChunk.SequenceNo, RecipientId = recipient.Id});
 				return true;
 			}
