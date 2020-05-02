@@ -23,5 +23,7 @@ namespace Pi.Replicate.Application.Common.Models
         public DateTime LastModifiedDate { get; set; }
 
         public string Path { get; set; }
+
+		public string Host{get;set;}
     }
 }

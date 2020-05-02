@@ -12,42 +12,71 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
 {
     public class AddReceivedFolderCommand : IRequest<Guid>
     {
-		public string Name { get; set; }
+        public string Name { get; set; }
 
-		public string Sender { get; set; }
-	}
+        public string Sender { get; set; }
 
-	public class AddReceivedFolderCommandHandler : IRequestHandler<AddReceivedFolderCommand, Guid>
-	{
-		private const string _folderInsertStatement = @"INSERT INTO dbo.Folder(Id,Name) VALUES(@Id,@Name)";
-		private const string _folderIdSelectStatement = "SELECT Id FROM dbo.Folder WHERE Name = @Name";
-		private readonly IDatabase _database;
-		private readonly PathBuilder _pathBuilder;
+        public string SenderAddress { get; set; }
+    }
 
-		public AddReceivedFolderCommandHandler(IDatabase database, PathBuilder pathBuilder)
-		{
-			_database = database;
-			_pathBuilder = pathBuilder;
-		}
+    public class AddReceivedFolderCommandHandler : IRequestHandler<AddReceivedFolderCommand, Guid>
+    {
+        private const string _folderInsertStatement = @"INSERT INTO dbo.Folder(Id,Name) VALUES(@Id,@Name)";
+        private const string _folderIdSelectStatement = "SELECT Id FROM dbo.Folder WHERE Name = @Name";
+		private const string _recipientCreationStatement = @"
+			BEGIN
+				DECLARE @recipientId uniqueidentifier;
 
-		public async Task<Guid> Handle(AddReceivedFolderCommand request, CancellationToken cancellationToken)
-		{
-			using (_database)
-			{
-				var folderId = await _database.QuerySingle<Guid>(_folderIdSelectStatement, new { request.Name });
-				if (folderId == Guid.Empty)
-				{
-					folderId = Guid.NewGuid();
-					await _database.Execute(_folderInsertStatement, new { Id = folderId, request.Name });
-					var folderPath = _pathBuilder.BuildPath(request.Name);
-					if (!System.IO.Directory.Exists(folderPath))
-						System.IO.Directory.CreateDirectory(folderPath);
+				SELECT @recipientId = Id
+				FROM dbo.Recipient
+				WHERE [Address] = @Address;
 
-					//todo link sender
-				}
+				IF(@recipientId is null)
+				BEGIN
+					SET @recipientId = NEWID();
+					INSERT INTO dbo.Recipient(Id,[Name],[Address]) VALUES(@recipientId,@Name,@Address);
+				END
 
-				return folderId;
-			}
-		}
-	}
+				IF NOT EXISTS (SELECT 1 FROM dbo.FolderRecipient WHERE FolderId = @FolderId and RecipientId = @recipientId)
+					INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,@recipientId)
+			END";
+        private readonly IDatabase _database;
+        private readonly PathBuilder _pathBuilder;
+
+        public AddReceivedFolderCommandHandler(IDatabase database, PathBuilder pathBuilder)
+        {
+            _database = database;
+            _pathBuilder = pathBuilder;
+        }
+
+        public async Task<Guid> Handle(AddReceivedFolderCommand request, CancellationToken cancellationToken)
+        {
+            using (_database)
+            {
+                Guid folderId = await CreateFolderIfNotExists(request);
+                await CreateRecipientOfNotExists(request,folderId);
+                return folderId;
+            }
+        }
+
+        private async Task<Guid> CreateFolderIfNotExists(AddReceivedFolderCommand request)
+        {
+            var folderId = await _database.QuerySingle<Guid>(_folderIdSelectStatement, new { request.Name });
+            if (folderId == Guid.Empty)
+            {
+                folderId = Guid.NewGuid();
+                await _database.Execute(_folderInsertStatement, new { Id = folderId, request.Name });
+                var folderPath = _pathBuilder.BuildPath(request.Name);
+                if (!System.IO.Directory.Exists(folderPath))
+                    System.IO.Directory.CreateDirectory(folderPath);
+            }
+
+            return folderId;
+        }
+
+        private async Task CreateRecipientOfNotExists(AddReceivedFolderCommand request, Guid folderId)
+        {
+            await _database.Execute(_recipientCreationStatement,new {Address = request.SenderAddress,Name = request.Sender,FolderId = folderId});
+        }
+    }
 }

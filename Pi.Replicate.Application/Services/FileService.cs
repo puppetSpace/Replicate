@@ -39,7 +39,7 @@ namespace Pi.Replicate.Application.Services
 			{
 				var signature = _deltaService.CreateSignature(changedFile.FullName);
 				foundFile.Update(changedFile,signature);
-				await _mediator.Send(new UpdateFileCommand { File = foundFile, AlsoUpdateSignature = true });
+				await _mediator.Send(new UpdateFileCommand { File = foundFile });
 			}
 
 			return foundFile;

@@ -13,8 +13,6 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
     public class UpdateFileCommand : IRequest
     {
         public File File { get; set; }
-
-        public bool AlsoUpdateSignature { get; set; }
     }
 
     public class UpdateFileHandler : IRequestHandler<UpdateFileCommand>
@@ -32,12 +30,8 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
         {
             using (_database)
             {
-                if(request.AlsoUpdateSignature)
-                    await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size,request.File.Version,request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
-                else
-                    await _database.Execute(_updateStatement, new { request.File.Id, request.File.Size, request.File.Version, request.File.LastModifiedDate });
+                await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.Version, request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
             }
-
 
             return Unit.Value;
         }

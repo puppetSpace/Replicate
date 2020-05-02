@@ -27,10 +27,8 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
-			var hostName = Dns.GetHostEntry(Request.HttpContext.Connection.RemoteIpAddress)?.HostName;
-			var sender = string.IsNullOrWhiteSpace(hostName) ? Request.HttpContext.Connection.RemoteIpAddress.ToString() : hostName;
-
-			var folderId = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = sender });
+			
+			var folderId = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress });
 			await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderId = folderId, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Signature = model.Signature, Version = model.Version });
 			return Ok();
 		}

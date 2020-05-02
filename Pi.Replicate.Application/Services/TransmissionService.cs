@@ -36,6 +36,7 @@ namespace Pi.Replicate.Application.Services
 				var endpoint = $"{recipient.Address}/api/file";
 				var fileTransmissionModel = _mapper.Map<FileTransmissionModel>(file);
 				fileTransmissionModel.FolderName = folder.Name;
+				fileTransmissionModel.Host = Environment.MachineName;
 				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 				return true;
 			}
