@@ -46,7 +46,7 @@ namespace Pi.Replicate.Application.Services
 
             Log.Information($"Deleting temp file '{tempPath}'");
             System.IO.File.Delete(tempPath);
-			await DeleteChunks(file);
+            await DeleteChunks(file);
         }
 
         private async Task ProcessChange(File file, EofMessage eofMessage)
@@ -57,14 +57,16 @@ namespace Pi.Replicate.Application.Services
             var filePath = _pathBuilder.BuildPath(file.Path);
             if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
             {
+                Log.Information($"Applying delta to {filePath}");
                 _deltaService.ApplyDelta(filePath, System.IO.File.ReadAllBytes(filePath));
-				await DeleteChunks(file);
+                await DeleteChunks(file);
             }
             else
             {
                 Log.Warning($"File '{filePath}' does not exist or is locked for writing. unable to apply delta");
             }
-
+            Log.Information($"Deleting temp file '{tempPath}'");
+            System.IO.File.Delete(tempPath);
         }
 
         private async Task<string> BuildFile(EofMessage eofMessage)
