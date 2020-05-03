@@ -8,13 +8,13 @@ namespace Pi.Replicate.Domain
 
         public Guid FileId { get; private set; }
 
-        public double SequenceNo { get; private set; }
+        public int SequenceNo { get; private set; }
 
         public ReadOnlyMemory<byte> Value { get; private set; }
 
         public ChunkSource ChunkSource { get; private set; }
 
-        public static FileChunk Build(Guid fileId, double sequenceNo, ReadOnlyMemory<byte> value,ChunkSource chunkSource)
+        public static FileChunk Build(Guid fileId, int sequenceNo, ReadOnlyMemory<byte> value,ChunkSource chunkSource)
         {
             return new FileChunk
             {

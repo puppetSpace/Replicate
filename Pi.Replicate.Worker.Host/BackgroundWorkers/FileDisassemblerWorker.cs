@@ -14,15 +14,13 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	public class FileProcessWorker : BackgroundService
+	public class FileDisassemblerWorker : BackgroundService
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
-		private readonly FileProcessService _fileProcessService;
+		private readonly FileDisassemblerService _fileProcessService;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
-		private readonly FileService _fileService;
-
-		public FileProcessWorker(WorkerQueueFactory workerQueueFactory, FileProcessService fileProcessService, IMediator mediator, TransmissionService transmissionService)
+		public FileDisassemblerWorker(WorkerQueueFactory workerQueueFactory, FileDisassemblerService fileProcessService, IMediator mediator, TransmissionService transmissionService)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_fileProcessService = fileProcessService;
@@ -32,7 +30,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			Log.Information($"Starting {nameof(FileProcessWorker)}");
+			Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
 			var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
 			var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
 			var runningTasks = new List<Task>();

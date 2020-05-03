@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Shared;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,6 +65,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
             var folderId = await _database.QuerySingle<Guid>(_folderIdSelectStatement, new { request.Name });
             if (folderId == Guid.Empty)
             {
+				Log.Verbose($"Creating new folder {request.Name}");
                 folderId = Guid.NewGuid();
                 await _database.Execute(_folderInsertStatement, new { Id = folderId, request.Name });
                 var folderPath = _pathBuilder.BuildPath(request.Name);

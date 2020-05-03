@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-    public class FileProcessService
+    public class FileDisassemblerService
     {
         private readonly int _sizeofChunkInBytes;
         private readonly CompressionService _compressionService;
@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.Services
         private readonly DeltaService _deltaService;
         private readonly IMediator _mediator;
 
-        public FileProcessService(IConfiguration configuration
+        public FileDisassemblerService(IConfiguration configuration
             , CompressionService compressionService
             , PathBuilder pathBuilder
             , DeltaService deltaService
@@ -90,10 +90,10 @@ namespace Pi.Replicate.Application.Services
 
             Log.Information($"Splitting up delta of changed file '{file.Path}'");
             var indexOfSlice = 0;
-            double sequenceNo = file.Version;
+            int sequenceNo = 0;
             while (indexOfSlice < delta.Length)
             {
-                var fileChunk = FileChunk.Build(file.Id, sequenceNo += 0.0001, delta.Slice(indexOfSlice, deltaSizeOfChunks), ChunkSource.FromNewFile);
+                var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks), ChunkSource.FromNewFile);
                 chunkCreatedDelegate(fileChunk);
                 indexOfSlice += deltaSizeOfChunks;
                 amountOfChunks++;

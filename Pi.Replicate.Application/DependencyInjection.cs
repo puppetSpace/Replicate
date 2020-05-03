@@ -21,7 +21,7 @@ namespace Pi.Replicate.Application
             services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
             services.AddTransient<FileCollectorFactory>();
-            services.AddTransient<FileProcessService>();
+            services.AddTransient<FileDisassemblerService>();
             services.AddTransient<TransmissionService>();
             services.AddTransient<FileService>();
             services.AddTransient<DeltaService>();

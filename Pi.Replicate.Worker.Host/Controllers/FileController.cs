@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.Files.Commands.AddReceivedFile;
 using Pi.Replicate.Application.Folders.Commands.AddReceivedFolder;
+using Serilog;
 
 namespace Pi.Replicate.Worker.Host.Controllers
 {
@@ -27,8 +28,8 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
-			
-			var folderId = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress });
+			Log.Information($"File data received from {Request.HttpContext.Connection.RemoteIpAddress}");
+			var folderId = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
 			await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderId = folderId, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Signature = model.Signature, Version = model.Version });
 			return Ok();
 		}

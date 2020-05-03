@@ -50,7 +50,7 @@ GO
 create table dbo.FileChunk(
 	Id uniqueidentifier NOT NULL,
 	FileId uniqueidentifier NOT NULL,
-	SequenceNo decimal(8,4) NOT NULL,
+	SequenceNo int NOT NULL,
 	[Value] varbinary(max) NOT NULL,
 	ChunkSource int NOT NULL,
 	CONSTRAINT PK_FileChunk PRIMARY KEY(Id),
