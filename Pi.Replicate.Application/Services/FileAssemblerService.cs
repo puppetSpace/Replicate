@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MediatR;
@@ -28,10 +29,13 @@ namespace Pi.Replicate.Application.Services
 
         public async Task ProcessFile(File file, EofMessage eofMessage)
         {
-            if (file.Version == 1)
-                await ProcessNew(file, eofMessage);
-            else
-                await ProcessChange(file, eofMessage);
+			using (_database)
+			{
+				if (file.IsNew())
+					await ProcessNew(file, eofMessage);
+				else
+					await ProcessChange(file, eofMessage);
+			}
         }
 
         private async Task ProcessNew(File file, EofMessage eofMessage)
@@ -47,9 +51,11 @@ namespace Pi.Replicate.Application.Services
             Log.Information($"Deleting temp file '{tempPath}'");
             System.IO.File.Delete(tempPath);
             await DeleteChunks(file);
+
+			await MarkFileAsCompleted(file);
         }
 
-        private async Task ProcessChange(File file, EofMessage eofMessage)
+		private async Task ProcessChange(File file, EofMessage eofMessage)
         {
             Log.Information($"Building delta file for {file.Name}");
             var tempPath = await BuildFile(eofMessage);
@@ -60,7 +66,9 @@ namespace Pi.Replicate.Application.Services
                 Log.Information($"Applying delta to {filePath}");
                 _deltaService.ApplyDelta(filePath, System.IO.File.ReadAllBytes(filePath));
                 await DeleteChunks(file);
-            }
+				await MarkFileAsCompleted(file);
+
+			}
             else
             {
                 Log.Warning($"File '{filePath}' does not exist or is locked for writing. unable to apply delta");
@@ -96,5 +104,36 @@ namespace Pi.Replicate.Application.Services
             Log.Information($"Deleting chunks for {file.Path}");
             await _database.Execute("DELETE FROM dbo.FileChunk WHERE FileId = @FileId", new { FileId = file.Id });
         }
-    }
+
+		private async Task MarkFileAsCompleted(File file)
+		{
+			Log.Information($"Mark '{file.Path}' as completed");
+			await _database.Execute("UPDATE dbo.[File] SET isCompleted = 1 WHERE Id = @FileId", new { FileId = file.Id });
+		}
+	}
+
+	public class FileAssemblerServiceFactory
+	{
+		private readonly CompressionService _compressionService;
+		private readonly PathBuilder _pathBuilder;
+		private readonly DeltaService _deltaService;
+		private readonly IDatabaseFactory _databaseFactory;
+
+		public FileAssemblerServiceFactory(CompressionService compressionService
+			, PathBuilder pathBuilder
+			, DeltaService deltaService
+			, IDatabaseFactory databaseFactory)
+		{
+			_compressionService = compressionService;
+			_pathBuilder = pathBuilder;
+			_deltaService = deltaService;
+			_databaseFactory = databaseFactory;
+		}
+
+		//to make sure that every thread get's its own instance of IDatabase
+		public FileAssemblerService Get()
+		{
+			return new FileAssemblerService(_compressionService, _pathBuilder, _deltaService, _databaseFactory.Get());
+		}
+	}
 }

@@ -9,10 +9,8 @@ namespace Pi.Replicate.Application.Common.Models
 {
     public class FileChunkTransmissionModel
     {
-		public double SequenceNo { get; set; }
+		public int SequenceNo { get; set; }
 
 		public byte[] Value { get; set; }
-
-		public ChunkSource ChunkSource { get; set; }
 	}
 }

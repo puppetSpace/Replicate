@@ -57,7 +57,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 				System.IO.Directory.CreateDirectory(path);
 
 
-			await _broker.Publish(folder);
+			_broker.Publish(folder).Forget();
 			return Unit.Value;
 		}
 	}

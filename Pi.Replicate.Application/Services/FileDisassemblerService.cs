@@ -68,7 +68,7 @@ namespace Pi.Replicate.Application.Services
             {
                 while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
                 {
-                    var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory, ChunkSource.FromNewFile);
+                    var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory);
                     chunkCreatedDelegate(fileChunk);
                 }
             }
@@ -93,7 +93,7 @@ namespace Pi.Replicate.Application.Services
             int sequenceNo = 0;
             while (indexOfSlice < delta.Length)
             {
-                var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks), ChunkSource.FromNewFile);
+                var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
                 chunkCreatedDelegate(fileChunk);
                 indexOfSlice += deltaSizeOfChunks;
                 amountOfChunks++;

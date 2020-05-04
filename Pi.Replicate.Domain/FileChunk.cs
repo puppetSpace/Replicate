@@ -12,9 +12,8 @@ namespace Pi.Replicate.Domain
 
         public ReadOnlyMemory<byte> Value { get; private set; }
 
-        public ChunkSource ChunkSource { get; private set; }
 
-        public static FileChunk Build(Guid fileId, int sequenceNo, ReadOnlyMemory<byte> value,ChunkSource chunkSource)
+        public static FileChunk Build(Guid fileId, int sequenceNo, ReadOnlyMemory<byte> value)
         {
             return new FileChunk
             {
@@ -22,15 +21,7 @@ namespace Pi.Replicate.Domain
                 FileId = fileId,
                 SequenceNo = sequenceNo,
                 Value = value,
-                ChunkSource = chunkSource
             };
         }
     }
-
-    public enum ChunkSource
-    {
-        FromNewFile = 0,
-        FromChangedFile = 1
-    }
-
 }

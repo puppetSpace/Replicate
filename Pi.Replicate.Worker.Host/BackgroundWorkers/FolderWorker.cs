@@ -30,7 +30,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			, WorkerQueueFactory workerQueueFactory
 			, FileService fileService)
 		{
-			_triggerInterval = int.TryParse(configuration[Constants.FolderCrawlTriggerInterval], out int interval) ? interval : 10;
+			_triggerInterval = int.Parse(configuration[Constants.FolderCrawlTriggerInterval]);
 			_mediator = mediator;
 			_fileCollectorFactory = fileCollectorFactory;
 			_workerQueueFactory = workerQueueFactory;

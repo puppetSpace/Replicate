@@ -32,6 +32,7 @@ create table dbo.[File](
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
 	[Source] int NOT NULL,
+	IsCompleted bit NOT NULL
 	CONSTRAINT PK_File PRIMARY KEY(Id),
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
 );
@@ -49,12 +50,10 @@ GO
 
 create table dbo.FileChunk(
 	Id uniqueidentifier NOT NULL,
-	FileId uniqueidentifier NOT NULL,
+	FileId uniqueidentifier NOT NULL,--no foreign key. Could be that chunks are coming in without the file data being present
 	SequenceNo int NOT NULL,
 	[Value] varbinary(max) NOT NULL,
-	ChunkSource int NOT NULL,
-	CONSTRAINT PK_FileChunk PRIMARY KEY(Id),
-	CONSTRAINT FK_FileChunk_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id)
+	CONSTRAINT PK_FileChunk PRIMARY KEY(Id)
 );
 GO
 
@@ -75,11 +74,10 @@ GO
 
 create table dbo.TransmissionResult(
 	RecipientId uniqueidentifier NOT NULL,
-	FileId uniqueIdentifier NOT NULL,
+	FileId uniqueIdentifier NOT NULL, --no foreign key. Could be that transmissionresult is coming in without the file data being present
 	FileChunkSequenceNo decimal(8,4) NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileId),
-	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
@@ -96,6 +94,7 @@ GO
 
 insert into dbo.SystemSetting VALUES(NEWID(),'ReplicateBasePath','D:\Temp');
 insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10');
+insert into dbo.SystemSetting VALUES(NEWID(),'FileAssemblyTriggerInterval','10');
 insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10');
 insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000');
 

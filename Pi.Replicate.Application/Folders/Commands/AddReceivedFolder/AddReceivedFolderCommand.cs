@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Observr;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
@@ -43,12 +45,14 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
 			END";
         private readonly IDatabase _database;
         private readonly PathBuilder _pathBuilder;
+		private readonly IBroker _broker;
 
-        public AddReceivedFolderCommandHandler(IDatabase database, PathBuilder pathBuilder)
+		public AddReceivedFolderCommandHandler(IDatabase database, PathBuilder pathBuilder, IBroker broker)
         {
             _database = database;
             _pathBuilder = pathBuilder;
-        }
+			_broker = broker;
+		}
 
         public async Task<Guid> Handle(AddReceivedFolderCommand request, CancellationToken cancellationToken)
         {
@@ -71,6 +75,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
                 var folderPath = _pathBuilder.BuildPath(request.Name);
                 if (!System.IO.Directory.Exists(folderPath))
                     System.IO.Directory.CreateDirectory(folderPath);
+				_broker.Publish(new Folder { Id = folderId, Name = request.Name }).Forget();
             }
 
             return folderId;

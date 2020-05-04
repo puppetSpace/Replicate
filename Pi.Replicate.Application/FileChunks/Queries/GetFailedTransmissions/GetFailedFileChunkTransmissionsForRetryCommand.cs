@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.FileChunks.Queries.GetFailedTransmissions
 	public class GetFailedFileChunkTransmissionsForRetryCommandHandler : IRequestHandler<GetFailedFileChunkTransmissionsForRetryCommand, ICollection<FailedFileChunk>>
 	{
 		private readonly IDatabase _database;
-		private const string _selectStatement = @"SELECT fc.Id,fc.FileId,fc.SequenceNo, fc.Value, fc.ChunkSource
+		private const string _selectStatement = @"SELECT fc.Id,fc.FileId,fc.SequenceNo, fc.Value
 												  , re.Id, re.Name, re.Address
 				FROM dbo.FileChunk fc
 				INNER JOIN dbo.FailedTransmission ftn on ftn.FileChunkId = fc.Id

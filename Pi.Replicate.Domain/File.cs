@@ -26,10 +26,7 @@ namespace Pi.Replicate.Domain
 
         public string Path { get; private set; }
 
-		public bool IsNew()
-		{
-			return Version == 1;
-		}
+		public bool IsNew() => Version == 1;
 
         public void Update(System.IO.FileInfo file, ReadOnlyMemory<byte> signature)
         {
