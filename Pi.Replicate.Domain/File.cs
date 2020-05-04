@@ -16,11 +16,6 @@ namespace Pi.Replicate.Domain
 
 		public long Size { get; private set; }
 
-		//only get this property when needed. Move to something different
-        public ReadOnlyMemory<byte> Signature { get; private set; }
-
-        public ReadOnlyMemory<byte> PreviousSignature { get; private set; }
-
 		public FileSource Source { get; private set; }
 
         public DateTime LastModifiedDate { get; private set; }
@@ -29,16 +24,15 @@ namespace Pi.Replicate.Domain
 
 		public bool IsNew() => Version == 1;
 
-        public void Update(System.IO.FileInfo file, ReadOnlyMemory<byte> signature)
+        public void Update(System.IO.FileInfo file)
         {
             LastModifiedDate = file.LastWriteTimeUtc;
             Size = file.Length;
 			Version++;
-			PreviousSignature = Signature;
-			Signature = signature;
+
         }
 
-        public static File Build(System.IO.FileInfo file, Guid folderId, string basePath, ReadOnlyMemory<byte> signature, DateTime? customLastModified = null)
+        public static File Build(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
         {
             if (file is null || !file.Exists)
                 throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
@@ -52,7 +46,6 @@ namespace Pi.Replicate.Domain
 				Path = file.FullName.Replace(basePath + "\\", ""), //must be relative to base
 				Size = file.Length,
 				Source = FileSource.Local,
-				Signature = signature,
 				Version = 1
 				
             };

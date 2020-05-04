@@ -15,8 +15,6 @@ namespace Pi.Replicate.Application.Files.Models
 
         public int Version { get; set; }
 
-        public byte[] Signature { get; set; }
-
         public FileSource Source { get; set; }
 
         public DateTime LastModifiedDate { get; set; }

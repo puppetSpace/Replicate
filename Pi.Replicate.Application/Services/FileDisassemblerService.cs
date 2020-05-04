@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage;
+using Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
+	//todo errorhandling
     public class FileDisassemblerService
     {
         private readonly int _sizeofChunkInBytes;
@@ -42,7 +44,7 @@ namespace Pi.Replicate.Application.Services
                 if (file.IsNew())
                     amountOfChunks = await ProcessNewFile(file, path, chunkCreatedDelegate);
                 else
-                    amountOfChunks = ProcessChangedFile(file, path, chunkCreatedDelegate);
+                    amountOfChunks = await ProcessChangedFile(file, path, chunkCreatedDelegate);
             }
             else
             {
@@ -80,24 +82,30 @@ namespace Pi.Replicate.Application.Services
             return sequenceNo;
         }
 
-        private int ProcessChangedFile(File file, string path, Action<FileChunk> chunkCreatedDelegate)
+        private async Task<int> ProcessChangedFile(File file, string path, Action<FileChunk> chunkCreatedDelegate)
         {
             int amountOfChunks = 0;
-            Log.Information($"Creating delta of changed file '{file.Path}'");
 
-            var delta = _deltaService.CreateDelta(path, file.Signature);
-            var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
+			var previousSignature = await _mediator.Send(new GetPreviousSignatureOfFileQuery() { FileId = file.Id });
 
-            Log.Information($"Splitting up delta of changed file '{file.Path}'");
-            var indexOfSlice = 0;
-            int sequenceNo = 0;
-            while (indexOfSlice < delta.Length)
-            {
-                var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
-                chunkCreatedDelegate(fileChunk);
-                indexOfSlice += deltaSizeOfChunks;
-                amountOfChunks++;
-            }
+			if (!previousSignature.IsEmpty)
+			{
+
+				Log.Information($"Creating delta of changed file '{file.Path}'");
+				var delta = _deltaService.CreateDelta(path, previousSignature);
+				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
+
+				Log.Information($"Splitting up delta of changed file '{file.Path}'");
+				var indexOfSlice = 0;
+				int sequenceNo = 0;
+				while (indexOfSlice < delta.Length)
+				{
+					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
+					chunkCreatedDelegate(fileChunk);
+					indexOfSlice += deltaSizeOfChunks;
+					amountOfChunks++;
+				}
+			}
             return amountOfChunks;
         }
     }

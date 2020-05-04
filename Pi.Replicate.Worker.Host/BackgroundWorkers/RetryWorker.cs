@@ -5,6 +5,7 @@ using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.EofMessages.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.FileChunks.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.Files.Queries.GetFailedTransmissions;
+using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -44,7 +45,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			Log.Information($"Retrying to send files that have failed");
 			var failedFiles = await _mediator.Send(new GetFailedFileTransmissionsForRetryCommand());
 			foreach (var ff in failedFiles)
-				await _transmissionService.SendFile(ff.Folder, ff.File, ff.Recipient);
+			{
+				var signature = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
+				await _transmissionService.SendFile(ff.Folder, ff.File, signature, ff.Recipient);
+			}
 		}
 
 		private async Task RetryFailedEofMessages()

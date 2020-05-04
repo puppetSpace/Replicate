@@ -26,8 +26,8 @@ namespace Pi.Replicate.Application.Services
 		public async Task<File> CreateNewFile(Folder folder, System.IO.FileInfo newFile)
 		{
 			var signature = _deltaService.CreateSignature(newFile.FullName);
-			var file = File.Build(newFile, folder.Id, _pathBuilder.BasePath, signature);
-			await _mediator.Send(new AddNewFileCommand { File = file });
+			var file = File.Build(newFile, folder.Id, _pathBuilder.BasePath);
+			await _mediator.Send(new AddNewFileCommand { File = file, Signature = signature });
 			return file;
 		}
 
@@ -38,8 +38,8 @@ namespace Pi.Replicate.Application.Services
 			if (foundFile is object)
 			{
 				var signature = _deltaService.CreateSignature(changedFile.FullName);
-				foundFile.Update(changedFile,signature);
-				await _mediator.Send(new UpdateFileCommand { File = foundFile });
+				foundFile.Update(changedFile);
+				await _mediator.Send(new UpdateFileCommand { File = foundFile, Signature = signature });
 			}
 
 			return foundFile;

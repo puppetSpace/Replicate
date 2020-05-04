@@ -48,7 +48,7 @@ namespace Pi.Replicate.Test.Processors
 				.Returns(Unit.Task);
 
 			var processService = new FileDisassemblerService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), mockMediator.Object);
-            await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
+            await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
             Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
 
@@ -83,7 +83,7 @@ namespace Pi.Replicate.Test.Processors
                 .Returns(Unit.Task);
 
             var processService = new FileDisassemblerService(configurationMock.Object, new CompressionService(), pathBuilder, new DeltaService(), mockMediator.Object);
-            await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath, ReadOnlyMemory<byte>.Empty), chunkCreated);
+            await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 
             Assert.AreEqual(0, amountOfCalls);

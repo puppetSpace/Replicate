@@ -43,12 +43,12 @@ namespace Pi.Replicate.Worker.Host
 
 			services.AddControllers();
 
-			//services.AddHostedService<FolderWorker>();
-			//services.AddHostedService<FileExportWorker>();
-			//services.AddHostedService<FileDisassemblerWorker>();
-			//services.AddHostedService<ChunkExportWorker>();
+			services.AddHostedService<FolderWorker>();
+			services.AddHostedService<FileExportWorker>();
+			services.AddHostedService<FileDisassemblerWorker>();
+			services.AddHostedService<ChunkExportWorker>();
 			services.AddHostedService<FileAssemblerWorker>();
-			//services.AddHostedService<RetryWorker>();
+			services.AddHostedService<RetryWorker>();
 
 		}
 

@@ -26,7 +26,7 @@ namespace Pi.Replicate.Application.Services
 			_mediator = mediator;
 		}
 
-		public async Task<bool> SendFile(Folder folder,File file, Recipient recipient)
+		public async Task<bool> SendFile(Folder folder,File file, ReadOnlyMemory<byte> signature, Recipient recipient)
 		{
 			try
 			{
@@ -36,6 +36,7 @@ namespace Pi.Replicate.Application.Services
 				var endpoint = $"{recipient.Address}/api/file";
 				var fileTransmissionModel = _mapper.Map<FileTransmissionModel>(file);
 				fileTransmissionModel.FolderName = folder.Name;
+				fileTransmissionModel.Signature = signature.ToArray();
 				fileTransmissionModel.Host = Environment.MachineName;
 				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 				return true;

@@ -15,7 +15,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFailedTransmissions
 	public class GetFailedFileTransmissionsForRetryCommandHandler : IRequestHandler<GetFailedFileTransmissionsForRetryCommand, ICollection<FailedFile>>
 	{
 		private readonly IDatabase _database;
-		private const string _selectStatement = @"SELECT fi.Id, fi.FolderId, fi.Version, fi.LastModifiedDate, fi.Name, fi.Path, fi.Signature, fi.Size, fi.Source 
+		private const string _selectStatement = @"SELECT fi.Id, fi.FolderId, fi.Version, fi.LastModifiedDate, fi.Name, fi.Path, fi.Size, fi.Source 
 												,fo.Id, fo.Name
 												,re.Id, re.Name, re.Address
 					FROM dbo.[File] fi

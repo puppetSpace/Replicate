@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
@@ -34,9 +35,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					var file = incomingQueue.Take(); //since no task has been awaited, this blocks the main thread. So run inside of task
 					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
 					var folder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
+					var signature = await _mediator.Send(new GetSignatureOfFileQuery { FileId = file.Id });
 					foreach (var recipient in recipients)
 					{
-						await _communicationService.SendFile(folder, file, recipient);
+						await _communicationService.SendFile(folder, file, signature, recipient);
 						outgoingQueue.Add(file);
 					}
 				}

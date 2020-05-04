@@ -19,7 +19,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetLatestVersionOfFile
     {
         private readonly IDatabase _database;
         private readonly IMapper _mapper;
-        private const string _selectStatement = "SELECT TOP 1 Id, FolderId,Version, LastModifiedDate, Name,Path, Signature,Size,Source FROM dbo.[File] WHERE FolderId = @FolderId and Path = @Path order by Version desc";
+        private const string _selectStatement = "SELECT TOP 1 Id, FolderId,Version, LastModifiedDate, Name,Path,Size,Source FROM dbo.[File] WHERE FolderId = @FolderId and Path = @Path order by Version desc";
 
         public GetLatestVersionOfFileQueryHandler(IDatabase database, IMapper mapper)
         {

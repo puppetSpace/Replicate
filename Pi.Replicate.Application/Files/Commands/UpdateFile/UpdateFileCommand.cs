@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Commands.UpdateFile
 {
-    public class UpdateFileCommand : IRequest
-    {
-        public File File { get; set; }
+	public class UpdateFileCommand : IRequest
+	{
+		public File File { get; set; }
+
+		public ReadOnlyMemory<byte> Signature {get;set;}
     }
 
     public class UpdateFileHandler : IRequestHandler<UpdateFileCommand>
@@ -30,7 +32,7 @@ namespace Pi.Replicate.Application.Files.Commands.UpdateFile
         {
             using (_database)
             {
-                await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.Version, request.File.LastModifiedDate, Signature = request.File.Signature.ToArray() });
+                await _database.Execute(_updateStatementWithSignature, new { request.File.Id, request.File.Size, request.File.Version, request.File.LastModifiedDate, Signature = request.Signature.ToArray() });
             }
 
             return Unit.Value;

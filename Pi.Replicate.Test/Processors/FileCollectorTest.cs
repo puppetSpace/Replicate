@@ -69,8 +69,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath)
             };
 
             var mockMediator = new Mock<IMediator>();
@@ -95,8 +95,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now)
             };
 
             var mockMediator = new Mock<IMediator>();
@@ -120,8 +120,8 @@ namespace Pi.Replicate.Test.Processors
             var pathBuilder = new PathBuilder(configurationMock.Object);
             ICollection<File> existingFiles = new List<File>
             {
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty),
-                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,ReadOnlyMemory<byte>.Empty,DateTime.Now)
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,pathBuilder.BasePath),
+                File.Build(new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,pathBuilder.BasePath,DateTime.Now)
             };
 
             existingFiles.Last();
