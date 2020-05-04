@@ -41,7 +41,7 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 															END";
 		private const string _insertStatementFileChunk = @"IF NOT EXISTS(SELECT 1 FROM dbo.FileChunk WHERE Id = @Id)
 															BEGIN
-																INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value,ChunkSource) VALUES(@Id,@FileId,@SequenceNo,@Value, @ChunkSource)
+																INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value) VALUES(@Id,@FileId,@SequenceNo,@Value)
 															END";
 
 		public AddFailedTransmissionCommandHandler(IDatabase database)
@@ -81,7 +81,7 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 				string fileId = null;
 				string eofMessageId = null;
 
-				await _database.Execute(_insertStatementFileChunk, new { request.FileChunk.Id, request.FileChunk.FileId, request.FileChunk.SequenceNo, Value = request.FileChunk.Value.ToArray(), request.FileChunk.ChunkSource });
+				await _database.Execute(_insertStatementFileChunk, new { request.FileChunk.Id, request.FileChunk.FileId, request.FileChunk.SequenceNo, Value = request.FileChunk.Value.ToArray()});
 				await _database.Execute(_insertStatement, new { Id = Guid.NewGuid(), request.RecipientId, FileChunkId = request.FileChunk.Id, FileId = fileId, EofMessageId = eofMessageId });
 			}
 

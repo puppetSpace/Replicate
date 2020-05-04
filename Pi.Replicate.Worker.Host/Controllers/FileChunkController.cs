@@ -21,7 +21,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		}
 
 		[HttpPost("api/file/{fileId}/chunk")]
-		public async Task<IActionResult> Post([FromQuery] Guid fileId, [FromBody] FileChunkTransmissionModel model)
+		public async Task<IActionResult> Post(Guid fileId, [FromBody] FileChunkTransmissionModel model)
 		{
 			await _mediator.Send(new AddReceivedFileChunkCommand { FileId = fileId, SequenceNo = model.SequenceNo, Value = model.Value });
 			return Ok();

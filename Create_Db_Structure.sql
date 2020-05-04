@@ -32,7 +32,7 @@ create table dbo.[File](
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
 	[Source] int NOT NULL,
-	IsReceived bit NOT NULL
+	IsReceived bit NOT NULL DEFAULT 0
 	CONSTRAINT PK_File PRIMARY KEY(Id),
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
 );
@@ -73,11 +73,12 @@ create table dbo.FailedTransmission(
 GO
 
 create table dbo.TransmissionResult(
+	Id uniqueidentifier NOT NULL,
 	RecipientId uniqueidentifier NOT NULL,
 	FileId uniqueIdentifier NOT NULL,
 	FileChunkSequenceNo decimal(8,4) NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
-	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileId),
+	CONSTRAINT PK_TransmissionResult PRIMARY KEY(Id),
 	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );

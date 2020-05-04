@@ -24,7 +24,9 @@ namespace Pi.Replicate.Worker.Host
 			.WriteTo.Debug()
 			.WriteTo.Console()
 			.CreateLogger();
-			CreateHostBuilder(args).Build().Run();
+
+
+			CreateHostBuilder(args).Build().CleanUp().Run();
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>

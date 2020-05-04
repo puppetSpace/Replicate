@@ -86,10 +86,10 @@ namespace Pi.Replicate.Application.Services
 
             var toTake = 10;
             var toSkip = 0;
-            while (toTake < eofMessage.AmountOfChunks)
+            while (toSkip < eofMessage.AmountOfChunks)
             {
                 //best way is to get the chunks in chunks. If a file exists out of 1000 * 1Mb files and load that into memory, you are gonna have a bad time
-                var chunks = await db.Query<byte[]>("SELECT [Value] FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @toSkip and @ToTake", new { FileId = eofMessage.FileId, ToSkip = toSkip, ToTake = toTake });
+                var chunks = await db.Query<byte[]>("SELECT [Value] FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @toSkip and @ToTake ORDER BY SEQUENCENO", new { FileId = eofMessage.FileId, ToSkip = toSkip, ToTake = toTake });
                 foreach (var chunk in chunks)
                     await sw.WriteAsync(chunk, 0, chunk.Length);
                 toSkip = toTake;

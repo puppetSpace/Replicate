@@ -21,12 +21,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
-			while (!queue.IsCompleted || !stoppingToken.IsCancellationRequested)
+			await Task.Run(async () =>
 			{
-				var chunkPackage = queue.Take();
-				await _transmissionService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
-			}
+				var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
+				while (!queue.IsCompleted || !stoppingToken.IsCancellationRequested)
+				{
+					var chunkPackage = queue.Take();
+					await _transmissionService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
+				}
+			});
 
 		}
 	}

@@ -33,19 +33,19 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				var completedFiles = await _mediator.Send(new GetCompletedFilesQuery());
 				var newFiles = completedFiles.Where(x => x.File.IsNew());
 				var changedFiles = completedFiles.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
-				await AssembleNewFiles(changedFiles);
+				await AssembleNewFiles(newFiles);
 				await ApplyChangedToExistingFiles(changedFiles);
 
 				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 			}
 		}
 
-		private async Task AssembleNewFiles(IOrderedEnumerable<CompletedFileDto> changedFiles)
+		private async Task AssembleNewFiles(IEnumerable<CompletedFileDto> newFiles)
 		{
 			var runningTasks = new List<Task>();
 			var semaphore = new SemaphoreSlim(10); //todo create setting for this
 
-			foreach (var completedFile in changedFiles)
+			foreach (var completedFile in newFiles)
 			{
 				runningTasks.Add(Task.Run(async () =>
 				{
@@ -58,7 +58,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			runningTasks.Clear();
 		}
 
-		private async Task ApplyChangedToExistingFiles(IOrderedEnumerable<CompletedFileDto> changedFiles)
+		private async Task ApplyChangedToExistingFiles(IEnumerable<CompletedFileDto> changedFiles)
 		{
 			foreach (var changedFile in changedFiles)
 			{

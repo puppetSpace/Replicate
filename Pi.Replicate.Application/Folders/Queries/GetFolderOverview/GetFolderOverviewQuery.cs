@@ -21,7 +21,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 		as
 		(SELECT TOP 1 Id, FolderId,[Version], LastModifiedDate, [Name],[Path], [Signature],Size,Source 
 		FROM dbo.[File] 
-		WHERE FolderId = @FolderId and [Path] = @Path 
+		WHERE FolderId = @FolderId
 		ORDER BY [Version] desc)
 		select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForUpload, count(emer.FileId) AmountOfFilesProcessedForDownload
 			from dbo.Folder fo
@@ -40,7 +40,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 		, count(ftn.FileChunkId) AmountOfFailedFileChunks
 		, count(ftn.EofMessageId) AmountOfFailedEofMessages
 		from dbo.Recipient re
-		inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id  ---and fre.FolderId = @FolderId
+		inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id and fre.FolderId = @FolderId
 		left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
 		left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id
 		left join dbo.[File] fir on fir.FolderId = fre.FolderId and fir.Source = 1

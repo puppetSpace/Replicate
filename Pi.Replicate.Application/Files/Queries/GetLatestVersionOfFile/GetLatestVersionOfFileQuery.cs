@@ -30,7 +30,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetLatestVersionOfFile
         {
             using (_database)
             {
-                var result = await _database.QuerySingle<FileDto>(_selectStatement,new{request.FolderId,request.Path});
+                var result = await _database.QuerySingle<FileDao>(_selectStatement,new{request.FolderId,request.Path});
                 return _mapper.Map<File>(result);
             }
         }

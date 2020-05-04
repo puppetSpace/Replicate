@@ -16,6 +16,7 @@ namespace Pi.Replicate.Domain
 
 		public long Size { get; private set; }
 
+		//only get this property when needed. Move to something different
         public ReadOnlyMemory<byte> Signature { get; private set; }
 
         public ReadOnlyMemory<byte> PreviousSignature { get; private set; }

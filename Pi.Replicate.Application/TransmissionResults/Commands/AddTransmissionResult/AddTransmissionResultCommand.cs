@@ -19,7 +19,7 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
     public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(RecipientId, FileId,FileChunkSequenceNo) VALUES(@RecipientId,@FileId, @FileChunkSequenceNo)";
+        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo) VALUES(@Id,@RecipientId,@FileId, @FileChunkSequenceNo)";
 
         public AddTransmissionResultCommandHandler(IDatabase database)
         {
@@ -29,7 +29,7 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
         {
             using (_database)
             {
-                await _database.Execute(_insertStatement, new { request.RecipientId,request.FileId,request.FileChunkSequenceNo });
+                await _database.Execute(_insertStatement, new {Id=  Guid.NewGuid(), request.RecipientId,request.FileId,request.FileChunkSequenceNo });
             }
 
 			return Unit.Value;

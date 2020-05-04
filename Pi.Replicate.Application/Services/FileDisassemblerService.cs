@@ -68,7 +68,7 @@ namespace Pi.Replicate.Application.Services
             {
                 while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
                 {
-                    var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory);
+                    var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory.ToArray());
                     chunkCreatedDelegate(fileChunk);
                 }
             }

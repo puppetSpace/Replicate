@@ -48,7 +48,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
         {
             using (_database)
             {
-                var result = await _database.Query<FileDto>(_selectStatement, new { request.FolderId });
+                var result = await _database.Query<FileDao>(_selectStatement, new { request.FolderId });
                 return _mapper.Map<ICollection<File>>(result);
             }
         }

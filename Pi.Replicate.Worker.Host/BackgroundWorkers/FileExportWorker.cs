@@ -25,19 +25,22 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
-			var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-			while (!incomingQueue.IsCompleted || !stoppingToken.IsCancellationRequested)
+			await Task.Run(async () =>
 			{
-				var file = incomingQueue.Take();
-				var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-				var folder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
-				foreach (var recipient in recipients)
+				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
+				while (!incomingQueue.IsCompleted || !stoppingToken.IsCancellationRequested)
 				{
-					await _communicationService.SendFile(folder, file, recipient);
-					outgoingQueue.Add(file);
+					var file = incomingQueue.Take(); //since no task has been awaited, this blocks the main thread. So run inside of task
+					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
+					var folder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
+					foreach (var recipient in recipients)
+					{
+						await _communicationService.SendFile(folder, file, recipient);
+						outgoingQueue.Add(file);
+					}
 				}
-			}
+			});
 		}
 	}
 }

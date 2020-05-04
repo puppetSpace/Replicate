@@ -16,18 +16,18 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-    public class RetryWorker : BackgroundService
-    {
-        private readonly int _triggerInterval;
-        private readonly IMediator _mediator;
-        private readonly TransmissionService _transmissionService;
+	public class RetryWorker : BackgroundService
+	{
+		private readonly int _triggerInterval;
+		private readonly IMediator _mediator;
+		private readonly TransmissionService _transmissionService;
 
-        public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService)
-        {
-            _triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
-            _mediator = mediator;
-            _transmissionService = transmissionService;
-        }
+		public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService)
+		{
+			_triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
+			_mediator = mediator;
+			_transmissionService = transmissionService;
+		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
@@ -40,12 +40,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		}
 
 		private async Task RetryFailedFiles()
-        {
-            Log.Information($"Retrying to send files that have failed");
-            var failedFiles = await _mediator.Send(new GetFailedFileTransmissionsForRetryCommand());
-            foreach (var ff in failedFiles)
-                await _transmissionService.SendFile(ff.Folder, ff.File, ff.Recipient);
-        }
+		{
+			Log.Information($"Retrying to send files that have failed");
+			var failedFiles = await _mediator.Send(new GetFailedFileTransmissionsForRetryCommand());
+			foreach (var ff in failedFiles)
+				await _transmissionService.SendFile(ff.Folder, ff.File, ff.Recipient);
+		}
 
 		private async Task RetryFailedEofMessages()
 		{
@@ -56,11 +56,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		}
 
 		private async Task RetryFailedChunks()
-        {
+		{
 			Log.Information($"Retrying to send filechunks that have failed");
 			var failedChunks = await _mediator.Send(new GetFailedFileChunkTransmissionsForRetryCommand());
-			foreach(var fc in failedChunks)
-				await _transmissionService.SendFileChunk(fc.FileChunk,fc.Recipient);
+			foreach (var fc in failedChunks)
+				await _transmissionService.SendFileChunk(fc.FileChunk, fc.Recipient);
 		}
 
 

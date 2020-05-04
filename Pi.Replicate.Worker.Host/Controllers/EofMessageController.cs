@@ -19,7 +19,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		}
 
 		[HttpPost("api/file/{fileId}/eot")]
-		public async Task<IActionResult> Post([FromQuery] Guid fileId, [FromBody] EofMessageTransmissionModel model)
+		public async Task<IActionResult> Post(Guid fileId, [FromBody] EofMessageTransmissionModel model)
 		{
 			Log.Information($"Eof message received from {Request.HttpContext.Connection.RemoteIpAddress}");
 			await _mediator.Send(new AddReceivedEofMessageCommand { FileId = fileId, AmountOfChunks = model.AmountOfChunks });

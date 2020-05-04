@@ -23,7 +23,7 @@ namespace Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk
 	{
 		private readonly IDatabase _database;
 		private const string _insertStatement = @"
-	IF NOT EXISTS (SELECT 1 FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo = @SequenceNo))
+	IF NOT EXISTS (SELECT 1 FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo = @SequenceNo)
 		INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,[Value]) VALUES(@Id,@FileId,@SequenceNo,@Value)
 ";
 

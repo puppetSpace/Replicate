@@ -31,17 +31,17 @@ namespace Pi.Replicate.Application.Files.Processing
 		{
 			var filesFromSystem=  GetFilesFromSystem();
 			var filesInDb = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
-			Log.Information($"{filesInDb?.Count} files already processed for folder '{_folder.Name}'.");
+			Log.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
 			
 			NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 			Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
 			ChangedFiles = filesFromSystem
 					.Where(x => filesInDb
-						.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc != y.LastModifiedDate))
+						.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
 					.ToList();
 
-			Log.Information($"{ChangedFiles.Count} changed files found in folder '{_folder.Name}'");
+			Log.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
 		}
 
 		private IList<System.IO.FileInfo> GetFilesFromSystem()

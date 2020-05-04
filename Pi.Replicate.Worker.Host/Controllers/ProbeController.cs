@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Pi.Replicate.Worker.Host.Controllers
 {
 	[ApiController]
-	[Route("[controller]")]
+	[Route("api/[controller]")]
     public class ProbeController : ControllerBase
     {
         public IActionResult Get()

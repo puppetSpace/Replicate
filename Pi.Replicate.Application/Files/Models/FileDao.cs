@@ -3,7 +3,7 @@ using Pi.Replicate.Domain;
 
 namespace Pi.Replicate.Application.Files.Models
 {
-    public class FileDto
+    public class FileDao
     {
         public Guid Id { get; set; }
 

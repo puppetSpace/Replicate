@@ -19,8 +19,8 @@ namespace Pi.Replicate.Application.Common
 				.ForMember(x=>x.Signature,opt=> opt.MapFrom((x,y)=> x.Signature.ToArray()));
 			CreateMap<Domain.FileChunk, FileChunkTransmissionModel>()
 	.ForMember(x => x.Value, opt => opt.MapFrom((x, y) => x.Value.ToArray()));
-			CreateMap<FileDto, Domain.File>()
-                .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory()));
+			CreateMap<FileDao, Domain.File>()
+                .ForMember(x => x.Signature, opt => opt.MapFrom((x, y) => x.Signature.AsMemory())).ReverseMap();
 			CreateMap<Domain.EofMessage, EofMessageTransmissionModel>();
         }
     }

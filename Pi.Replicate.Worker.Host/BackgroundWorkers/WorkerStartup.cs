@@ -1,35 +1,38 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Domain;
 using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Worker.Host.BackgroundWorkers
+namespace Pi.Replicate.Worker.Host
 {
-    public class WorkerStartup
-    {
-        private readonly IDatabase _database;
-		private readonly IMediator _mediator;
-		private readonly WorkerQueueFactory _workerQueueFactory;
+	
 
-		public WorkerStartup(IDatabase database, IMediator mediator, WorkerQueueFactory workerQueueFactory)
-        {
-            _database = database;
-			_mediator = mediator;
-			_workerQueueFactory = workerQueueFactory;
+	public static class WorkerStatupExtension
+	{
+		public static IHost CleanUp(this IHost host)
+		{
+			var database = (IDatabase)host.Services.GetService(typeof(IDatabase));
+			var startup = new WorkerStartup(database);
+			startup.Initialize().GetAwaiter().GetResult();
+			return host;
 		}
-        public async Task Initialize()
-        {
-            using (_database)
-            {
-				Log.Information("Deleting unprocessed files from database");
-                await _database.Execute("DELETE FROM dbo.[File] where Source = 0 and Id not in (select fileId from dbo.TransmissionResult)", null);
-            }            
-        }
-    }
+
+		private class WorkerStartup
+		{
+			private readonly IDatabase _database;
+
+			public WorkerStartup(IDatabase database)
+			{
+				_database = database;
+			}
+			public async Task Initialize()
+			{
+				using (_database)
+				{
+					Log.Information("Deleting unprocessed files from database");
+					await _database.Execute("DELETE FROM dbo.[File] where Source = 0 and Id not in (select fileId from dbo.TransmissionResult)", null);
+				}
+			}
+		}
+	}
 }

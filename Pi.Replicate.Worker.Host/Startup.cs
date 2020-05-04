@@ -11,8 +11,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Observr;
 using Pi.Replicate.Application;
 using Pi.Replicate.Data;
+using Pi.Replicate.Worker.Host.BackgroundWorkers;
 using Polly;
 
 namespace Pi.Replicate.Worker.Host
@@ -32,6 +34,7 @@ namespace Pi.Replicate.Worker.Host
 			services.AddApplication();
 			services.AddData();
 			services.AddSystemSettingsFromDatabase(Configuration);
+			services.AddObservr();
 			services.AddHttpClient("default", client =>
 			{
 				client.DefaultRequestHeaders.Accept.Clear();
@@ -39,6 +42,14 @@ namespace Pi.Replicate.Worker.Host
 			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
 
 			services.AddControllers();
+
+			//services.AddHostedService<FolderWorker>();
+			//services.AddHostedService<FileExportWorker>();
+			//services.AddHostedService<FileDisassemblerWorker>();
+			//services.AddHostedService<ChunkExportWorker>();
+			services.AddHostedService<FileAssemblerWorker>();
+			//services.AddHostedService<RetryWorker>();
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

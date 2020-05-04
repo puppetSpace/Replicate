@@ -32,7 +32,9 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 	public class AddReceivedFileCommandHandler : IRequestHandler<AddReceivedFileCommand>
 	{
 		private readonly IDatabase _database;
-		private const string _fileInsertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
+		private const string _fileInsertStatement = @"
+			IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
+				INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
 		
 		public AddReceivedFileCommandHandler(IDatabase database)
 		{
