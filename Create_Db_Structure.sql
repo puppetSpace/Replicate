@@ -32,7 +32,7 @@ create table dbo.[File](
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
 	[Source] int NOT NULL,
-	IsCompleted bit NOT NULL
+	IsReceived bit NOT NULL
 	CONSTRAINT PK_File PRIMARY KEY(Id),
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
 );
@@ -74,10 +74,11 @@ GO
 
 create table dbo.TransmissionResult(
 	RecipientId uniqueidentifier NOT NULL,
-	FileId uniqueIdentifier NOT NULL, --no foreign key. Could be that transmissionresult is coming in without the file data being present
+	FileId uniqueIdentifier NOT NULL,
 	FileChunkSequenceNo decimal(8,4) NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(RecipientId, FileId),
+	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
