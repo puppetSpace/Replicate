@@ -31,6 +31,7 @@ namespace Pi.Replicate.Worker.Host
 				{
 					Log.Information("Deleting unprocessed files from database");
 					await _database.Execute("DELETE FROM dbo.[File] where Source = 0 and Id not in (select fileId from dbo.TransmissionResult)", null);
+					await _database.Execute("DELETE from dbo.EofMessage where fileid not in (select fileId from dbo.TransmissionResult))", null);
 				}
 			}
 		}
