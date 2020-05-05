@@ -8,6 +8,7 @@ using Pi.Replicate.Shared;
 using Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult;
 using Serilog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -19,15 +20,16 @@ namespace Pi.Replicate.Application.Services
 		private readonly IMapper _mapper;
 		private readonly IMediator _mediator;
 
-		public TransmissionService(IHttpClientFactory httpClientFactory,IMapper mapper, IMediator mediator)
+		public TransmissionService(IHttpClientFactory httpClientFactory, IMapper mapper, IMediator mediator)
 		{
 			_httpClientFactory = httpClientFactory;
 			_mapper = mapper;
 			_mediator = mediator;
 		}
 
-		public async Task<bool> SendFile(Folder folder,File file, ReadOnlyMemory<byte> signature, Recipient recipient)
+		public async Task<bool> SendFile(Folder folder, File file, ReadOnlyMemory<byte> signature, Recipient recipient)
 		{
+			var canContinue = true;
 			try
 			{
 				Log.Information($"Sending '{file.Path}' metadata to {recipient.Name}");
@@ -39,18 +41,20 @@ namespace Pi.Replicate.Application.Services
 				fileTransmissionModel.Signature = signature.ToArray();
 				fileTransmissionModel.Host = Environment.MachineName;
 				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
-				return true;
 			}
 			catch (System.Exception ex)
 			{
 				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				await _mediator.Send(new AddFailedFileTransmissionCommand { FileId = file.Id, RecipientId = recipient.Id });
-				return false;
+				var result = await _mediator.Send(new AddFailedFileTransmissionCommand { FileId = file.Id, RecipientId = recipient.Id });
+				canContinue = result.WasSuccessful;
 			}
+
+			return canContinue;
 		}
 
 		public async Task<bool> SendEofMessage(EofMessage message, Recipient recipient)
 		{
+			var canContinue = true;
 			try
 			{
 				Log.Information($"Sending Eot message to {recipient.Name}");
@@ -59,33 +63,34 @@ namespace Pi.Replicate.Application.Services
 				var endpoint = $"{recipient.Address}/api/file/{message.FileId}/eot";
 				var eotModel = _mapper.Map<EofMessageTransmissionModel>(message);
 				await httpClient.PostAsync(endpoint, eotModel, throwErrorOnResponseNok: true);
-				return true;
 			}
 			catch (System.Exception ex)
 			{
 				Log.Error(ex, $"Failed to send Eof message to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessage = message, RecipientId = recipient.Id });
-				return false;
+				var result = await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessage = message, RecipientId = recipient.Id });
+				canContinue = result.WasSuccessful;
 			}
+			return canContinue;
 		}
 
 		public async Task<bool> SendFileChunk(FileChunk fileChunk, Recipient recipient)
 		{
-			Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
+			var canContinue = true;
 			try
 			{
+				Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var chunkModel = _mapper.Map<FileChunkTransmissionModel>(fileChunk);
 				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
-				await _mediator.Send(new AddTransmissionResultCommand{FileId = fileChunk.FileId, FileChunkSequenceNo = fileChunk.SequenceNo, RecipientId = recipient.Id});
-				return true;
+				await _mediator.Send(new AddTransmissionResultCommand { FileId = fileChunk.FileId, FileChunkSequenceNo = fileChunk.SequenceNo, RecipientId = recipient.Id });
 			}
 			catch (Exception ex)
 			{
 				Log.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunk = fileChunk, RecipientId = recipient.Id });
-				return false;
+				var result = await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunk = fileChunk, RecipientId = recipient.Id });
+				canContinue = result.WasSuccessful;
 			}
+			return canContinue;
 		}
 
 	}

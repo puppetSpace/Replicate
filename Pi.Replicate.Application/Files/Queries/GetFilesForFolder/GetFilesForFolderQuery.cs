@@ -57,7 +57,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, $"Error happend while executing query {nameof(GetFilesForFolderQuery)}");
+				Log.Error(ex, $"Error occured while executing query {nameof(GetFilesForFolderQuery)}");
 				return Result<ICollection<File>>.Failure();
 			}
         }

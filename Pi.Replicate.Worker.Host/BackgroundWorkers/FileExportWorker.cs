@@ -33,13 +33,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				while (!incomingQueue.IsCompleted || !stoppingToken.IsCancellationRequested)
 				{
 					var file = incomingQueue.Take(); //since no task has been awaited, this blocks the main thread. So run inside of task
-					var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-					var folder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
-					var signature = await _mediator.Send(new GetSignatureOfFileQuery { FileId = file.Id });
-					foreach (var recipient in recipients)
+					var folderResult = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
+					var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = file.Id });
+					if (folderResult.WasSuccessful && signatureResult.WasSuccessful)
 					{
-						await _communicationService.SendFile(folder, file, signature, recipient);
-						outgoingQueue.Add(file);
+						foreach (var recipient in folderResult.Data.Recipients)
+						{
+							if(await _communicationService.SendFile(folderResult.Data, file, signatureResult.Data, recipient))
+								outgoingQueue.Add(file);
+						}
 					}
 				}
 			});
