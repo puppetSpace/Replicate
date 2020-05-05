@@ -3,17 +3,19 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
+using Serilog;
 
 namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder
 {
-	public class GetRecipientsForFolderQuery : IRequest<ICollection<Recipient>>
+	public class GetRecipientsForFolderQuery : IRequest<Result<ICollection<Recipient>>>
 	{
 		public Guid FolderId { get; set; }
 	}
 
-	public class GetRecipientsForFolderQueryHandler : IRequestHandler<GetRecipientsForFolderQuery, ICollection<Recipient>>
+	public class GetRecipientsForFolderQueryHandler : IRequestHandler<GetRecipientsForFolderQuery, Result<ICollection<Recipient>>>
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatement = @"
@@ -26,10 +28,18 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder
 		{
 			_database = database;
 		}
-		public async Task<ICollection<Recipient>> Handle(GetRecipientsForFolderQuery request, CancellationToken cancellationToken)
+		public async Task<Result<ICollection<Recipient>>> Handle(GetRecipientsForFolderQuery request, CancellationToken cancellationToken)
 		{
-			using (_database)
-				return await _database.Query<Recipient>(_selectStatement,new { request.FolderId });
+			try
+			{
+				using (_database)
+					return Result<ICollection<Recipient>>.Success(await _database.Query<Recipient>(_selectStatement, new { request.FolderId }));
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error occured while executing query '{nameof(GetRecipientsForFolderQuery)}'");
+				return Result<ICollection<Recipient>>.Failure();
+			}
 		}
 	}
 }

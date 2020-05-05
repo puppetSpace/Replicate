@@ -1,12 +1,10 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Commands.UpdateFile;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Serilog;
-using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -46,11 +44,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					{
 						await semaphore.WaitAsync();
 						Log.Information($"'{file.Path}' is being processed");
-						var recipients = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-						var eofMessage = await SplitFile(file, recipients, outgoingQueue);
-						await FinializeFileProcess(eofMessage, recipients);
-
-						Log.Information($"'{file.Path}' is processed");
+						var recipientsResult = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
+						if (recipientsResult.WasSuccessful)
+						{
+							var eofMessage = await SplitFile(file, recipientsResult.Data, outgoingQueue);
+							await FinializeFileProcess(eofMessage, recipientsResult.Data);
+							Log.Information($"'{file.Path}' is processed");
+						}
 						semaphore.Release();
 					}));
 
@@ -71,8 +71,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task FinializeFileProcess(EofMessage eofMessage, ICollection<Recipient> recipients)
 		{
-			foreach (var recipient in recipients)
-				await _transmissionService.SendEofMessage(eofMessage, recipient);
+			if (eofMessage is object)
+			{
+				foreach (var recipient in recipients)
+					await _transmissionService.SendEofMessage(eofMessage, recipient);
+			}
 		}
 
 

@@ -1,5 +1,7 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,12 +11,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile
 {
-    public class GetPreviousSignatureOfFileQuery : IRequest<ReadOnlyMemory<byte>>
+    public class GetPreviousSignatureOfFileQuery : IRequest<Result<ReadOnlyMemory<byte>>>
     {
 		public Guid FileId { get; set; }
 	}
 
-	public class GetPreviousSignatureOfFileQueryHandler : IRequestHandler<GetPreviousSignatureOfFileQuery, ReadOnlyMemory<byte>>
+	public class GetPreviousSignatureOfFileQueryHandler : IRequestHandler<GetPreviousSignatureOfFileQuery, Result<ReadOnlyMemory<byte>>>
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatement = @"
@@ -29,11 +31,19 @@ namespace Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile
 			_database = database;
 		}
 
-		public async Task<ReadOnlyMemory<byte>> Handle(GetPreviousSignatureOfFileQuery request, CancellationToken cancellationToken)
+		public async Task<Result<ReadOnlyMemory<byte>>> Handle(GetPreviousSignatureOfFileQuery request, CancellationToken cancellationToken)
 		{
-			using (_database)
+			try
 			{
-				return await _database.QuerySingle<byte[]>(_selectStatement, new { request.FileId });
+				using (_database)
+				{
+					return Result<ReadOnlyMemory<byte>>.Success(await _database.QuerySingle<byte[]>(_selectStatement, new { request.FileId }));
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error occured while executing query '{nameof(GetPreviousSignatureOfFileQuery)}'");
+				return Result<ReadOnlyMemory<byte>>.Failure();
 			}
 		}
 	}
