@@ -24,35 +24,33 @@ namespace Pi.Replicate.Application.Files.Processing
 			_folder = folder;
 		}
 
-		public List<System.IO.FileInfo> NewFiles { get; private set; }
-		public List<System.IO.FileInfo> ChangedFiles { get; private set; }
+		public List<System.IO.FileInfo> NewFiles { get; private set; } = new List<System.IO.FileInfo>();
+		public List<System.IO.FileInfo> ChangedFiles { get; private set; } = new List<System.IO.FileInfo>();
 
 		public async Task CollectFiles()
 		{
 			var filesFromSystem=  GetFilesFromSystem();
-			var filesInDb = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
-			Log.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
-			
-			NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
-			Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
+			var result = await _mediator.Send(new GetFilesForFolderQuery(_folder.Id));
+			if (result.WasSuccessful)
+			{
+				var filesInDb = result.Data;
+				Log.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
 
-			ChangedFiles = filesFromSystem
-					.Where(x => filesInDb
-						.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
-					.ToList();
+				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
+				Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
-			Log.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
+				ChangedFiles = filesFromSystem
+						.Where(x => filesInDb
+							.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
+						.ToList();
+
+				Log.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
+			}
 		}
 
 		private IList<System.IO.FileInfo> GetFilesFromSystem()
 		{
 			var folderPath = _pathBuilder.BuildPath(_folder.Name);
-			if (_folder is null || !System.IO.Directory.Exists(folderPath))
-			{
-				Log.Warning($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
-				throw new InvalidOperationException($"Unable to get files. Given Folder path is null or does not exists. Value:'{folderPath}'.");
-			}
-
 			var folderCrawler = new FolderCrawler();
 			var files = folderCrawler.GetFiles(folderPath);
 

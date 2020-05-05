@@ -5,6 +5,7 @@ using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Files.Models;
 using Pi.Replicate.Domain;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 {
-    public class GetFilesForFolderQuery : IRequest<ICollection<File>>
+    public class GetFilesForFolderQuery : IRequest<Result<ICollection<File>>>
     {
         public GetFilesForFolderQuery(Guid folderId)
         {
@@ -24,7 +25,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
         public Guid FolderId { get; }
     }
 
-    public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, ICollection<File>>
+    public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, Result<ICollection<File>>>
     {
         private readonly IDatabase _database;
         private readonly IMapper _mapper;
@@ -44,13 +45,21 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
             _mapper = mapper;
         }
 
-        public async Task<ICollection<File>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ICollection<File>>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
         {
-            using (_database)
-            {
-                var result = await _database.Query<FileDao>(_selectStatement, new { request.FolderId });
-                return _mapper.Map<ICollection<File>>(result);
-            }
+			try
+			{
+				using (_database)
+				{
+					var result = await _database.Query<FileDao>(_selectStatement, new { request.FolderId });
+					return Result<ICollection<File>>.Success(_mapper.Map<ICollection<File>>(result));
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error happend while executing query {nameof(GetFilesForFolderQuery)}");
+				return Result<ICollection<File>>.Failure();
+			}
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Pi.Replicate.Application.Folders.Processing
         public IList<System.IO.FileInfo> GetFiles(string path)
         {
             var files = new List<System.IO.FileInfo>();
-            if (!System.IO.Directory.Exists(path))
+            if (string.IsNullOrWhiteSpace(path) || !System.IO.Directory.Exists(path))
             {
                 Log.Warning($"Given path, '{path}' is not a directory. Returning empty list");
                 return files;
