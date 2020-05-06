@@ -32,13 +32,16 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			{
 				while (!stoppingToken.IsCancellationRequested)
 				{
-					var completedFiles = await _mediator.Send(new GetCompletedFilesQuery());
-					var newFiles = completedFiles.Where(x => x.File.IsNew());
-					var changedFiles = completedFiles.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
-					await AssembleNewFiles(newFiles);
-					await ApplyChangedToExistingFiles(changedFiles);
+					var completedFilesResult = await _mediator.Send(new GetCompletedFilesQuery());
+					if (completedFilesResult.WasSuccessful)
+					{
+						var newFiles = completedFilesResult.Data.Where(x => x.File.IsNew());
+						var changedFiles = completedFilesResult.Data.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
+						await AssembleNewFiles(newFiles);
+						await ApplyChangedToExistingFiles(changedFiles);
 
-					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+						await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+					}
 
 				}
 			});

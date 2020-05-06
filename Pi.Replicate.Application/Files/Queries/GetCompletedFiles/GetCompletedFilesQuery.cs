@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Files.Models;
 using Pi.Replicate.Domain;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -13,12 +15,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetCompletedFiles
 {
-    public class GetCompletedFilesQuery : IRequest<ICollection<CompletedFileDto>>
+    public class GetCompletedFilesQuery : IRequest<Result<ICollection<CompletedFileDto>>>
     {
         
     }
 
-	public class GetCompletedFilesQueryHandler : IRequestHandler<GetCompletedFilesQuery, ICollection<CompletedFileDto>>
+	public class GetCompletedFilesQueryHandler : IRequestHandler<GetCompletedFilesQuery, Result<ICollection<CompletedFileDto>>>
 	{
 		private readonly IDatabase _database;
 		private readonly IMapper _mapper;
@@ -39,13 +41,21 @@ namespace Pi.Replicate.Application.Files.Queries.GetCompletedFiles
 			_mapper = mapper;
 		}
 
-		public async Task<ICollection<CompletedFileDto>> Handle(GetCompletedFilesQuery request, CancellationToken cancellationToken)
+		public async Task<Result<ICollection<CompletedFileDto>>> Handle(GetCompletedFilesQuery request, CancellationToken cancellationToken)
 		{
-			using (_database)
+			try
 			{
-				return await _database.Query<FileDao, EofMessage, CompletedFileDto>(_selectStatement, null
-					, (f, e) => new CompletedFileDto { File = _mapper.Map<File>(f), EofMessage = e });
-
+				using (_database)
+				{
+					var queryresult = await _database.Query<FileDao, EofMessage, CompletedFileDto>(_selectStatement, null
+						, (f, e) => new CompletedFileDto { File = _mapper.Map<File>(f), EofMessage = e });
+					return Result<ICollection<CompletedFileDto>>.Success(queryresult);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error occured while executing query '{nameof(GetCompletedFilesQuery)}'");
+				return Result<ICollection<CompletedFileDto>>.Failure();
 			}
 		}
 	}
