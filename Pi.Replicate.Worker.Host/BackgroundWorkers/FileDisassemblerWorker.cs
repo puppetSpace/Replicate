@@ -26,9 +26,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_transmissionService = transmissionService;
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await Task.Run(() =>
+			var th = new Thread(() =>
 			{
 				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
@@ -56,6 +56,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 				}
 			});
+
+			th.Start();
+
+			return Task.CompletedTask;
 		}
 
 		private async Task<EofMessage> SplitFile(File file, ICollection<Recipient> recipients, BlockingCollection<KeyValuePair<Recipient, FileChunk>> queue)

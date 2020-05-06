@@ -19,9 +19,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_transmissionService = transmissionService;
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await Task.Run(async () =>
+			var th = new Thread(async () =>
 			{
 				var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
 				while (!queue.IsCompleted || !stoppingToken.IsCancellationRequested)
@@ -30,7 +30,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					await _transmissionService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
 				}
 			});
+			th.Start();
 
+			return Task.CompletedTask;
 		}
 	}
 }

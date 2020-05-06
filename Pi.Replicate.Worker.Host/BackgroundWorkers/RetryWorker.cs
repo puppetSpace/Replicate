@@ -1,17 +1,14 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.EofMessages.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.FileChunks.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.Files.Queries.GetFailedTransmissions;
 using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,14 +27,19 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_transmissionService = transmissionService;
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await RetryFailedFiles();
-			await RetryFailedEofMessages();
-			await RetryFailedChunks();
+			var th = new Thread(async () =>
+			{
+				await RetryFailedFiles();
+				await RetryFailedEofMessages();
+				await RetryFailedChunks();
 
-			Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
-			await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
+				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+			});
+			th.Start();
+			return Task.CompletedTask;
 		}
 
 		private async Task RetryFailedFiles()
@@ -46,8 +48,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			var failedFiles = await _mediator.Send(new GetFailedFileTransmissionsForRetryCommand());
 			foreach (var ff in failedFiles)
 			{
-				var signature = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
-				await _transmissionService.SendFile(ff.Folder, ff.File, signature, ff.Recipient);
+				var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
+				if (signatureResult.WasSuccessful)
+					await _transmissionService.SendFile(ff.Folder, ff.File, signatureResult.Data, ff.Recipient);
+				//else
+				//add back to failed files
 			}
 		}
 

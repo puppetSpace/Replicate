@@ -26,18 +26,26 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			while (!stoppingToken.IsCancellationRequested)
+			var th = new Thread(async () =>
 			{
-				var completedFiles = await _mediator.Send(new GetCompletedFilesQuery());
-				var newFiles = completedFiles.Where(x => x.File.IsNew());
-				var changedFiles = completedFiles.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
-				await AssembleNewFiles(newFiles);
-				await ApplyChangedToExistingFiles(changedFiles);
+				while (!stoppingToken.IsCancellationRequested)
+				{
+					var completedFiles = await _mediator.Send(new GetCompletedFilesQuery());
+					var newFiles = completedFiles.Where(x => x.File.IsNew());
+					var changedFiles = completedFiles.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
+					await AssembleNewFiles(newFiles);
+					await ApplyChangedToExistingFiles(changedFiles);
 
-				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
-			}
+					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+
+				}
+			});
+
+			th.Start();
+
+			return Task.CompletedTask;
 		}
 
 		private async Task AssembleNewFiles(IEnumerable<CompletedFileDto> newFiles)

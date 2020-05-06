@@ -37,33 +37,39 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_fileService = fileService;
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			while (!stoppingToken.IsCancellationRequested)
+			var th = new System.Threading.Thread(async() =>
 			{
-				var result = await _mediator.Send(new GetFoldersToCrawlQuery(), stoppingToken);
-				if (result.WasSuccessful)
+				while (!stoppingToken.IsCancellationRequested)
 				{
-					foreach (var folder in result.Data)
+					var result = await _mediator.Send(new GetFoldersToCrawlQuery(), stoppingToken);
+					if (result.WasSuccessful)
 					{
-						try
+						foreach (var folder in result.Data)
 						{
-							Log.Information($"Crawling through folder '{folder.Name}'");
-							var collector = _fileCollectorFactory.Get(folder);
-							await collector.CollectFiles();
-							await ProcessNewFiles(folder, collector.NewFiles);
-							await ProcessChangedFiles(folder, collector.ChangedFiles);
-						}
-						catch (Exception ex)
-						{
-							Log.Error(ex, $"Unexpected error occured during processing of folder {folder.Name}");
+							try
+							{
+								Log.Information($"Crawling through folder '{folder.Name}'");
+								var collector = _fileCollectorFactory.Get(folder);
+								await collector.CollectFiles();
+								await ProcessNewFiles(folder, collector.NewFiles);
+								await ProcessChangedFiles(folder, collector.ChangedFiles);
+							}
+							catch (Exception ex)
+							{
+								Log.Error(ex, $"Unexpected error occured during processing of folder {folder.Name}");
+							}
 						}
 					}
-				}
 
-				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
-				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
-			}
+					Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
+				}
+			});
+			th.Start();
+
+			return Task.CompletedTask;
 		}
 
 		private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)

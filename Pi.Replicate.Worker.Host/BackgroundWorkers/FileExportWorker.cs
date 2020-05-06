@@ -24,9 +24,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_workerQueueFactory = workerQueueFactory;
 		}
 
-		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			await Task.Run(async () =>
+			var th = new Thread(async () =>
 			{
 				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
 				var outgoingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
@@ -45,6 +45,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					}
 				}
 			});
+
+			th.Start();
+
+			return Task.CompletedTask;
 		}
 	}
 }
