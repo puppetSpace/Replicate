@@ -20,7 +20,11 @@ namespace Pi.Replicate.Application.EofMessages.Commands.AddReceivedEofMessage
 	public class AddReceivedEofMessageCommandHandler : IRequestHandler<AddReceivedEofMessageCommand>
 	{
 		private readonly IDatabase _database;
-		private const string _insertStatement = "INSERT INTO dbo.EofMessage(Id,FileId,AmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)";
+		private const string _insertStatement = @"
+			IF NOT EXISTS (SELECT 1 FROM dbo.EofMessage WHERE FileId = @FileId)
+				INSERT INTO dbo.EofMessage(Id,FileId,AmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)
+			ELSE
+				UPDATE dbo.EofMessage SET AmountOfChunks = @AmountOfChunks WHERE FileId = @FileID";
 
 		public AddReceivedEofMessageCommandHandler(IDatabase database)
 		{
