@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Files.Queries.GetCompletedFiles;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
+				Log.Information($"Starting {nameof(FileAssemblerWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var completedFilesResult = await _mediator.Send(new GetCompletedFilesQuery());

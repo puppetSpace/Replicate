@@ -138,7 +138,7 @@ namespace Pi.Replicate.Application.Services
 		private async Task MarkFileAsCompleted(File file)
 		{
 			Log.Information($"Mark '{file.Path}' as completed and deleting chunks");
-			await _database.Execute("UPDATE dbo.[File] SET IsReceived = 1 WHERE Id = @FileId", new { FileId = file.Id });
+			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2 WHERE Id = @FileId", new { FileId = file.Id });
 			await _database.Execute("DELETE FROM dbo.FileChunk WHERE FileId = @FileId", new { FileId = file.Id });
 		}
 	}

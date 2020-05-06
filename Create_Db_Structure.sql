@@ -32,7 +32,7 @@ create table dbo.[File](
 	[Path] varchar(max) NOT NULL,
 	[Signature] varbinary(max),
 	[Source] int NOT NULL,
-	IsReceived bit NOT NULL DEFAULT 0
+	[Status] int NOT NULL DEFAULT 0
 	CONSTRAINT PK_File PRIMARY KEY(Id),
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
 );

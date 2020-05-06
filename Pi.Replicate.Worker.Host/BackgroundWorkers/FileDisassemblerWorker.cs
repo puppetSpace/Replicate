@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Commands.MarkFileAsFailed;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
@@ -38,7 +39,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				while (!incomingQueue.IsCompleted && !stoppingToken.IsCancellationRequested)
 				{
 					runningTasks.RemoveAll(x => x.IsCompleted);
-					var file = incomingQueue.Take(stoppingToken); //since no task has been awaited, this blocks the main thread. So run inside of task
+					var file = incomingQueue.Take(stoppingToken);
 
 					runningTasks.Add(Task.Run(async () =>
 					{
@@ -48,7 +49,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 						if (recipientsResult.WasSuccessful)
 						{
 							var eofMessage = await SplitFile(file, recipientsResult.Data, outgoingQueue);
-							await FinializeFileProcess(eofMessage, recipientsResult.Data);
+							if (eofMessage is object)
+								await FinializeFileProcess(eofMessage, recipientsResult.Data);
+							else
+								await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
+
 							Log.Information($"'{file.Path}' is processed");
 						}
 						semaphore.Release();
@@ -75,11 +80,8 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task FinializeFileProcess(EofMessage eofMessage, ICollection<Recipient> recipients)
 		{
-			if (eofMessage is object)
-			{
-				foreach (var recipient in recipients)
-					await _transmissionService.SendEofMessage(eofMessage, recipient);
-			}
+			foreach (var recipient in recipients)
+				await _transmissionService.SendEofMessage(eofMessage, recipient);
 		}
 
 

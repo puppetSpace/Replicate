@@ -41,6 +41,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new System.Threading.Thread(async () =>
 			{
+				Log.Information($"Starting {nameof(FolderWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var result = await _mediator.Send(new GetFoldersToCrawlQuery(), stoppingToken);

@@ -2,18 +2,19 @@
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
+using Serilog;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	public class ChunkExportWorker : BackgroundService
+	public class FileChunkExportWorker : BackgroundService
 	{
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly TransmissionService _transmissionService;
 
-		public ChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService transmissionService)
+		public FileChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService transmissionService)
 		{
 			_workerQueueFactory = workerQueueFactory;
 			_transmissionService = transmissionService;
@@ -23,6 +24,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
+				Log.Information($"Starting {nameof(FileChunkExportWorker)}");
 				var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
 				while (!queue.IsCompleted || !stoppingToken.IsCancellationRequested)
 				{
