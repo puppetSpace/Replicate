@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
@@ -11,29 +12,42 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Commands.AddNewFile
 {
-    public class AddNewFileCommand : IRequest
+    public class AddNewFileCommand : IRequest<Result<File>>
     {
-        public File File { get; set; }
+        public System.IO.FileInfo FileInfo { get; set; }
+
+		public Guid FolderId { get; set; }
 
 		public ReadOnlyMemory<byte> Signature { get; set; }
 	}
 
-    public class AddNewFileCommandHandler : IRequestHandler<AddNewFileCommand>
+    public class AddNewFileCommandHandler : IRequestHandler<AddNewFileCommand, Result<File>>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
+		private readonly PathBuilder _pathBuilder;
+		private const string _insertStatement = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
 
-        public AddNewFileCommandHandler(IDatabase database)
+        public AddNewFileCommandHandler(IDatabase database, PathBuilder pathBuilder)
         {
             _database = database;
-        }
+			_pathBuilder = pathBuilder;
+		}
 
-        public async Task<Unit> Handle(AddNewFileCommand request, CancellationToken cancellationToken)
+        public async Task<Result<File>> Handle(AddNewFileCommand request, CancellationToken cancellationToken)
         {
-            using (_database)
-                await _database.Execute(_insertStatement, new { request.File.Id, request.File.FolderId, request.File.Name, request.File.Size, request.File.Version, request.File.LastModifiedDate, request.File.Path, Signature = request.Signature.ToArray(), request.File.Source });
+			try
+			{
+				var file = File.Build(request.FileInfo, request.FolderId, _pathBuilder.BasePath);
+				using (_database)
+					await _database.Execute(_insertStatement, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, Signature = request.Signature.ToArray(), file.Source });
 
-            return Unit.Value;
+				return Result<File>.Success(file);
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error occured while executing command '{nameof(AddNewFileCommand)}'");
+				return Result<File>.Failure();
+			}
         }
     }
 }

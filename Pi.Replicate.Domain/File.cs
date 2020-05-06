@@ -26,6 +26,7 @@ namespace Pi.Replicate.Domain
 
         public void Update(System.IO.FileInfo file)
         {
+			Id = Guid.NewGuid();
             LastModifiedDate = file.LastWriteTimeUtc;
             Size = file.Length;
 			Version++;

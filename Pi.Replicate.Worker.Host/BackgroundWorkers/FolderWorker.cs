@@ -39,7 +39,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var th = new System.Threading.Thread(async() =>
+			var th = new System.Threading.Thread(async () =>
 			{
 				while (!stoppingToken.IsCancellationRequested)
 				{
@@ -78,11 +78,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			foreach (var newFile in newFiles)
 			{
 				var createdFile = await _fileService.CreateNewFile(folder, newFile);
-				Log.Debug($"Adding '{createdFile.Path}' to queue");
-				if (queue.Any(x => string.Equals(x.Path, createdFile.Path)))
-					Log.Information($"{createdFile.Path} already present in queue for processing");
-				else
-					queue.Add(createdFile);
+				if (createdFile is object)
+				{
+					Log.Debug($"Adding '{createdFile.Path}' to queue");
+					if (queue.Any(x => string.Equals(x.Path, createdFile.Path)))
+						Log.Information($"{createdFile.Path} already present in queue for processing");
+					else
+						queue.Add(createdFile);
+				}
 			}
 		}
 
@@ -99,10 +102,6 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 						Log.Information($"{updatedFile.Path} already present in queue for processing");
 					else
 						queue.Add(updatedFile);
-				}
-				else
-				{
-					Log.Information($"Unable to perform update action. No existing file for '{changedFile.FullName}'");
 				}
 			}
 		}
