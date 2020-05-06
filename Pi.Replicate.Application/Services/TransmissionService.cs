@@ -85,7 +85,7 @@ namespace Pi.Replicate.Application.Services
 			catch (Exception ex)
 			{
 				Log.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				var result = await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunkId = fileChunk.Id, RecipientId = recipient.Id });
+				var result = await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunkId = fileChunk.Id, RecipientId = recipient.Id, FileId = fileChunk.FileId, SequenceNo = fileChunk.SequenceNo, Value = fileChunk.Value });
 				canContinue = result.WasSuccessful;
 			}
 			return canContinue;

@@ -38,6 +38,7 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTran
 		private const string _deleteFailedFileStatement = "DELETE FROM dbo.FailedTransmission WHERE FileId = @FileId and RecipientId = @RecipientId";
 		private const string _deleteFailedEofMessageStatement = "DELETE FROM dbo.FailedTransmission WHERE EofMessageId = @EofMessageId and RecipientId = @RecipientId";
 		private const string _deleteFailedFileChunkStatement = "DELETE FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId";
+		private const string _deleteFileChunkStatement = "DELETE FROM dbo.FileChunk WHERE FileChunkId = @FileChunkId";
 
 		public DeleteFailedTransmissionCommandHandler(IDatabase database)
 		{
@@ -79,7 +80,10 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTran
 			try
 			{
 				using (_database)
-					await _database.Execute(_deleteFailedFileStatement, new { request.FileChunkId, request.RecipientId });
+				{
+					await _database.Execute(_deleteFailedFileChunkStatement, new { request.FileChunkId, request.RecipientId });
+					await _database.Execute(_deleteFileChunkStatement, new { request.FileChunkId });
+				}
 				return Result.Success();
 			}
 			catch (Exception ex)
