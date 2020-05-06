@@ -44,4 +44,9 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="EofMessages\Queries\" />
+    <Folder Include="FileChunks\Queries\" />
+  </ItemGroup>
+
 </Project>

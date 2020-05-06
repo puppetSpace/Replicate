@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.EofMessages.Queries.GetFailedTransmissions;
-using Pi.Replicate.Application.FileChunks.Queries.GetFailedTransmissions;
-using Pi.Replicate.Application.Files.Queries.GetFailedTransmissions;
+using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTransmissions;
+using Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmission;
+using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChunkTransmissions;
 using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
@@ -11,6 +11,8 @@ using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions;
+using Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTransmission;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
@@ -45,31 +47,54 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task RetryFailedFiles()
 		{
 			Log.Information($"Retrying to send files that have failed");
-			var failedFiles = await _mediator.Send(new GetFailedFileTransmissionsForRetryCommand());
-			foreach (var ff in failedFiles)
+			var failedFilesResult = await _mediator.Send(new GetFailedFileTransmissionsForRetryQuery());
+			if (failedFilesResult.WasSuccessful)
 			{
-				var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
-				if (signatureResult.WasSuccessful)
-					await _transmissionService.SendFile(ff.Folder, ff.File, signatureResult.Data, ff.Recipient);
-				//else
-				//add back to failed files
+				foreach (var ff in failedFilesResult.Data)
+				{
+					var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
+					if (signatureResult.WasSuccessful)
+					{
+						var wasSucessful = await _transmissionService.SendFile(ff.Folder, ff.File, signatureResult.Data, ff.Recipient);
+						if(wasSucessful)
+							await _mediator.Send(new DeleteFailedFileTransmissionCommand { FileId = ff.File.Id, RecipientId = ff.Recipient.Id });
+					}
+					else
+					{
+						await _mediator.Send(new AddFailedFileTransmissionCommand { FileId = ff.File.Id, RecipientId = ff.Recipient.Id });
+					}
+				}
 			}
 		}
 
 		private async Task RetryFailedEofMessages()
 		{
 			Log.Information($"Retrying to send eof messages that have failed");
-			var failedEofMessages = await _mediator.Send(new GetFailedEofMessageTransmissionsForRetryCommand());
-			foreach (var fem in failedEofMessages)
-				await _transmissionService.SendEofMessage(fem.EofMessage, fem.Recipient);
+			var failedEofMessagesResult = await _mediator.Send(new GetFailedEofMessageTransmissionsForRetryQuery());
+			if (failedEofMessagesResult.WasSuccessful)
+			{
+				foreach (var fem in failedEofMessagesResult.Data)
+				{
+					var wasSuccessful = await _transmissionService.SendEofMessage(fem.EofMessage, fem.Recipient);
+					if(wasSuccessful)
+						await _mediator.Send(new DeleteFailedEofMessageTransmissionCommand { EofMessageId = fem.EofMessage.Id, RecipientId = fem.Recipient.Id });
+				}
+			}
 		}
 
 		private async Task RetryFailedChunks()
 		{
 			Log.Information($"Retrying to send filechunks that have failed");
-			var failedChunks = await _mediator.Send(new GetFailedFileChunkTransmissionsForRetryCommand());
-			foreach (var fc in failedChunks)
-				await _transmissionService.SendFileChunk(fc.FileChunk, fc.Recipient);
+			var failedChunksResult = await _mediator.Send(new GetFailedFileChunkTransmissionsForRetryQuery());
+			if (failedChunksResult.WasSuccessful)
+			{
+				foreach (var fc in failedChunksResult.Data)
+				{
+					var wasSuccessful = await _transmissionService.SendFileChunk(fc.FileChunk, fc.Recipient);
+					if(wasSuccessful)
+						await _mediator.Send(new DeleteFailedFileChunkTransmissionCommand { FileChunkId = fc.FileChunk.Id, RecipientId = fc.Recipient.Id });
+				}
+			}
 		}
 
 

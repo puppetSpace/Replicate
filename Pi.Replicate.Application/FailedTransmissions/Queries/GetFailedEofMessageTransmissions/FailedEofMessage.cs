@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.EofMessages.Queries.GetFailedTransmissions
+namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTransmissions
 {
     public class FailedEofMessage
     {

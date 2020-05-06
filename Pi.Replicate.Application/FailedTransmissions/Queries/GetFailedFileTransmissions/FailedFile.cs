@@ -1,6 +1,6 @@
 using Pi.Replicate.Domain;
 
-namespace Pi.Replicate.Application.Files.Queries.GetFailedTransmissions
+namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions
 {
     public class FailedFile
     {

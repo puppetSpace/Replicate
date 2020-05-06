@@ -2,13 +2,11 @@
 using MediatR;
 using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmission;
-using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult;
 using Serilog;
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -67,7 +65,7 @@ namespace Pi.Replicate.Application.Services
 			catch (System.Exception ex)
 			{
 				Log.Error(ex, $"Failed to send Eof message to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				var result = await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessage = message, RecipientId = recipient.Id });
+				var result = await _mediator.Send(new AddFailedEofMessageTransmissionCommand { EofMessageId = message.Id, RecipientId = recipient.Id });
 				canContinue = result.WasSuccessful;
 			}
 			return canContinue;
@@ -87,7 +85,7 @@ namespace Pi.Replicate.Application.Services
 			catch (Exception ex)
 			{
 				Log.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				var result = await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunk = fileChunk, RecipientId = recipient.Id });
+				var result = await _mediator.Send(new AddFailedFileChunkTransmissionCommand { FileChunkId = fileChunk.Id, RecipientId = recipient.Id });
 				canContinue = result.WasSuccessful;
 			}
 			return canContinue;
