@@ -18,7 +18,7 @@ namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettings
 	public class GetSystemSettingsQueryHandler : IRequestHandler<GetSystemSettingsQuery, ICollection<SystemSetting>>
 	{
 		private readonly IDatabase _database;
-		private const string _selectStatement = "SELECT Id,[Key],[Value] from dbo.SystemSetting";
+		private const string _selectStatement = "SELECT Id,[Key],[Value],DataType,Info from dbo.SystemSetting";
 
 		public GetSystemSettingsQueryHandler(IDatabase database)
 		{

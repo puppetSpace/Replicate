@@ -89,14 +89,18 @@ create table dbo.SystemSetting(
 	Id uniqueidentifier NOT NULL,
 	[Key] varchar(255) NOT NULL,
 	[Value] varchar(max) NOT NULL,
+	DataType varchar(20) NOT NULL,
+	Info varchar(500) NOT NULL,
 	CONSTRAINT PK_SystemSetting PRIMARY KEY(Id),
 	CONSTRAINT UQ_SystemSetting_Key UNIQUE([Key])
 );
 GO
 
-insert into dbo.SystemSetting VALUES(NEWID(),'ReplicateBasePath','D:\Temp');
-insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10');
-insert into dbo.SystemSetting VALUES(NEWID(),'FileAssemblyTriggerInterval','10');
-insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10');
-insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000');
+insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
+insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
+insert into dbo.SystemSetting VALUES(NEWID(),'FileAssemblyTriggerInterval','10','number','The amount of time to wait to between each moment the application checks if all chunks have arrived for a file and assembly of files');
+insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10','number','The amount of time to wait between each moment the application retries sending failed data to the recipients');
+insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000','number','A file will be split up into chunks. This setting defines the size of that chunk');
+insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileDisassemblyJobs','10','number', 'Amount of files that ares allowed to be disassembled at the same time');
+insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileAssemblyJobs','10','number','Amount of files that ares allowed to be assembled at the same time');
 

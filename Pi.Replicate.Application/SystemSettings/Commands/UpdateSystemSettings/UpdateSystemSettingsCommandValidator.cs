@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.SystemSettings.Commands.UpsertSystemSettings
+namespace Pi.Replicate.Application.SystemSettings.Commands.UpdateSystemSettings
 {
-	public class UpsertSystemSettingsCommandValidator : AbstractValidator<UpsertSystemSettingsCommand>
+	public class UpdateSystemSettingsCommandValidator : AbstractValidator<UpdateSystemSettingsCommand>
 	{
-		public UpsertSystemSettingsCommandValidator()
+		public UpdateSystemSettingsCommandValidator()
 		{
 			RuleFor(x => x.Value)
 				.NotEmpty()
@@ -19,14 +19,12 @@ namespace Pi.Replicate.Application.SystemSettings.Commands.UpsertSystemSettings
 			RuleFor(x => x.Value)
 				.Must(x => int.TryParse(x, out var _))
 				.WithMessage(x => $"value of {x.Key} should be a number")
-				.When(x => x.Key == Constants.FileSplitSizeOfChunksInBytes || x.Key == Constants.FolderCrawlTriggerInterval || x.Key == Constants.RetryTriggerInterval);
+				.When(x => string.Equals(x.DateType,"number",StringComparison.OrdinalIgnoreCase));
 
 			RuleFor(x => x.Value)
 				.Must(x => int.TryParse(x, out var _))
 				.WithMessage(x => $"value of {x.Key} should be greater than 0")
-				.When(x => int.TryParse(x.Value, out var _) && (x.Key == Constants.FileSplitSizeOfChunksInBytes 
-				|| x.Key == Constants.FolderCrawlTriggerInterval 
-				|| x.Key == Constants.RetryTriggerInterval));
+				.When(x => int.TryParse(x.Value, out var _) && string.Equals(x.DateType,"number",StringComparison.OrdinalIgnoreCase));
 
 			RuleFor(x => x.Value)
 				.Must(x => System.IO.Directory.Exists(x))

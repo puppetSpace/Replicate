@@ -17,6 +17,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class FileAssemblerWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
+		private readonly int _amountOfConcurrentJobs;
 		private readonly IMediator _mediator;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
 
@@ -25,6 +26,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_mediator = mediator;
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
+			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileAssemblyJobs]);
 		}
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,7 +58,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task AssembleNewFiles(IEnumerable<CompletedFileDto> newFiles)
 		{
 			var runningTasks = new List<Task>();
-			var semaphore = new SemaphoreSlim(10); //todo create setting for this
+			var semaphore = new SemaphoreSlim(_amountOfConcurrentJobs);
 
 			foreach (var completedFile in newFiles)
 			{

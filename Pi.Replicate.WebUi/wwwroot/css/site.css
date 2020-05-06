@@ -237,11 +237,7 @@
   border-top: 0;
   vertical-align: middle !important;
 }
-.settings-general #triggerIntervalFolderCrawl,
-.settings-general #triggerIntervalRetry {
-  width: 6rem;
-}
-.settings-general #chunkSize {
+.settings-general input[type=number] {
   width: 8rem;
 }
 .selectable:hover {

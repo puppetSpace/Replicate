@@ -8,10 +8,12 @@ namespace Pi.Replicate.Shared
 {
     public static class Constants
     {
-        public const string ReplicateBasePath = "ReplicateBasePath";
-        public const string FolderCrawlTriggerInterval = "FolderCrawlTriggerInterval";
-        public const string FileAssemblyTriggerInterval = "FileAssemblyTriggerInterval";
-		public const string RetryTriggerInterval = "RetryTriggerInterval";
-        public const string FileSplitSizeOfChunksInBytes = "FileSplitSizeOfChunksInBytes";
-    }
+        public const string ReplicateBasePath = "BaseFolder";
+        public const string FolderCrawlTriggerInterval = "TriggerIntervalFolderCrawl";
+        public const string FileAssemblyTriggerInterval = "TriggerIntervalFileAssembly";
+		public const string RetryTriggerInterval = "TriggerIntervalRetry";
+        public const string FileSplitSizeOfChunksInBytes = "SizeOfChunksInBytes";
+        public const string ConcurrentFileDisassemblyJobs = "ConcurrentFileDisassemblyJobs";
+        public const string ConcurrentFileAssemblyJobs = "ConcurrentFileAssemblyJobs";
+	}
 }

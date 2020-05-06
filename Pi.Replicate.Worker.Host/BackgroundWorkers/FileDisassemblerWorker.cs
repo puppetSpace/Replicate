@@ -1,10 +1,12 @@
 ﻿using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Files.Commands.MarkFileAsFailed;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -15,12 +17,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	public class FileDisassemblerWorker : BackgroundService
 	{
+		private readonly int _amountOfConcurrentJobs;
 		private readonly WorkerQueueFactory _workerQueueFactory;
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
-		public FileDisassemblerWorker(WorkerQueueFactory workerQueueFactory, FileDisassemblerService fileProcessService, IMediator mediator, TransmissionService transmissionService)
+		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueFactory workerQueueFactory, FileDisassemblerService fileProcessService, IMediator mediator, TransmissionService transmissionService)
 		{
+			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueFactory = workerQueueFactory;
 			_fileProcessService = fileProcessService;
 			_mediator = mediator;
@@ -35,7 +39,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
 				var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
 				var runningTasks = new List<Task>();
-				var semaphore = new SemaphoreSlim(10); //todo create setting for this
+				var semaphore = new SemaphoreSlim(_amountOfConcurrentJobs);
 				while (!incomingQueue.IsCompleted && !stoppingToken.IsCancellationRequested)
 				{
 					runningTasks.RemoveAll(x => x.IsCompleted);

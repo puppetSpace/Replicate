@@ -14,9 +14,9 @@ namespace Pi.Replicate.Domain
 
         public string Value { get; private set; }
 
-		public static SystemSetting Build(string key,string value)
-		{
-			return new SystemSetting { Id = Guid.NewGuid(), Key = key, Value = value };
-		}
-    }
+		public string DataType { get; private set; }
+
+		public string Info { get; private set; }
+
+	}
 }
