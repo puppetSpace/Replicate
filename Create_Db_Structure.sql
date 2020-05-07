@@ -76,7 +76,7 @@ create table dbo.TransmissionResult(
 	Id uniqueidentifier NOT NULL,
 	RecipientId uniqueidentifier NOT NULL,
 	FileId uniqueIdentifier NOT NULL,
-	FileChunkSequenceNo decimal(8,4) NOT NULL,
+	FileChunkSequenceNo int NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(Id),
 	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
@@ -103,4 +103,20 @@ insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10','number
 insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000','number','A file will be split up into chunks. This setting defines the size of that chunk');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileDisassemblyJobs','10','number', 'Amount of files that ares allowed to be disassembled at the same time');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileAssemblyJobs','10','number','Amount of files that ares allowed to be assembled at the same time');
+GO
 
+create view dbo.V_AmountOfFilesSentByRecipient
+as
+select a.RecipientId, count(a.FileId) AmountOfFilesSent
+from(
+select distinct re.Id RecipientId,fi.Id FileId
+,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum
+, (em.AmountOfChunks*(em.AmountOfChunks + 1)) / 2 ChunksChecksum
+from dbo.Recipient re
+inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id
+left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
+left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id
+left join dbo.EofMessage em on em.FileId = fi.Id
+where re.Verified = 1) a
+where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
+group by a.RecipientId;

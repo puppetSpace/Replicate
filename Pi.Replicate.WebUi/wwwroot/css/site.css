@@ -100,11 +100,17 @@
 .folder-overview .folder-overview-data h3 {
   margin-right: 25px;
 }
-.folder-overview .metadata {
+.folder-overview .recipient-metadata {
+  display: flex;
+  flex-direction: column;
+  font-size: smaller;
+}
+.folder-overview .folder-metadata {
   display: flex;
   flex-direction: column;
   font-size: smaller;
   margin-top: 0.5rem;
+  justify-content: center;
 }
 .folder-overview .folder-setting {
   font-size: x-large;
@@ -330,4 +336,7 @@ app {
   background-color: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   cursor: pointer;
+}
+.space-before-10 {
+  margin-left: 10px;
 }

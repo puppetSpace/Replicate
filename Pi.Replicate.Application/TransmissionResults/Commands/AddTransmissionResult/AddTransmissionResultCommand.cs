@@ -14,7 +14,8 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
 		public double FileChunkSequenceNo { get; set; }
 
         public Guid RecipientId { get; set; }
-    }
+	}
+
 
     public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand>
     {

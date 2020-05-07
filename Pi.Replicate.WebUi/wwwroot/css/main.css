@@ -57,11 +57,17 @@
 .folder-overview .folder-overview-data h3 {
   margin-right: 25px;
 }
-.folder-overview .metadata {
+.folder-overview .recipient-metadata {
+  display: flex;
+  flex-direction: column;
+  font-size: smaller;
+}
+.folder-overview .folder-metadata {
   display: flex;
   flex-direction: column;
   font-size: smaller;
   margin-top: 0.5rem;
+  justify-content: center;
 }
 .folder-overview .folder-setting {
   font-size: x-large;

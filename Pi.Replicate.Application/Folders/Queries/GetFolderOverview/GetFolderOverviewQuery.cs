@@ -1,67 +1,67 @@
 using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
+using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 {
-    public class GetFolderOverviewQuery : IRequest<FolderOverviewModel>
-    {
-        public Guid FolderId { get; set; }
-    }
+	public class GetFolderOverviewQuery : IRequest<Result<FolderOverviewModel>>
+	{
+		public Guid FolderId { get; set; }
+	}
 
-    public class GetFolderOverviewQueryHandler : IRequestHandler<GetFolderOverviewQuery, FolderOverviewModel>
-    {
-        //todo rework queries
-        private readonly IDatabase _database;
-        private const string _selectStatement = @"
-					
-		with latestFile_cte(Id, FolderId,[Version], LastModifiedDate, [Name],[Path], [Signature],Size,Source)
-		as
-		(SELECT TOP 1 Id, FolderId,[Version], LastModifiedDate, [Name],[Path], [Signature],Size,Source 
-		FROM dbo.[File] 
-		WHERE FolderId = @FolderId
-		ORDER BY [Version] desc)
-		select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForUpload, count(emer.FileId) AmountOfFilesProcessedForDownload
+	public class GetFolderOverviewQueryHandler : IRequestHandler<GetFolderOverviewQuery, Result<FolderOverviewModel>>
+	{
+		private readonly IDatabase _database;
+		private const string _selectStatement = @"				
+			select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForUpload, count(fir.Id) AmountOfFilesProcessedForSending, count(fif.Id) AmountOfFilesFailedToProcess
 			from dbo.Folder fo
-			left join latestFile_cte fi on fi.FolderId = fo.Id and fi.Source = 0
-			left join dbo.EofMessage eme on eme.FileId = fi.Id
-			left join latestFile_cte fir on fir.FolderId = fo.Id and fi.Source = 1
-			left join dbo.EofMessage emer on emer.FileId = fir.Id
+			left join dbo.[File] fil on fil.FolderId = fo.Id and fil.Source = 0
+			left join dbo.EofMessage eme on eme.FileId = fil.Id
+			left join dbo.[File] fir on fir.FolderId = fo.Id and fir.Source = 1 and fir.[Status] = 2
+			left join dbo.[File] fif on fif.FolderId = fo.Id and fif.Source = 0 and fir.[Status] = 1
 			where fo.Id = @FolderId
 			group by fo.[Name]";
 
-        private const string _recipientSelectStatement = @"
-		select re.Id RecipientId, re.[Name] RecipientName, re.[Address] RecipientAddress
-		, count(trt.FileChunkSequenceNo) AmountOfChunksUploaded
-		, count(trtr.FileChunkSequenceNo) AmountOfChunksDownloaded
-		, count(ftn.fileId) AmountOfFailedFileMetadata
-		, count(ftn.FileChunkId) AmountOfFailedFileChunks
-		, count(ftn.EofMessageId) AmountOfFailedEofMessages
-		from dbo.Recipient re
-		inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id and fre.FolderId = @FolderId
-		left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
-		left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id
-		left join dbo.[File] fir on fir.FolderId = fre.FolderId and fir.Source = 1
-		left join dbo.TransmissionResult trtr on trtr.FileId = fir.Id and trtr.RecipientId = re.Id
-		left join dbo.FailedTransmission ftn on ftn.RecipientId = re.Id
-		group by re.Id, re.[Name], re.[Address]";
+		private const string _recipientSelectStatement = @"
+			select re.Id RecipientId, re.[Name] RecipientName, re.[Address] RecipientAddress, ref.AmountofFilesSent
+			, count(fir.Id) AmountOfFilesReceived
+			, count(ftn.fileId) AmountOfFailedFileInfo
+			, count(ftn.FileChunkId) AmountOfFailedFileChunks
+			, count(ftn.EofMessageId) AmountOfFailedEofMessages
+			from dbo.Recipient re
+			inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id --and fre.FolderId = @FolderId
+			left join dbo.V_AmountOfFilesSentByRecipient ref on ref.RecipientId = re.Id and ref.FolderId = fre.FolderId
+			left join dbo.[File] fir on fir.FolderId = fre.FolderId and fir.Source = 1 and fir.[Status] = 2
+			left join dbo.FailedTransmission ftn on ftn.RecipientId = re.Id
+			where re.Verified = 1
+			group by re.Id, re.[Name], re.[Address],ref.AmountofFilesSent";
 
-        public GetFolderOverviewQueryHandler(IDatabase database)
-        {
-            _database = database;
-        }
+		public GetFolderOverviewQueryHandler(IDatabase database)
+		{
+			_database = database;
+		}
 
-        public async Task<FolderOverviewModel> Handle(GetFolderOverviewQuery request, CancellationToken cancellationToken)
-        {
-            using (_database)
-            {
-                var folderOverview = await _database.QuerySingle<FolderOverviewModel>(_selectStatement, new { request.FolderId });
-                var recipients = await _database.Query<RecipientOverviewModel>(_recipientSelectStatement, new { request.FolderId });
-                folderOverview.Recipients = recipients;
-                return folderOverview;
-            }
-        }
-    }
+		public async Task<Result<FolderOverviewModel>> Handle(GetFolderOverviewQuery request, CancellationToken cancellationToken)
+		{
+			try
+			{
+				using (_database)
+				{
+					var folderOverview = await _database.QuerySingle<FolderOverviewModel>(_selectStatement, new { request.FolderId });
+					var recipients = await _database.Query<RecipientOverviewModel>(_recipientSelectStatement, new { request.FolderId });
+					folderOverview.Recipients = recipients;
+					return Result<FolderOverviewModel>.Success(folderOverview);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, $"Error occured while executing query '{nameof(GetFolderOverviewQuery)}'");
+				return Result<FolderOverviewModel>.Failure();
+			}
+		}
+	}
 }
