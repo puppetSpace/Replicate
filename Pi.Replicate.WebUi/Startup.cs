@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using Blazored.Toast;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -35,6 +36,7 @@ namespace Pi.Replicate.WebUi
             services.AddHttpClient();
             services.AddSystemSettingsFromDatabase(Configuration);
 			services.AddHttpContextAccessor();
+			services.AddBlazoredToast();
 
 		}
 

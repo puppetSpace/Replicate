@@ -7,25 +7,32 @@ using Pi.Replicate.Data.Db;
 using System.Collections.Generic;
 using Pi.Replicate.Domain;
 using MediatR;
-using Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettings;
+using Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingsForConfiguration;
+using System;
 
 namespace Pi.Replicate.Data
 {
-    public static class DependecyInjection
-    {
-        public static void AddData(this IServiceCollection services)
-        {
-            services.AddTransient<IDatabase, Database>();
-            services.AddTransient<IDatabaseFactory, DatabaseFactory>();
-        }
+	public static class DependecyInjection
+	{
+		public static void AddData(this IServiceCollection services)
+		{
+			services.AddTransient<IDatabase, Database>();
+			services.AddTransient<IDatabaseFactory, DatabaseFactory>();
+		}
 
-
-        public static void AddSystemSettingsFromDatabase(this IServiceCollection services, IConfiguration configuration)
-        {
-            var mediator = services.BuildServiceProvider().GetService<IMediator>();
-            var systemSettings = mediator.Send(new GetSystemSettingsQuery()).GetAwaiter().GetResult();
-            foreach (var systemSetting in systemSettings)
-                configuration[systemSetting.Key] = systemSetting.Value;
-        }
-    }
+		public static void AddSystemSettingsFromDatabase(this IServiceCollection services, IConfiguration configuration)
+		{
+			var mediator = services.BuildServiceProvider().GetService<IMediator>();
+			var systemSettingResult = mediator.Send(new GetSystemSettingsForConfigurationQuery()).GetAwaiter().GetResult();
+			if (systemSettingResult.WasSuccessful)
+			{
+				foreach (var systemSetting in systemSettingResult.Data)
+					configuration[systemSetting.Key] = systemSetting.Value;
+			}
+			else
+			{
+				throw new InvalidOperationException("Unable to add systemsettings to configuration");
+			}
+		}
+	}
 }

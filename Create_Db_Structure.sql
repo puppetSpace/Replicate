@@ -107,9 +107,9 @@ GO
 
 create view dbo.V_AmountOfFilesSentByRecipient
 as
-select a.RecipientId, count(a.FileId) AmountOfFilesSent
+select a.RecipientId,a.FolderId, count(a.FileId) AmountOfFilesSent
 from(
-select distinct re.Id RecipientId,fi.Id FileId
+select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
 ,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum
 , (em.AmountOfChunks*(em.AmountOfChunks + 1)) / 2 ChunksChecksum
 from dbo.Recipient re
@@ -119,4 +119,4 @@ left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId =
 left join dbo.EofMessage em on em.FileId = fi.Id
 where re.Verified = 1) a
 where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
-group by a.RecipientId;
+group by a.RecipientId,a.FolderId;
