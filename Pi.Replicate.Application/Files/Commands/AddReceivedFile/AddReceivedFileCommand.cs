@@ -36,7 +36,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 			IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
 				INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)
 			ELSE
-				UPDATE dbo.[File] SET Size = @Size, LastModifiedDate = @LastModifiedDate, Signature = @Signature WHERE FileId = @Id";
+				UPDATE dbo.[File] SET Size = @Size, LastModifiedDate = @LastModifiedDate, Signature = @Signature WHERE Id = @Id";
 		
 		public AddReceivedFileCommandHandler(IDatabase database)
 		{

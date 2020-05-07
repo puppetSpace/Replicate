@@ -47,7 +47,7 @@ namespace Pi.Replicate.Worker.Host
 			services.AddHostedService<FileExportWorker>();
 			services.AddHostedService<FileDisassemblerWorker>();
 			services.AddHostedService<FileChunkExportWorker>();
-			services.AddHostedService<FileAssemblerWorker>();
+			//services.AddHostedService<FileAssemblerWorker>();
 			services.AddHostedService<RetryWorker>();
 
 		}

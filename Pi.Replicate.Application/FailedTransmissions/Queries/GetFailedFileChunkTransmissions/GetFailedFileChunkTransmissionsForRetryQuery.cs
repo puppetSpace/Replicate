@@ -24,7 +24,7 @@ namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChun
 												  , re.Id, re.Name, re.Address
 				FROM dbo.FileChunk fc
 				INNER JOIN dbo.FailedTransmission ftn on ftn.FileChunkId = fc.Id
-				LEFT JOIN dbo.Recipient re on re.Id = ftn.Recipient";
+				LEFT JOIN dbo.Recipient re on re.Id = ftn.RecipientId";
 
 		public GetFailedFileChunkTransmissionsForRetryQueryHandler(IDatabase database)
 		{
