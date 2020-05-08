@@ -32,7 +32,7 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTran
 		public Guid RecipientId { get; set; }
 	}
 
-	public class DeleteFailedTransmissionCommandHandler : IRequestHandler<DeleteFailedFileTransmissionCommand, Result>, IRequestHandler<DeleteFailedEofMessageTransmissionCommand,Result>, IRequestHandler<DeleteFailedFileChunkTransmissionCommand,Result>
+	public class DeleteFailedTransmissionCommandHandler : IRequestHandler<DeleteFailedFileTransmissionCommand, Result>, IRequestHandler<DeleteFailedEofMessageTransmissionCommand, Result>, IRequestHandler<DeleteFailedFileChunkTransmissionCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private const string _deleteFailedFileStatement = "DELETE FROM dbo.FailedTransmission WHERE FileId = @FileId and RecipientId = @RecipientId";
@@ -47,50 +47,26 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTran
 
 		public async Task<Result> Handle(DeleteFailedFileTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					await _database.Execute(_deleteFailedFileStatement, new { request.FileId, request.RecipientId });
-				return Result.Success();
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(DeleteFailedFileTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			using (_database)
+				await _database.Execute(_deleteFailedFileStatement, new { request.FileId, request.RecipientId });
+			return Result.Success();
 		}
 
 		public async Task<Result> Handle(DeleteFailedEofMessageTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					await _database.Execute(_deleteFailedEofMessageStatement, new { request.EofMessageId, request.RecipientId });
-				return Result.Success();
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(DeleteFailedEofMessageTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			using (_database)
+				await _database.Execute(_deleteFailedEofMessageStatement, new { request.EofMessageId, request.RecipientId });
+			return Result.Success();
 		}
 
 		public async Task<Result> Handle(DeleteFailedFileChunkTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					await _database.Execute(_deleteFailedFileChunkStatement, new { request.FileChunkId, request.RecipientId });
-					await _database.Execute(_deleteFileChunkStatement, new { request.FileChunkId });
-				}
-				return Result.Success();
+				await _database.Execute(_deleteFailedFileChunkStatement, new { request.FileChunkId, request.RecipientId });
+				await _database.Execute(_deleteFileChunkStatement, new { request.FileChunkId });
 			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(DeleteFailedFileChunkTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			return Result.Success();
 		}
 	}
 }

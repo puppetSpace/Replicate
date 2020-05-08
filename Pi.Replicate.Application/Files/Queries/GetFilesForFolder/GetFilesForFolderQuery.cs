@@ -15,21 +15,21 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 {
-    public class GetFilesForFolderQuery : IRequest<Result<ICollection<File>>>
-    {
-        public GetFilesForFolderQuery(Guid folderId)
-        {
-            FolderId = folderId;
-        }
+	public class GetFilesForFolderQuery : IRequest<Result<ICollection<File>>>
+	{
+		public GetFilesForFolderQuery(Guid folderId)
+		{
+			FolderId = folderId;
+		}
 
-        public Guid FolderId { get; }
-    }
+		public Guid FolderId { get; }
+	}
 
-    public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, Result<ICollection<File>>>
-    {
-        private readonly IDatabase _database;
-        private readonly IMapper _mapper;
-        private const string _selectStatement = @"
+	public class GetFilesForFolderQueryHandler : IRequestHandler<GetFilesForFolderQuery, Result<ICollection<File>>>
+	{
+		private readonly IDatabase _database;
+		private readonly IMapper _mapper;
+		private const string _selectStatement = @"
 			select Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source
 			from (
 				select *,ROW_NUMBER() over(partition by Name order by Version desc)  rnk
@@ -39,27 +39,19 @@ namespace Pi.Replicate.Application.Files.Queries.GetFilesForFolder
 			where rnk = 1
 ";
 
-        public GetFilesForFolderQueryHandler(IDatabase database, IMapper mapper)
-        {
-            _database = database;
-            _mapper = mapper;
-        }
+		public GetFilesForFolderQueryHandler(IDatabase database, IMapper mapper)
+		{
+			_database = database;
+			_mapper = mapper;
+		}
 
-        public async Task<Result<ICollection<File>>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
-        {
-			try
+		public async Task<Result<ICollection<File>>> Handle(GetFilesForFolderQuery request, CancellationToken cancellationToken)
+		{
+			using (_database)
 			{
-				using (_database)
-				{
-					var result = await _database.Query<FileDao>(_selectStatement, new { request.FolderId });
-					return Result<ICollection<File>>.Success(_mapper.Map<ICollection<File>>(result));
-				}
+				var result = await _database.Query<FileDao>(_selectStatement, new { request.FolderId });
+				return Result<ICollection<File>>.Success(_mapper.Map<ICollection<File>>(result));
 			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query {nameof(GetFilesForFolderQuery)}");
-				return Result<ICollection<File>>.Failure();
-			}
-        }
-    }
+		}
+	}
 }

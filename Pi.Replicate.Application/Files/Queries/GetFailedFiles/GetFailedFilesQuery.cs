@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetFailedFiles
 {
-    public class GetFailedFilesQuery : IRequest<Result<ICollection<File>>>
-    {
-        
-    }
+	public class GetFailedFilesQuery : IRequest<Result<ICollection<File>>>
+	{
+
+	}
 
 	public class GetFailedFileQueryHandler : IRequestHandler<GetFailedFilesQuery, Result<ICollection<File>>>
 	{
@@ -29,16 +29,8 @@ namespace Pi.Replicate.Application.Files.Queries.GetFailedFiles
 
 		public async Task<Result<ICollection<File>>> Handle(GetFailedFilesQuery request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					return Result<ICollection<File>>.Success(await _database.Query<File>(_selectStatement, null));
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFailedFilesQuery)}'");
-				return Result<ICollection<File>>.Failure();
-			}
+			using (_database)
+				return Result<ICollection<File>>.Success(await _database.Query<File>(_selectStatement, null));
 		}
 	}
 }

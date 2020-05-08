@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChunkTransmissions
 {
-    public class GetFailedFileChunkTransmissionsForRetryQuery : IRequest<Result<ICollection<FailedFileChunk>>>
-    {
-        
-    }
+	public class GetFailedFileChunkTransmissionsForRetryQuery : IRequest<Result<ICollection<FailedFileChunk>>>
+	{
+
+	}
 
 	public class GetFailedFileChunkTransmissionsForRetryQueryHandler : IRequestHandler<GetFailedFileChunkTransmissionsForRetryQuery, Result<ICollection<FailedFileChunk>>>
 	{
@@ -33,18 +33,10 @@ namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChun
 
 		public async Task<Result<ICollection<FailedFileChunk>>> Handle(GetFailedFileChunkTransmissionsForRetryQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var result = await _database.Query<FileChunk, Recipient, FailedFileChunk>(_selectStatement, null, (fc, re) => new FailedFileChunk { FileChunk = fc, Recipient = re });
-					return Result<ICollection<FailedFileChunk>>.Success(result);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFailedFileChunkTransmissionsForRetryQuery)}'");
-				return Result<ICollection<FailedFileChunk>>.Failure();
+				var result = await _database.Query<FileChunk, Recipient, FailedFileChunk>(_selectStatement, null, (fc, re) => new FailedFileChunk { FileChunk = fc, Recipient = re });
+				return Result<ICollection<FailedFileChunk>>.Success(result);
 			}
 		}
 	}

@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile
 {
-    public class GetPreviousSignatureOfFileQuery : IRequest<Result<ReadOnlyMemory<byte>>>
-    {
+	public class GetPreviousSignatureOfFileQuery : IRequest<Result<ReadOnlyMemory<byte>>>
+	{
 		public Guid FileId { get; set; }
 	}
 
@@ -33,18 +33,8 @@ namespace Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile
 
 		public async Task<Result<ReadOnlyMemory<byte>>> Handle(GetPreviousSignatureOfFileQuery request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-				{
-					return Result<ReadOnlyMemory<byte>>.Success(await _database.QuerySingle<byte[]>(_selectStatement, new { request.FileId }));
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetPreviousSignatureOfFileQuery)}'");
-				return Result<ReadOnlyMemory<byte>>.Failure();
-			}
+			using (_database)
+				return Result<ReadOnlyMemory<byte>>.Success(await _database.QuerySingle<byte[]>(_selectStatement, new { request.FileId }));
 		}
 	}
 }

@@ -28,8 +28,9 @@ namespace Pi.Replicate.WebUi.Shared
         {
             _subscription?.Dispose();
             _subscription = Broker.Subscribe(this);
-            var folderNames = await Mediator.Send(new GetFolderListQuery());
-            Folders = folderNames.OrderBy(x=>x.Name).ToList();
+            var folderResult = await Mediator.Send(new GetFolderListQuery());
+			if(folderResult.WasSuccessful)
+				Folders = folderResult.Data.OrderBy(x=>x.Name).ToList();
         }
 
         public async Task Handle(Folder value, CancellationToken cancellationToken)

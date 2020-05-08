@@ -2,12 +2,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 
 namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
 {
-    public class AddTransmissionResultCommand : IRequest
+    public class AddTransmissionResultCommand : IRequest<Result>
     {
         public Guid FileId { get; set; }
 
@@ -17,7 +18,7 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
 	}
 
 
-    public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand>
+    public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand, Result>
     {
         private readonly IDatabase _database;
         private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo) VALUES(@Id,@RecipientId,@FileId, @FileChunkSequenceNo)";
@@ -26,14 +27,14 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
         {
             _database = database;
         }
-        public async Task<Unit> Handle(AddTransmissionResultCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AddTransmissionResultCommand request, CancellationToken cancellationToken)
         {
             using (_database)
             {
                 await _database.Execute(_insertStatement, new {Id=  Guid.NewGuid(), request.RecipientId,request.FileId,request.FileChunkSequenceNo });
             }
 
-			return Unit.Value;
+			return Result.Success();
         }
     }
 }

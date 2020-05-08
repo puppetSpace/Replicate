@@ -12,8 +12,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Queries.GetFolderSettings
 {
-    public class GetFolderSettingsQuery : IRequest<Result<FolderSettingsViewModel>>
-    {
+	public class GetFolderSettingsQuery : IRequest<Result<FolderSettingsViewModel>>
+	{
 		public Guid FolderId { get; set; }
 	}
 
@@ -32,18 +32,10 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderSettings
 
 		public async Task<Result<FolderSettingsViewModel>> Handle(GetFolderSettingsQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var recipients = await _database.Query<Recipient>(_selectStatementRecipients, new { request.FolderId });
-					return Result<FolderSettingsViewModel>.Success(new FolderSettingsViewModel { Recipients = recipients });
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFolderSettingsQuery)}'");
-				return Result<FolderSettingsViewModel>.Failure();
+				var recipients = await _database.Query<Recipient>(_selectStatementRecipients, new { request.FolderId });
+				return Result<FolderSettingsViewModel>.Success(new FolderSettingsViewModel { Recipients = recipients });
 			}
 		}
 	}

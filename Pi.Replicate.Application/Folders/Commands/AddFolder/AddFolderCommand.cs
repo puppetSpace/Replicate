@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Observr;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 {
-	public class AddFolderCommand : IRequest
+	public class AddFolderCommand : IRequest<Result>
 	{
 		public string Name { get; set; }
 
@@ -20,7 +21,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 		public List<Recipient> Recipients { get; set; }
 	}
 
-	public class AddNewFolderCommandHandler : IRequestHandler<AddFolderCommand>
+	public class AddNewFolderCommandHandler : IRequestHandler<AddFolderCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private readonly PathBuilder _pathBuilder;
@@ -35,7 +36,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 			_broker = broker;
 		}
 
-		public async Task<Unit> Handle(AddFolderCommand request, CancellationToken cancellationToken)
+		public async Task<Result> Handle(AddFolderCommand request, CancellationToken cancellationToken)
 		{
 			var folder = new Folder
 			{
@@ -58,7 +59,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 
 
 			_broker.Publish(folder).Forget();
-			return Unit.Value;
+			return Result.Success();
 		}
 	}
 }

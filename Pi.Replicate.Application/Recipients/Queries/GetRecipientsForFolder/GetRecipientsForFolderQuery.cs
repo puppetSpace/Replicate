@@ -30,16 +30,8 @@ namespace Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder
 		}
 		public async Task<Result<ICollection<Recipient>>> Handle(GetRecipientsForFolderQuery request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					return Result<ICollection<Recipient>>.Success(await _database.Query<Recipient>(_selectStatement, new { request.FolderId }));
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetRecipientsForFolderQuery)}'");
-				return Result<ICollection<Recipient>>.Failure();
-			}
+			using (_database)
+				return Result<ICollection<Recipient>>.Success(await _database.Query<Recipient>(_selectStatement, new { request.FolderId }));
 		}
 	}
 }

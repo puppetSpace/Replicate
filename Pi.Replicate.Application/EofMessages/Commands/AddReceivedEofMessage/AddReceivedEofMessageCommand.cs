@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using System;
@@ -10,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.EofMessages.Commands.AddReceivedEofMessage
 {
-    public class AddReceivedEofMessageCommand : IRequest
+    public class AddReceivedEofMessageCommand : IRequest<Result>
     {
 		public Guid FileId { get; set; }
 
 		public int AmountOfChunks { get; set; }
 	}
 
-	public class AddReceivedEofMessageCommandHandler : IRequestHandler<AddReceivedEofMessageCommand>
+	public class AddReceivedEofMessageCommandHandler : IRequestHandler<AddReceivedEofMessageCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private const string _insertStatement = @"
@@ -31,13 +32,13 @@ namespace Pi.Replicate.Application.EofMessages.Commands.AddReceivedEofMessage
 			_database = database;
 		}
 
-		public async Task<Unit> Handle(AddReceivedEofMessageCommand request, CancellationToken cancellationToken)
+		public async Task<Result> Handle(AddReceivedEofMessageCommand request, CancellationToken cancellationToken)
 		{
 			var eofMessage = EofMessage.Build(request.FileId, request.AmountOfChunks);
 			using (_database)
 				await _database.Execute(_insertStatement, new {eofMessage.Id, eofMessage.FileId, eofMessage.AmountOfChunks });
 
-			return Unit.Value;
+			return Result.Success();
 		}
 	}
 }

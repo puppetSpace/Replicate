@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingsForConfiguration
 {
-    public class GetSystemSettingsForConfigurationQuery : IRequest<Result<ICollection<SystemSettingDto>>>
-    {
-        
-    }
+	public class GetSystemSettingsForConfigurationQuery : IRequest<Result<ICollection<SystemSettingDto>>>
+	{
+
+	}
 
 	public class GetSystemSettingsForConfigurationQueryHandler : IRequestHandler<GetSystemSettingsForConfigurationQuery, Result<ICollection<SystemSettingDto>>>
 	{
@@ -29,18 +29,10 @@ namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingsForCo
 
 		public async Task<Result<ICollection<SystemSettingDto>>> Handle(GetSystemSettingsForConfigurationQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var queryResult = await _database.Query<SystemSettingDto>(_selectStatement, null);
-					return Result<ICollection<SystemSettingDto>>.Success(queryResult);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetSystemSettingsForConfigurationQuery)}'");
-				return Result<ICollection<SystemSettingDto>>.Failure();
+				var queryResult = await _database.Query<SystemSettingDto>(_selectStatement, null);
+				return Result<ICollection<SystemSettingDto>>.Success(queryResult);
 			}
 		}
 	}

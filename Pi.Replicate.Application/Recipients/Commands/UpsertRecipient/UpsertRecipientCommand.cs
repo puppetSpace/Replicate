@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Recipients.Commands.UpsertRecipient
 {
-    public class UpsertRecipientCommand : IRequest
+    public class UpsertRecipientCommand : IRequest<Result>
     {
         public string Name { get; set; }
 
@@ -19,7 +20,7 @@ namespace Pi.Replicate.Application.Recipients.Commands.UpsertRecipient
 		public bool Verified { get; set; }
 	}
 
-    public class UpsertRecipientCommandHandler : IRequestHandler<UpsertRecipientCommand>
+    public class UpsertRecipientCommandHandler : IRequestHandler<UpsertRecipientCommand, Result>
     {
         private readonly IDatabase _database;
         private const string _insertStatement = @"
@@ -37,14 +38,14 @@ namespace Pi.Replicate.Application.Recipients.Commands.UpsertRecipient
             _database = database;
         }
 
-        public async Task<Unit> Handle(UpsertRecipientCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpsertRecipientCommand request, CancellationToken cancellationToken)
         {
             using (_database)
             {
                 var builtRecipient = Recipient.Build(request.Name, request.Address,request.Verified);
                 await _database.Execute(_insertStatement, new { builtRecipient.Id, builtRecipient.Name, builtRecipient.Address, builtRecipient.Verified }); ;
 
-                return Unit.Value;
+                return Result.Success();
             }
         }
     }

@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTransmissions
 {
-    public class GetFailedEofMessageTransmissionsForRetryQuery : IRequest<Result<ICollection<FailedEofMessage>>>
-    {
-        
-    }
+	public class GetFailedEofMessageTransmissionsForRetryQuery : IRequest<Result<ICollection<FailedEofMessage>>>
+	{
+
+	}
 
 	public class GetFailedEofMessageTransmissionsForRetryQueryHandler : IRequestHandler<GetFailedEofMessageTransmissionsForRetryQuery, Result<ICollection<FailedEofMessage>>>
 	{
@@ -33,18 +33,10 @@ namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessa
 
 		public async Task<Result<ICollection<FailedEofMessage>>> Handle(GetFailedEofMessageTransmissionsForRetryQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var result = await _database.Query<EofMessage, Recipient, FailedEofMessage>(_selectStatement, null, (em, re) => new FailedEofMessage { EofMessage = em, Recipient = re });
-					return Result<ICollection<FailedEofMessage>>.Success(result);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFailedEofMessageTransmissionsForRetryQuery)}'");
-				return Result<ICollection<FailedEofMessage>>.Failure();
+				var result = await _database.Query<EofMessage, Recipient, FailedEofMessage>(_selectStatement, null, (em, re) => new FailedEofMessage { EofMessage = em, Recipient = re });
+				return Result<ICollection<FailedEofMessage>>.Success(result);
 			}
 		}
 	}

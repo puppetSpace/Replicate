@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Recipients.Commands.DeleteRecipient
 {
-    public class DeleteRecipientCommand : IRequest
+    public class DeleteRecipientCommand : IRequest<Result>
     {
 		public string Name { get; set; }
 	}
 
-	public class DeleteRecipientCommandHandler : IRequestHandler<DeleteRecipientCommand>
+	public class DeleteRecipientCommandHandler : IRequestHandler<DeleteRecipientCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private const string _deleteStatement = "DELETE FROM dbo.Recipient WHERE Name = @Name";
@@ -24,12 +25,12 @@ namespace Pi.Replicate.Application.Recipients.Commands.DeleteRecipient
 			_database = database;
 		}
 
-		public async Task<Unit> Handle(DeleteRecipientCommand request, CancellationToken cancellationToken)
+		public async Task<Result> Handle(DeleteRecipientCommand request, CancellationToken cancellationToken)
 		{
 			using (_database)
 				await _database.Execute(_deleteStatement, new { request.Name });
 
-			return Unit.Value;
+			return Result.Success();
 		}
 	}
 }

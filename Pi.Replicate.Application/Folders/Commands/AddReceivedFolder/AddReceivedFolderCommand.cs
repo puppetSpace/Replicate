@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Observr;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -13,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
 {
-    public class AddReceivedFolderCommand : IRequest<Guid>
+    public class AddReceivedFolderCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; }
 
@@ -22,7 +23,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
         public string SenderAddress { get; set; }
     }
 
-    public class AddReceivedFolderCommandHandler : IRequestHandler<AddReceivedFolderCommand, Guid>
+    public class AddReceivedFolderCommandHandler : IRequestHandler<AddReceivedFolderCommand, Result<Guid>>
     {
         private const string _folderInsertStatement = @"INSERT INTO dbo.Folder(Id,Name) VALUES(@Id,@Name)";
         private const string _folderIdSelectStatement = "SELECT Id FROM dbo.Folder WHERE Name = @Name";
@@ -54,13 +55,13 @@ namespace Pi.Replicate.Application.Folders.Commands.AddReceivedFolder
 			_broker = broker;
 		}
 
-        public async Task<Guid> Handle(AddReceivedFolderCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(AddReceivedFolderCommand request, CancellationToken cancellationToken)
         {
             using (_database)
             {
                 Guid folderId = await CreateFolderIfNotExists(request);
                 await CreateRecipientOfNotExists(request,folderId);
-                return folderId;
+                return Result < Guid > .Success(folderId);
             }
         }
 

@@ -2,7 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Pi.Replicate.Application.Folders.Commands.AddFolder;
-using Pi.Replicate.Application.Folders.Queries.GetAvailableFolders;
+using Pi.Replicate.Application.Folders.Queries.GetAvailableFolderNames;
 using Pi.Replicate.Application.Recipients.Queries.GetVerifiedRecipients;
 using Pi.Replicate.WebUi.Components;
 using System;
@@ -29,10 +29,13 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
 		protected override async Task OnInitializedAsync()
 		{
-			var folderNames = await Mediator.Send(new GetAvailableFoldersQuery());
-			AvailableFolderNames = folderNames;
-			var recipients = await Mediator.Send(new GetVerifiedRecipientsQuery());
-			Recipients = recipients.OrderBy(x => x.Name).Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
+			var folderNamesResult = await Mediator.Send(new GetAvailableFolderNamesQuery());
+			var recipientsResult = await Mediator.Send(new GetVerifiedRecipientsQuery());
+			if (folderNamesResult.WasSuccessful && recipientsResult.WasSuccessful)
+			{
+				AvailableFolderNames = folderNamesResult.Data;
+				Recipients = recipientsResult.Data.OrderBy(x => x.Name).Select(x => new CheckItem<Domain.Recipient> { Data = x, DisplayText = x.Name }).ToList();
+			}
 		}
 
 		protected async Task CreateNewFolder()

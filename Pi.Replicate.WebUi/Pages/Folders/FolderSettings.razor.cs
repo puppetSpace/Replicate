@@ -29,11 +29,11 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 		{
 			if (Guid.TryParse(FolderId, out var folderId))
 			{
-				var recipients = await Mediator.Send(new GetVerifiedRecipientsQuery());
+				var recipientsResult = await Mediator.Send(new GetVerifiedRecipientsQuery());
 				var folderSettingsResult = await Mediator.Send(new GetFolderSettingsQuery { FolderId = folderId });
-				if (folderSettingsResult.WasSuccessful)
+				if (folderSettingsResult.WasSuccessful && recipientsResult.WasSuccessful)
 				{
-					Recipients = recipients
+					Recipients = recipientsResult.Data
 						.OrderBy(x => x.Name)
 						.Select(x => new CheckItem<Recipient> { Data = x, DisplayText = x.Name, IsChecked = folderSettingsResult.Data.Recipients.Any(y=>string.Equals(y.Name,x.Name,StringComparison.OrdinalIgnoreCase))})
 						.ToList();

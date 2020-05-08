@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingOverview
 {
-    public class GetSystemSettingOverviewQuery : IRequest<Result<ICollection<SystemSettingViewModel>>>
-    {
-        
-    }
+	public class GetSystemSettingOverviewQuery : IRequest<Result<ICollection<SystemSettingViewModel>>>
+	{
+
+	}
 
 	public class GetSystemSettingOverviewQueryHandler : IRequestHandler<GetSystemSettingOverviewQuery, Result<ICollection<SystemSettingViewModel>>>
 	{
@@ -32,18 +32,10 @@ namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingOvervi
 
 		public async Task<Result<ICollection<SystemSettingViewModel>>> Handle(GetSystemSettingOverviewQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var queryResult = await _database.Query<SystemSetting>(_selectStatement, null);
-					return Result<ICollection<SystemSettingViewModel>>.Success(_mapper.Map<ICollection<SystemSettingViewModel>>(queryResult));
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetSystemSettingOverviewQuery)}'");
-				return Result<ICollection<SystemSettingViewModel>>.Failure();
+				var queryResult = await _database.Query<SystemSetting>(_selectStatement, null);
+				return Result<ICollection<SystemSettingViewModel>>.Success(_mapper.Map<ICollection<SystemSettingViewModel>>(queryResult));
 			}
 		}
 	}

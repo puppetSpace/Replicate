@@ -34,20 +34,12 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolder
 
 		public async Task<Result<Folder>> Handle(GetFolderQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var folder = await _database.QuerySingle<Folder>(_selectStatement, new { Id = request.FolderId });
-					var recipients = await _database.Query<Recipient>(_selectStatementFolderRecipients, new { request.FolderId });
-					folder.Recipients = recipients.ToList();
-					return Result<Folder>.Success(folder);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query {nameof(GetFolderQuery)}");
-				return Result<Folder>.Failure();
+				var folder = await _database.QuerySingle<Folder>(_selectStatement, new { Id = request.FolderId });
+				var recipients = await _database.Query<Recipient>(_selectStatementFolderRecipients, new { request.FolderId });
+				folder.Recipients = recipients.ToList();
+				return Result<Folder>.Success(folder);
 			}
 		}
 	}

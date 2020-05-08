@@ -18,7 +18,8 @@ namespace Pi.Replicate.Application
             services.AddMediatR(Assembly.GetExecutingAssembly());
             services.AddAutoMapper(typeof(MappingProfile).Assembly);
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddSingleton<PathBuilder>();
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
+			services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
             services.AddTransient<FileCollectorFactory>();
             services.AddTransient<FileDisassemblerService>();

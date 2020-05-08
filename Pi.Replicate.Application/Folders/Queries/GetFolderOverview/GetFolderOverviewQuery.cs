@@ -47,20 +47,12 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 
 		public async Task<Result<FolderOverviewModel>> Handle(GetFolderOverviewQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var folderOverview = await _database.QuerySingle<FolderOverviewModel>(_selectStatement, new { request.FolderId });
-					var recipients = await _database.Query<RecipientOverviewModel>(_recipientSelectStatement, new { request.FolderId });
-					folderOverview.Recipients = recipients;
-					return Result<FolderOverviewModel>.Success(folderOverview);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFolderOverviewQuery)}'");
-				return Result<FolderOverviewModel>.Failure();
+				var folderOverview = await _database.QuerySingle<FolderOverviewModel>(_selectStatement, new { request.FolderId });
+				var recipients = await _database.Query<RecipientOverviewModel>(_recipientSelectStatement, new { request.FolderId });
+				folderOverview.Recipients = recipients;
+				return Result<FolderOverviewModel>.Success(folderOverview);
 			}
 		}
 	}

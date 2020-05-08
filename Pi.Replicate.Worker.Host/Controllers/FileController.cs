@@ -29,9 +29,13 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
 			Log.Information($"File data received from {Request.HttpContext.Connection.RemoteIpAddress}");
-			var folderId = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
-			await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderId = folderId, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Signature = model.Signature, Version = model.Version });
-			return Ok();
+			var folderIdResult = await _mediator.Send(new AddReceivedFolderCommand { Name = model.FolderName, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
+			if (folderIdResult.WasSuccessful)
+			{
+				await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderId = folderIdResult.Data, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Signature = model.Signature, Version = model.Version });
+				return Ok();
+			}
+			return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
 		}
 	}
 }

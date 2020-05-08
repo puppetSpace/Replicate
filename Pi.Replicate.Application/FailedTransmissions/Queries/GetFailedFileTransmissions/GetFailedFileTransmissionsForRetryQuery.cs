@@ -32,21 +32,13 @@ namespace Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTran
 		}
 		public async Task<Result<ICollection<FailedFile>>> Handle(GetFailedFileTransmissionsForRetryQuery request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					var result = await _database.Query<File, Folder, Recipient, FailedFile>(_selectStatement, null
-					, (fi, fo, re) => new FailedFile { File = fi, Folder = fo, Recipient = re }
-					);
+				var result = await _database.Query<File, Folder, Recipient, FailedFile>(_selectStatement, null
+				, (fi, fo, re) => new FailedFile { File = fi, Folder = fo, Recipient = re }
+				);
 
-					return Result<ICollection<FailedFile>>.Success(result);
-				}
-			}
-			catch (System.Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query '{nameof(GetFailedFileTransmissionsForRetryQuery)}'");
-				return Result<ICollection<FailedFile>>.Failure();
+				return Result<ICollection<FailedFile>>.Success(result);
 			}
 		}
 	}

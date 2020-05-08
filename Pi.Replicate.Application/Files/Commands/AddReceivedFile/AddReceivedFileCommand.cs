@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 {
-    public class AddReceivedFileCommand : IRequest
+    public class AddReceivedFileCommand : IRequest<Result>
     {
 		public Guid Id { get; set; }
 
@@ -29,7 +30,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 		public string Path { get; set; }
 	}
 
-	public class AddReceivedFileCommandHandler : IRequestHandler<AddReceivedFileCommand>
+	public class AddReceivedFileCommandHandler : IRequestHandler<AddReceivedFileCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private const string _fileInsertStatement = @"
@@ -43,12 +44,12 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 			_database = database;
 		}
 
-		public async Task<Unit> Handle(AddReceivedFileCommand request, CancellationToken cancellationToken)
+		public async Task<Result> Handle(AddReceivedFileCommand request, CancellationToken cancellationToken)
 		{
 			using (_database)
 				await _database.Execute(_fileInsertStatement, new { request.Id, request.FolderId, request.Name, request.Size, request.Version, request.LastModifiedDate, request.Path, request.Signature, Source = FileSource.Remote });
 
-			return Unit.Value;
+			return Result.Success();
 		}
 	}
 }

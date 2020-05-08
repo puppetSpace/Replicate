@@ -13,39 +13,31 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl
 {
-    public class GetFoldersToCrawlQuery : IRequest<Result<ICollection<Folder>>>
-    {
-        
-    }
+	public class GetFoldersToCrawlQuery : IRequest<Result<ICollection<Folder>>>
+	{
 
-    public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, Result<ICollection<Folder>>>
-    {
-        private readonly IDatabase _database;
-        private const string _selectStatementFolder = "SELECT Id, Name FROM dbo.Folder";
+	}
+
+	public class GetFoldersToCrawlQueryHandler : IRequestHandler<GetFoldersToCrawlQuery, Result<ICollection<Folder>>>
+	{
+		private readonly IDatabase _database;
+		private const string _selectStatementFolder = "SELECT Id, Name FROM dbo.Folder";
 
 
-        public GetFoldersToCrawlQueryHandler(IDatabase database)
-        {
-            _database = database;
-        }
+		public GetFoldersToCrawlQueryHandler(IDatabase database)
+		{
+			_database = database;
+		}
 
-        public async Task<Result<ICollection<Folder>>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
-        {
-			try
+		public async Task<Result<ICollection<Folder>>> Handle(GetFoldersToCrawlQuery request, CancellationToken cancellationToken)
+		{
+			using (_database)
 			{
-				using (_database)
-				{
-					var folders = await _database.Query<Folder>(_selectStatementFolder, null);
-				
+				var folders = await _database.Query<Folder>(_selectStatementFolder, null);
 
-					return Result<ICollection<Folder>>.Success(folders);
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing query {nameof(GetFoldersToCrawlQuery)}");
-				return Result<ICollection<Folder>>.Failure();
+
+				return Result<ICollection<Folder>>.Success(folders);
 			}
 		}
-    }
+	}
 }

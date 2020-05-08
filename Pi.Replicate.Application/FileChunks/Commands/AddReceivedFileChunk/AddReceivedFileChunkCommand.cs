@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk
 {
-    public class AddReceivedFileChunkCommand : IRequest
+    public class AddReceivedFileChunkCommand : IRequest<Result>
     {
 		public Guid FileId { get; set; }
 
@@ -19,7 +20,7 @@ namespace Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk
 		public ReadOnlyMemory<byte> Value { get; set; }
 	}
 
-	public class AddReceivedFileChunkCommandHandler : IRequestHandler<AddReceivedFileChunkCommand>
+	public class AddReceivedFileChunkCommandHandler : IRequestHandler<AddReceivedFileChunkCommand, Result>
 	{
 		private readonly IDatabase _database;
 		private const string _insertStatement = @"
@@ -34,14 +35,14 @@ namespace Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk
 			_database = database;
 		}
 
-		public async Task<Unit> Handle(AddReceivedFileChunkCommand request, CancellationToken cancellationToken)
+		public async Task<Result> Handle(AddReceivedFileChunkCommand request, CancellationToken cancellationToken)
 		{
 			using (_database)
 			{
 				var fileChunk = FileChunk.Build(request.FileId, request.SequenceNo, request.Value);
 				await _database.Execute(_insertStatement, new { fileChunk.Id, fileChunk.FileId, fileChunk.SequenceNo, Value = fileChunk.Value.ToArray() });
 			}
-			return Unit.Value;
+			return Result.Success();
 		}
 	}
 }

@@ -63,53 +63,29 @@ namespace Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmi
 
 		public async Task<Result> Handle(AddFailedFileTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					await _database.Execute(_insertStatementForFile, new { Id = Guid.NewGuid(), request.RecipientId, request.FileId });
-				return Result.Success();
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(AddFailedFileTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			using (_database)
+				await _database.Execute(_insertStatementForFile, new { Id = Guid.NewGuid(), request.RecipientId, request.FileId });
+			return Result.Success();
 		}
 
 		public async Task<Result> Handle(AddFailedEofMessageTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					await _database.Execute(_insertStatementForEofMessage, new { Id = Guid.NewGuid(), request.RecipientId, EofMessageId = request.EofMessageId });
+			using (_database)
+				await _database.Execute(_insertStatementForEofMessage, new { Id = Guid.NewGuid(), request.RecipientId, EofMessageId = request.EofMessageId });
 
-				return Result.Success();
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(AddFailedEofMessageTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			return Result.Success();
 		}
 
 		public async Task<Result> Handle(AddFailedFileChunkTransmissionCommand request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
-				{
-					await _database.Execute(_insertStatementFileChunk, new { Id = Guid.NewGuid(), request.RecipientId, request.FileChunkId });
-					//the filechunk must be save so it can be retrieved again for resend
-					await _database.Execute(_insertStatementFileChunk, new { Id = request.FileChunkId, request.FileId, request.SequenceNo, Value = request.Value.ToArray() });
+				await _database.Execute(_insertStatementFileChunk, new { Id = Guid.NewGuid(), request.RecipientId, request.FileChunkId });
+				//the filechunk must be save so it can be retrieved again for resend
+				await _database.Execute(_insertStatementFileChunk, new { Id = request.FileChunkId, request.FileId, request.SequenceNo, Value = request.Value.ToArray() });
 
-				}
-				return Result.Success();
 			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(AddFailedFileChunkTransmissionCommand)}'");
-				return Result.Failure();
-			}
+			return Result.Success();
 		}
 	}
 }

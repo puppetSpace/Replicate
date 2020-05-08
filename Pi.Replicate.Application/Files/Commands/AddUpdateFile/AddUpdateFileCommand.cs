@@ -41,25 +41,17 @@ namespace Pi.Replicate.Application.Files.Commands.AddUpdateFile
 
 		public async Task<Result<File>> Handle(AddUpdateFileCommand request, CancellationToken cancellationToken)
 		{
-			try
+			using (_database)
 			{
-				using (_database)
+				var relativePath = request.FileInfo.FullName.Replace(_pathBuilder.BasePath + "\\", "");
+				var result = await _database.QuerySingle<FileDao>(_selectStatement, new { request.FolderId, Path = relativePath });
+				var foundFile = _mapper.Map<File>(result);
+				if (foundFile is object)
 				{
-					var relativePath = request.FileInfo.FullName.Replace(_pathBuilder.BasePath + "\\", "");
-					var result = await _database.QuerySingle<FileDao>(_selectStatement, new { request.FolderId, Path = relativePath });
-					var foundFile = _mapper.Map<File>(result);
-					if (foundFile is object)
-					{
-						foundFile.Update(request.FileInfo);
-						await _database.Execute(_insertStatement, new { foundFile.Id, foundFile.FolderId, foundFile.Name, foundFile.Size, foundFile.Version, foundFile.LastModifiedDate, foundFile.Path, Signature = request.Signature.ToArray(), foundFile.Source });
-					}
-					return Result<File>.Success(foundFile);
+					foundFile.Update(request.FileInfo);
+					await _database.Execute(_insertStatement, new { foundFile.Id, foundFile.FolderId, foundFile.Name, foundFile.Size, foundFile.Version, foundFile.LastModifiedDate, foundFile.Path, Signature = request.Signature.ToArray(), foundFile.Source });
 				}
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occurred while executing command '{nameof(AddUpdateFileCommand)}'");
-				return Result<File>.Failure();
+				return Result<File>.Success(foundFile);
 			}
 		}
 	}

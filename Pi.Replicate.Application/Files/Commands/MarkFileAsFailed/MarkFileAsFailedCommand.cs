@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Files.Commands.MarkFileAsFailed
 {
-    public class MarkFileAsFailedCommand : IRequest<Result>
-    {
+	public class MarkFileAsFailedCommand : IRequest<Result>
+	{
 		public Guid FileId { get; set; }
 	}
 
@@ -28,18 +28,10 @@ namespace Pi.Replicate.Application.Files.Commands.MarkFileAsFailed
 
 		public async Task<Result> Handle(MarkFileAsFailedCommand request, CancellationToken cancellationToken)
 		{
-			try
-			{
-				using (_database)
-					await _database.Execute(_updateStatement, new { Id = request.FileId });
+			using (_database)
+				await _database.Execute(_updateStatement, new { Id = request.FileId });
 
-				return Result.Success();
-			}
-			catch (Exception ex)
-			{
-				Log.Error(ex, $"Error occured while executing command '{nameof(MarkFileAsFailedCommand)}'");
-				return Result.Failure();
-			}
+			return Result.Success();
 		}
 	}
 }
