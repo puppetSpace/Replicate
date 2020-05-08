@@ -5,6 +5,7 @@ using Moq;
 using Pi.Replicate.Application.Files.Processing;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Infrastructure.Services;
 using Pi.Replicate.Shared;
 using System;
 using System.Threading;

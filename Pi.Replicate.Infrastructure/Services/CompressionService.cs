@@ -1,24 +1,22 @@
-﻿using System;
+﻿using Pi.Replicate.Application.Common.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Services
+namespace Pi.Replicate.Infrastructure.Services
 {
-    public class CompressionService
+    public class CompressionService : ICompressionService
     {
-        public async Task<string> CompressFileToTempFile(string path)
+        public async Task Compress(string source,string destination)
         {
-            var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
-            using var stream = System.IO.File.OpenRead(path);
-            using var output = System.IO.File.OpenWrite(tempPath);
+            using var stream = System.IO.File.OpenRead(source);
+            using var output = System.IO.File.OpenWrite(destination);
             using var gzip = new GZipStream(output, CompressionMode.Compress);
 
             await stream.CopyToAsync(gzip);
-
-            return tempPath;
         }
 
         public async Task Decompress(string compressedFile,string destination)

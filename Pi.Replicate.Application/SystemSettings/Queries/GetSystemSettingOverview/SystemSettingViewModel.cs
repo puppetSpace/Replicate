@@ -19,6 +19,6 @@ namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingOvervi
 
 		public string DataType { get; set; }
 
-		public string Info { get; set; }
+		public string Description { get; set; }
 	}
 }

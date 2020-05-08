@@ -1,5 +1,6 @@
 ﻿using Octodiff.Core;
 using Octodiff.Diagnostics;
+using Pi.Replicate.Application.Common.Interfaces;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -9,10 +10,10 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Services
+namespace Pi.Replicate.Infrastructure.Services
 {
     //https://github.com/OctopusDeploy/Octodiff
-    public class DeltaService
+    public class DeltaService : IDeltaService
     {
 
         public ReadOnlyMemory<byte> CreateSignature(Stream input)

@@ -10,6 +10,7 @@ using Observr;
 using Pi.Replicate.Application;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Data;
+using Pi.Replicate.Infrastructure;
 using Serilog;
 
 namespace Pi.Replicate.WebUi
@@ -32,6 +33,7 @@ namespace Pi.Replicate.WebUi
             services.AddServerSideBlazor();
             services.AddApplication();
             services.AddData();
+			services.AddInfrastructure();
             services.AddObservr();
             services.AddHttpClient();
             services.AddSystemSettingsFromDatabase(Configuration);

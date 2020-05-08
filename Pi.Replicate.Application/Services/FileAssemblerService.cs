@@ -11,14 +11,14 @@ namespace Pi.Replicate.Application.Services
 {
 	public class FileAssemblerService
 	{
-		private readonly CompressionService _compressionService;
+		private readonly ICompressionService _compressionService;
 		private readonly PathBuilder _pathBuilder;
-		private readonly DeltaService _deltaService;
+		private readonly IDeltaService _deltaService;
 		private readonly IDatabase _database;
 
-		public FileAssemblerService(CompressionService compressionService
+		public FileAssemblerService(ICompressionService compressionService
 			, PathBuilder pathBuilder
-			, DeltaService deltaService
+			, IDeltaService deltaService
 			, IDatabase database)
 		{
 			_pathBuilder = pathBuilder;
@@ -145,14 +145,14 @@ namespace Pi.Replicate.Application.Services
 
 	public class FileAssemblerServiceFactory
 	{
-		private readonly CompressionService _compressionService;
+		private readonly ICompressionService _compressionService;
 		private readonly PathBuilder _pathBuilder;
-		private readonly DeltaService _deltaService;
+		private readonly IDeltaService _deltaService;
 		private readonly IDatabaseFactory _databaseFactory;
 
-		public FileAssemblerServiceFactory(CompressionService compressionService
+		public FileAssemblerServiceFactory(ICompressionService compressionService
 			, PathBuilder pathBuilder
-			, DeltaService deltaService
+			, IDeltaService deltaService
 			, IDatabaseFactory databaseFactory)
 		{
 			_compressionService = compressionService;

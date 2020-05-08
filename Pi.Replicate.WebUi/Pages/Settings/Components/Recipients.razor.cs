@@ -5,16 +5,12 @@ using Observr;
 using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
 using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
+using Pi.Replicate.Infrastructure.Services;
 using Pi.Replicate.WebUi.Components;
 using Pi.Replicate.WebUi.Models;
-using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -98,7 +94,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		protected async Task VerifyRecipient(RecipientViewModel recipientModel)
 		{
 			recipientModel.IsVerifying = true;
-			var result = await ProbeService.Probe(recipientModel.Address);
+			var result = await ProbeService.Probe($"{recipientModel.Address}/api/probe");
 			recipientModel.Verified = result.IsSuccessful;
 			recipientModel.VerifyResult = result.IsSuccessful ? string.Empty : result.Message;
 			recipientModel.IsVerifying = false;

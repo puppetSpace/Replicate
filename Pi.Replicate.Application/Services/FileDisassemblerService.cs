@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage;
 using Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile;
 using Pi.Replicate.Domain;
@@ -14,15 +15,15 @@ namespace Pi.Replicate.Application.Services
     public class FileDisassemblerService
     {
         private readonly int _sizeofChunkInBytes;
-        private readonly CompressionService _compressionService;
+        private readonly ICompressionService _compressionService;
         private readonly PathBuilder _pathBuilder;
-        private readonly DeltaService _deltaService;
+        private readonly IDeltaService _deltaService;
         private readonly IMediator _mediator;
 
         public FileDisassemblerService(IConfiguration configuration
-            , CompressionService compressionService
+            , ICompressionService compressionService
             , PathBuilder pathBuilder
-            , DeltaService deltaService
+            , IDeltaService deltaService
             , IMediator mediator)
         {
             _sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
@@ -64,7 +65,8 @@ namespace Pi.Replicate.Application.Services
 		{
 			int sequenceNo = 0;
 			Log.Information($"Compressing file '{path}'");
-			var pathOfCompressed = await _compressionService.CompressFileToTempFile(path);
+			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
+			await _compressionService.Compress(path, pathOfCompressed);
 
 			Log.Information($"Splitting up '{path}'");
 

@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.Files.Commands.AddNewFile;
 using Pi.Replicate.Application.Files.Commands.AddUpdateFile;
 using Pi.Replicate.Domain;
@@ -9,10 +10,10 @@ namespace Pi.Replicate.Application.Services
 {
 	public class FileService
 	{
-		private readonly DeltaService _deltaService;
+		private readonly IDeltaService _deltaService;
 		private readonly IMediator _mediator;
 
-		public FileService(DeltaService deltaService, IMediator mediator)
+		public FileService(IDeltaService deltaService, IMediator mediator)
 		{
 			_deltaService = deltaService;
 			_mediator = mediator;

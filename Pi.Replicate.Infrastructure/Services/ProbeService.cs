@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Services
+namespace Pi.Replicate.Infrastructure.Services
 {
     public class ProbeService
     {

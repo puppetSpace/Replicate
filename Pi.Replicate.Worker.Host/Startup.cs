@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using Observr;
 using Pi.Replicate.Application;
 using Pi.Replicate.Data;
+using Pi.Replicate.Infrastructure;
 using Pi.Replicate.Worker.Host.BackgroundWorkers;
 using Polly;
 
@@ -34,6 +35,7 @@ namespace Pi.Replicate.Worker.Host
 			services.AddApplication();
 			services.AddData();
 			services.AddSystemSettingsFromDatabase(Configuration);
+			services.AddInfrastructure();
 			services.AddObservr();
 			services.AddHttpClient("default", client =>
 			{

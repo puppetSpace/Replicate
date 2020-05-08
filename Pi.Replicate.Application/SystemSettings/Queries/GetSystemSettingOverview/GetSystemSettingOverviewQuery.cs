@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingOvervi
 	{
 		private readonly IDatabase _database;
 		private readonly IMapper _mapper;
-		private const string _selectStatement = "SELECT Id,[Key],[Value],DataType,Info from dbo.SystemSetting";
+		private const string _selectStatement = "SELECT Id,[Key],[Value],DataType,Description from dbo.SystemSetting";
 
 		public GetSystemSettingOverviewQueryHandler(IDatabase database, IMapper mapper)
 		{

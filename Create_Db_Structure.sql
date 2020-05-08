@@ -84,17 +84,23 @@ create table dbo.TransmissionResult(
 );
 GO
 
-
 create table dbo.SystemSetting(
 	Id uniqueidentifier NOT NULL,
 	[Key] varchar(255) NOT NULL,
 	[Value] varchar(max) NOT NULL,
 	DataType varchar(20) NOT NULL,
-	Info varchar(500) NOT NULL,
+	[Description] varchar(500) NOT NULL,
 	CONSTRAINT PK_SystemSetting PRIMARY KEY(Id),
 	CONSTRAINT UQ_SystemSetting_Key UNIQUE([Key])
 );
 GO
+
+create table dbo.WebhookType(
+	Id uniqueidentifier NOT NULL,
+	[Name] varchar(50),
+	[Description] varchar(max)
+
+)
 
 insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
 insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
