@@ -37,7 +37,6 @@ namespace Pi.Replicate.WebUi
             services.AddObservr();
             services.AddHttpClient();
             services.AddSystemSettingsFromDatabase(Configuration);
-			services.AddHttpContextAccessor();
 			services.AddBlazoredToast();
 
 		}
