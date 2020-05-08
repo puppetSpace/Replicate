@@ -24,6 +24,8 @@ namespace Pi.Replicate.Application.Common
 
 		public bool IsChanged => State == ViewModelState.Changed; 
 
+		public bool IsNew => State == ViewModelState.New;
+
 		public ViewModelState State { get; private set; }
 
 		protected void Set<TE>(ref TE oldValue, TE newValue, [CallerMemberName]string membername = "")

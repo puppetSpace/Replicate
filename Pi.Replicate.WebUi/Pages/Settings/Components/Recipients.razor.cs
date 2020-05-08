@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Observr;
 using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
 using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
-using Pi.Replicate.Application.Recipients.Queries.GetRecipients;
+using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.WebUi.Components;
@@ -20,9 +20,9 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages.Settings.Components
 {
-    public class RecipientsBase : ComponentBase, Observr.IObserver<SettingsSaveNotificationMessage>, IDisposable
-    {
-		private List<RecipientModel> _toDeleteRecipients = new List<RecipientModel>();
+	public class RecipientsBase : ComponentBase, Observr.IObserver<SettingsSaveNotificationMessage>, IDisposable
+	{
+		private List<RecipientViewModel> _toDeleteRecipients = new List<RecipientViewModel>();
 		private IDisposable _saveNotificationSubscription;
 
 		[Inject]
@@ -38,26 +38,24 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 
 		protected List<string> ValidationMessages { get; set; } = new List<string>();
 
-		protected List<RecipientModel> Recipients { get; set; } = new List<RecipientModel>();
+		protected List<RecipientViewModel> Recipients { get; set; } = new List<RecipientViewModel>();
 
-		protected RecipientModel NewRecipient { get; set; }
+		protected RecipientViewModel NewRecipient { get; set; }
 
 		public async Task Handle(SettingsSaveNotificationMessage value, CancellationToken cancellationToken)
 		{
 			ValidationMessages.Clear();
 			var saveTasks = new List<Task>();
-			foreach(var recipient in Recipients)
-			{
-				if (recipient.IsChanged)
-					saveTasks.Add(Mediator.Send(new UpsertRecipientCommand { Address = recipient.Address, Name = recipient.Name, Verified = recipient.Verified }));
-			}
+			foreach (var recipient in Recipients.Where(x => x.IsChanged || x.IsNew))
+				saveTasks.Add(Mediator.Send(new UpsertRecipientCommand { Address = recipient.Address, Name = recipient.Name, Verified = recipient.Verified }));
+
 			foreach (var deleted in _toDeleteRecipients)
 				saveTasks.Add(Mediator.Send(new DeleteRecipientCommand { Name = deleted.Name }));
 			try
 			{
 				await Task.WhenAll(saveTasks);
 				_toDeleteRecipients.Clear();
-				Recipients.ForEach(x => x.IsChanged = false);
+				Recipients.ForEach(x => x.ResetState());
 			}
 			catch (ValidationException ex)
 			{
@@ -73,14 +71,16 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		protected override async Task OnInitializedAsync()
 		{
 			_saveNotificationSubscription = SaveNotifier.Subscribe(this);
-			var recipients = await Mediator.Send(new GetRecipientsQuery());
-			Recipients = recipients.Select(x => new RecipientModel(x)).ToList();
+			var recipientsResult = await Mediator.Send(new GetRecipientsForSettingsQuery());
+			if (recipientsResult.WasSuccessful)
+				Recipients = recipientsResult.Data.ToList();
 		}
 
 		protected void ShowAddRecipientDialog()
 		{
 			ValidationMessages.Clear();
-			NewRecipient = new RecipientModel();
+			NewRecipient = new RecipientViewModel();
+			NewRecipient.SetAsNew();
 			Dialog.Show();
 		}
 
@@ -95,7 +95,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 			}
 		}
 
-		protected async Task VerifyRecipient(RecipientModel recipientModel)
+		protected async Task VerifyRecipient(RecipientViewModel recipientModel)
 		{
 			recipientModel.IsVerifying = true;
 			var result = await ProbeService.Probe(recipientModel.Address);
@@ -105,7 +105,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 			StateHasChanged();
 		}
 
-		protected void DeleteRecipient(RecipientModel recipientModel)
+		protected void DeleteRecipient(RecipientViewModel recipientModel)
 		{
 			_toDeleteRecipients.Add(recipientModel);
 			Recipients.Remove(recipientModel);
@@ -122,58 +122,6 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 				ValidationMessages.Add("Name already exists");
 			if (Recipients.Any(x => string.Equals(x.Address, NewRecipient.Address, StringComparison.OrdinalIgnoreCase)))
 				ValidationMessages.Add("Address already exists for a recipient");
-		}
-
-		protected class RecipientModel
-		{
-			private string _name;
-			private string _address;
-			private bool _verified;
-
-			public RecipientModel()
-			{
-			}
-
-			public RecipientModel(Recipient recipient)
-			{
-				Name = recipient.Name;
-				Address = recipient.Address;
-				Verified = recipient.Verified;
-				IsChanged = false;
-			}
-
-			public string Name
-			{
-				get => _name;
-				set => Set(ref _name, value);
-			}
-
-			public string Address
-			{
-				get => _address;
-				set => Set(ref _address, value);
-			}
-
-			public bool Verified
-			{
-				get => _verified;
-				set => Set(ref _verified, value);
-			}
-
-			public bool IsVerifying { get; set; }
-
-			public string VerifyResult { get; set; }
-
-			public bool IsChanged { get; set; }
-
-			private void Set<TE>(ref TE oldValue, TE newValue)
-			{
-				if (EqualityComparer<TE>.Default.Equals(oldValue, newValue))
-					return;
-
-				oldValue = newValue;
-				IsChanged = true;
-			}
 		}
 
 	}

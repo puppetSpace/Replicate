@@ -1,2 +1,9 @@
 ﻿@page "/folder/{folderId}/settings"
 @inherits FolderSettingsBase
+    <h3>Folder Settings</h3>
+    <form>
+        <div class="form-group">
+            <label for="recipients">Recipients:</label>
+            <CheckBoxListView CheckItems="Recipients" />
+        </div>
+    </form>

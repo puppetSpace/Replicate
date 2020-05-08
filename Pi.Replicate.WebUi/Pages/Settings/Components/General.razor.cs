@@ -40,7 +40,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 			try
 			{
 				await Task.WhenAll(saveTasks);
-				
+				SystemSettings.ForEach(x => x.ResetState());
 			}
 			catch (ValidationException ex)
 			{
