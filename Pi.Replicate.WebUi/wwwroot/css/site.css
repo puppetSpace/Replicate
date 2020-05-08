@@ -112,7 +112,7 @@
   margin-top: 0.5rem;
   justify-content: center;
 }
-.folder-overview .folder-setting {
+.folder-overview .folder-setting-link {
   font-size: x-large;
   align-self: center;
   margin-left: auto;
@@ -178,6 +178,8 @@
   max-height: 300px;
   background-color: rgba(255, 255, 255, 0.1);
   border-radius: 5px;
+  width: fit-content;
+  padding-right: 1rem;
 }
 .checkboxlistview ul {
   padding-left: 10px;
