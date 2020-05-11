@@ -97,10 +97,19 @@ GO
 
 create table dbo.WebhookType(
 	Id uniqueidentifier NOT NULL,
-	[Name] varchar(50),
-	[Description] varchar(max)
-
+	[Name] varchar(50) NOT NULL,
+	[Description] varchar(max) NULL,
+	CONSTRAINT PK_WebhookType PRIMARY KEY(Id)
 )
+GO
+
+create table dbo.FolderWebhook(
+	Id uniqueidentifier NOT NULL,
+	FolderId uniqueidentifier NOT NULL,
+	WebhookTypeId uniqueidentifier NOT NULL,
+	CallbackUrl varchar(500) NOT NULL
+)
+GO
 
 insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
 insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
