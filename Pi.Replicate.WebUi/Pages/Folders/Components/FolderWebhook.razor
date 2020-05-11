@@ -1,0 +1,26 @@
+﻿@inherits FolderWebhookBase
+
+<div class="form-group folderwebhook">
+    <label for="@(@FolderWebhook.WebHookTypeName)">@FolderWebhook.WebHookTypeName</label>
+    <div class="folderwebhook-input">
+        <input type="text" id="@(FolderWebhook.WebHookTypeName)" class="form-control form-text" @bind="FolderWebhook.CallbackUrl" />
+        <input type="button" class="btn btn-secondary" value="Test" @onclick="TestWebhook" />
+        @if (ProbeResult != Pi.Replicate.Infrastructure.Services.ProbeResult.EmptyResult)
+        {
+            @if (ProbeResult.IsSuccessful)
+            {
+                <span class="oi oi-check"></span>
+            }
+            else
+            {
+                <span title="@ProbeResult.Message" class="oi oi-warning"></span>
+            }
+        }
+    </div>
+    <small>@FolderWebhook.WebHookTypeDescription</small>
+    <br />
+    <details class="folderwebhook-messagestructure">
+        <summary>Message structure</summary>
+        <pre><code>@FolderWebhook.WebHookTypeMessageStructure</code></pre>
+    </details>
+</div>

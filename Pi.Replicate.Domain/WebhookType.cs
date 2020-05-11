@@ -13,5 +13,7 @@ namespace Pi.Replicate.Domain
 		public string Name { get; set; }
 
 		public string Description { get; set; }
+
+		public string MessageStructure { get; set; }
 	}
 }

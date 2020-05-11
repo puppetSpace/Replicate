@@ -17,7 +17,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatement = @"				
-			select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForUpload, count(fir.Id) AmountOfFilesProcessedForSending, count(fif.Id) AmountOfFilesFailedToProcess
+			select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForSending, count(fir.Id) AmountOfFilesProcessedForDownload, count(fif.Id) AmountOfFilesFailedToProcess
 			from dbo.Folder fo
 			left join dbo.[File] fil on fil.FolderId = fo.Id and fil.Source = 0
 			left join dbo.EofMessage eme on eme.FileId = fil.Id

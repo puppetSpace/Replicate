@@ -94,7 +94,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		protected async Task VerifyRecipient(RecipientViewModel recipientModel)
 		{
 			recipientModel.IsVerifying = true;
-			var result = await ProbeService.Probe($"{recipientModel.Address}/api/probe");
+			var result = await ProbeService.ProbeGet($"{recipientModel.Address}/api/probe");
 			recipientModel.Verified = result.IsSuccessful;
 			recipientModel.VerifyResult = result.IsSuccessful ? string.Empty : result.Message;
 			recipientModel.IsVerifying = false;

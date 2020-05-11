@@ -1,10 +1,8 @@
 ﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Shared;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

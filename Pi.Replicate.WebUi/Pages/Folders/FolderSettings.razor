@@ -1,9 +1,23 @@
 ﻿@page "/folder/{folderId}/settings"
+@using Pi.Replicate.WebUi.Pages.Folders.Components
 @inherits FolderSettingsBase
-    <h3>Folder Settings</h3>
-    <form class="folder-settings">
-        <div class="form-group">
-            <label for="recipients">Recipients:</label>
-            <CheckBoxListView CheckItems="Recipients" />
-        </div>
-    </form>
+<h3>Folder Settings</h3>
+<form class="folder-settings">
+    <ValidationDisplay ValidationMessages="ValidationMessages" />
+    <div class="form-group">
+        <h4>Recipients</h4>
+        <CheckBoxListView CheckItems="Recipients" />
+    </div>
+    <br />
+    <div>
+        <h4>Webhooks</h4>
+        @foreach (var webhook in FolderWebhookViewModels.OrderBy(x => x.WebHookTypeName))
+        {
+            <FolderWebhook FolderWebhook="webhook" />
+        }
+    </div>
+    <div class="form-group" style="display:flex">
+        <input type="button" class="btn btn-primary" value="Save" @onclick="Save" />
+        <input type="button" class="btn btn-danger" value="Delete folder" style="margin-left:auto" @onclick="Delete" />
+    </div>
+</form>

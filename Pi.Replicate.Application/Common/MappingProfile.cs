@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.Files.Models;
+using Pi.Replicate.Application.Folders.Queries.GetFolderSettings;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
 using Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingOverview;
 using System;
@@ -25,6 +26,8 @@ namespace Pi.Replicate.Application.Common
 			CreateMap<Domain.SystemSetting, SystemSettingViewModel>()
 				.AfterMap((s,d)=> d.ResetState());
 			CreateMap<Domain.Recipient, RecipientViewModel>()
+				.AfterMap((s, d) => d.ResetState());
+			CreateMap<Domain.FolderWebhook, FolderWebhookViewModel>()
 				.AfterMap((s, d) => d.ResetState());
 		}
 	}

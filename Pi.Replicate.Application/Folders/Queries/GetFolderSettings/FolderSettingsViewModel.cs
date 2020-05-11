@@ -15,5 +15,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderSettings
 			Recipients = new List<Recipient>();
 		}
 		public ICollection<Recipient> Recipients { get; set; }
+
+		public ICollection<FolderWebhookViewModel> FolderWebhooks { get; set; }
 	}
 }

@@ -41,6 +41,17 @@
   margin-top: auto;
   background-color: rgba(255, 255, 255, 0.1);
 }
+@keyframes warningflash {
+  from {
+    color: yellow;
+  }
+  to {
+    color: #ffffff;
+  }
+}
+.oi-warning {
+  animation: warningflash 2s linear infinite;
+}
 .nav-link {
   color: #d7d7d7;
   border-radius: 4px;
@@ -156,6 +167,9 @@
   color: #d7d7d7;
   cursor: pointer;
 }
+.folder-settings {
+  width: 60%;
+}
 .settings-overview {
   margin-top: 15px;
   margin-left: 15px;
@@ -212,14 +226,6 @@
     transform: rotate(360deg);
   }
 }
-@keyframes warningflash {
-  from {
-    color: yellow;
-  }
-  to {
-    color: #ffffff;
-  }
-}
 .settings-recipients .recipient-header {
   border-bottom: 2px solid #ffffff;
   display: flex;
@@ -233,9 +239,6 @@
   max-height: 500px;
   overflow: auto;
 }
-.settings-recipients .recipient-section .oi-warning {
-  animation: warningflash 2s linear infinite;
-}
 .settings-recipients .recipient-section table {
   color: #ffffff;
   max-height: 500px;
@@ -247,6 +250,27 @@
 }
 .settings-general input[type=number] {
   width: 8rem;
+}
+.folderwebhook .folderwebhook-input {
+  display: flex;
+  align-items: center;
+}
+.folderwebhook .folderwebhook-input input[type=button] {
+  margin-left: 20px;
+}
+.folderwebhook .folderwebhook-input span {
+  margin-left: 10px;
+}
+.folderwebhook .folderwebhook-messagestructure {
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+.folderwebhook pre {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+  width: fit-content;
+  padding: 5px;
+  border-radius: 4px;
 }
 .selectable:hover {
   cursor: pointer;

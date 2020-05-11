@@ -22,9 +22,9 @@ namespace Pi.Replicate.Application.Common
 			State = ViewModelState.New;
 		}
 
-		public bool IsChanged => State == ViewModelState.Changed; 
+		public virtual bool IsChanged => State == ViewModelState.Changed; 
 
-		public bool IsNew => State == ViewModelState.New;
+		public virtual bool IsNew => State == ViewModelState.New;
 
 		public ViewModelState State { get; private set; }
 

@@ -34,7 +34,7 @@ create table dbo.[File](
 	[Source] int NOT NULL,
 	[Status] int NOT NULL DEFAULT 0
 	CONSTRAINT PK_File PRIMARY KEY(Id),
-	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id),
+	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id) on DELETE CASCADE,
 );
 GO
 
@@ -44,7 +44,7 @@ create table dbo.EofMessage(
 	AmountOfChunks int NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_EofMessage PRIMARY KEY(Id),
-	CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
+	CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
 );
 GO
 
@@ -65,7 +65,7 @@ create table dbo.FailedTransmission(
 	FileChunkId uniqueidentifier NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_FailedTransmission PRIMARY KEY(Id),
-	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
+	CONSTRAINT FK_FailedTransmission_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
 	CONSTRAINT FK_FailedTransmission_EofMessage FOREIGN KEY(EofMessageId) REFERENCES dbo.EofMessage(Id),
 	CONSTRAINT FK_FailedTransmission_FileChunk FOREIGN KEY(FileChunkId) REFERENCES dbo.FileChunk(Id),
 	CONSTRAINT FK_FailedTransmission_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
@@ -79,7 +79,7 @@ create table dbo.TransmissionResult(
 	FileChunkSequenceNo int NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(Id),
-	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id),
+	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
@@ -99,6 +99,7 @@ create table dbo.WebhookType(
 	Id uniqueidentifier NOT NULL,
 	[Name] varchar(50) NOT NULL,
 	[Description] varchar(max) NULL,
+	MessageStructure varchar(max) NULL
 	CONSTRAINT PK_WebhookType PRIMARY KEY(Id)
 )
 GO
@@ -107,7 +108,10 @@ create table dbo.FolderWebhook(
 	Id uniqueidentifier NOT NULL,
 	FolderId uniqueidentifier NOT NULL,
 	WebhookTypeId uniqueidentifier NOT NULL,
-	CallbackUrl varchar(500) NOT NULL
+	CallbackUrl varchar(500) NOT NULL,
+	CONSTRAINT PK_FolderWebhook PRIMARY KEY(Id),
+	CONSTRAINT FK_FolderWebhook_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id) ON DELETE CASCADE,
+	CONSTRAINT FK_FolderWebhook_WebhookType FOREIGN KEY(WebhookTypeId) REFERENCES dbo.WebhookType(Id)
 )
 GO
 
@@ -118,6 +122,25 @@ insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10','number
 insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000','number','A file will be split up into chunks. This setting defines the size of that chunk');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileDisassemblyJobs','10','number', 'Amount of files that ares allowed to be disassembled at the same time');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileAssemblyJobs','10','number','Amount of files that ares allowed to be assembled at the same time');
+GO
+
+insert into dbo.WebhookType VALUES(NEWID(),'FileDisassembled','When a file is completely processed and ready for transmission','{
+    "name":"myfile.ext",
+    "path":"d:\\examples\\Folder1\\myfile.ext",
+    "folder":"Folder1"
+}');
+insert into dbo.WebhookType VALUES(NEWID(),'FileAssembled','When a file is completely received and assembled','{
+    "name":"myfile.ext",
+    "path":"d:\\examples\\Folder1\\myfile.ext",
+    "folder":"Folder1"
+}');
+insert into dbo.WebhookType VALUES(NEWID(),'FileFailed','When processing of a file fails','{
+    "name":"myfile.ext",
+    "path":"d:\\examples\\Folder1\\myfile.ext",
+    "folder":"Folder1",
+    "error":"errormessage"
+}');
+
 GO
 
 create view dbo.V_AmountOfFilesSentByRecipient

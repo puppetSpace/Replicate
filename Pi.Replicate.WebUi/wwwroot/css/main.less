@@ -1,5 +1,19 @@
 ﻿@import "darkTheme_colors.less";
 
+@keyframes warningflash {
+    from {
+        color: yellow;
+    }
+
+    to {
+        color: @color-white;
+    }
+}
+
+.oi-warning {
+    animation: warningflash 2s linear infinite;
+}
+
 .nav-link {
     color: #d7d7d7;
     border-radius: 4px;
@@ -141,7 +155,7 @@
 }
 
 .folder-settings {
-
+    width: 60%;
 }
 
 .settings-overview {
