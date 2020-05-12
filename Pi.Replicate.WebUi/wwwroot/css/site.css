@@ -99,8 +99,9 @@
   margin-left: 2rem;
 }
 .folder-overview {
-  display: flex;
-  flex-direction: column;
+  /*    display: flex;
+    flex-direction: column;*/
+  height: 100%;
 }
 .folder-overview .folder-overview-data {
   display: flex;
@@ -110,11 +111,6 @@
 }
 .folder-overview .folder-overview-data h3 {
   margin-right: 25px;
-}
-.folder-overview .recipient-metadata {
-  display: flex;
-  flex-direction: column;
-  font-size: smaller;
 }
 .folder-overview .folder-metadata {
   display: flex;
@@ -128,44 +124,26 @@
   align-self: center;
   margin-left: auto;
 }
-.folder-overview .folder-overview-recipients {
+.folder-overview .blade-rack {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+}
+.folder-overview .blade-rack .blade-recipients {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   margin-top: 20px;
+  flex: 1;
+  align-items: flex-start;
 }
-.folder-overview .folder-overview-recipients .recipient {
-  background-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 6.4px 14.4px 0 rgba(28, 28, 28, 0.3), 0 1.2px 3.6px 0 rgba(28, 28, 28, 0.2);
-  padding: 10px;
-  border-radius: 5px;
-  width: 13rem;
-  margin: 10px;
+.folder-overview .blade-rack .blade-side {
+  border-right: 20px solid rgba(28, 28, 28, 0.2);
+  border-radius: 10px;
+  margin-right: 15px;
 }
-.folder-overview .folder-overview-recipients .recipient .recipient-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.folder-overview .folder-overview-recipients .recipient .recipient-header h4 {
-  margin: 0;
-}
-.folder-overview .folder-overview-recipients .recipient .recipient-header h4,
-.folder-overview .folder-overview-recipients .recipient .recipient-header p {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  width: 80%;
-  text-align: center;
-}
-.folder-overview .folder-overview-recipients .recipient .recipient-address {
-  font-size: smaller;
-  font-style: italic;
-}
-.folder-overview .folder-overview-recipients .recipient:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: #d7d7d7;
-  cursor: pointer;
+.folder-overview .blade-rack .blade-files {
+  flex: 0.4;
 }
 .folder-settings {
   width: 60%;
@@ -271,6 +249,88 @@
   width: fit-content;
   padding: 5px;
   border-radius: 4px;
+}
+.recipient-tile {
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 6.4px 14.4px 0 rgba(28, 28, 28, 0.3), 0 1.2px 3.6px 0 rgba(28, 28, 28, 0.2);
+  padding: 10px;
+  border-radius: 5px;
+  width: 13rem;
+  margin: 10px;
+}
+.recipient-tile .recipient-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.recipient-tile .recipient-header h4 {
+  margin: 0;
+}
+.recipient-tile .recipient-header h4,
+.recipient-tile .recipient-header p {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  width: 80%;
+  text-align: center;
+}
+.recipient-tile .recipient-address {
+  font-size: smaller;
+  font-style: italic;
+}
+.recipient-tile .recipient-metadata {
+  display: flex;
+  flex-direction: column;
+  font-size: smaller;
+}
+.recipient-tile:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #d7d7d7;
+  cursor: pointer;
+}
+.file-overview .file-overview-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.file-overview .file-overview-header span {
+  margin-left: auto;
+  margin-right: 20px;
+}
+.file-overview .file-overview-header span:hover {
+  cursor: pointer;
+}
+.file-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 5px;
+}
+.file-item .file-item-header {
+  display: flex;
+}
+.file-item .file-item-header .file-item-name {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 600;
+}
+.file-item .file-item-header .file-item-version,
+.file-item .file-item-header .file-item-sent {
+  margin-left: 15px;
+  font-size: small;
+  align-self: center;
+  color: #d7d7d7;
+}
+.file-item .file-item-body {
+  margin-top: 5px;
+  font-size: smaller;
+}
+.file-item .file-item-body .file-item-metadata {
+  padding-left: 10px;
+}
+.file-item .file-item-body .file-item-previousversions {
+  margin-top: 10px;
 }
 .selectable:hover {
   cursor: pointer;

@@ -2,9 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Components;
+using Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient;
 using Pi.Replicate.Application.Folders.Queries.GetFolderOverview;
 
 namespace Pi.Replicate.WebUi.Pages.Folders
@@ -17,7 +19,9 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
         protected FolderOverviewModel FolderOverviewModel { get; set; } = new FolderOverviewModel();
 
-        [Inject]
+		public List<FileOverviewModel> FileOverviewModels { get; set; } = new List<FileOverviewModel>();
+
+		[Inject]
         protected IMediator Mediator { get; set; }
 
 
@@ -28,12 +32,19 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 				var folderOverviewResult = await Mediator.Send(new GetFolderOverviewQuery { FolderId = result });
 				if (folderOverviewResult.WasSuccessful)
 					FolderOverviewModel = folderOverviewResult.Data;
+
+
+				var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = FolderOverviewModel.Recipients.First().RecipientId });
+				if (queryResult.WasSuccessful)
+					FileOverviewModels = queryResult.Data.ToList();
 			}
         }
 
-        protected void RecipientClicked(Guid recipientId)
-        {
-            Debug.WriteLine(recipientId);
-        }
+        protected async Task RecipientClicked(Guid recipientId)
+		{
+			var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = recipientId });
+			if (queryResult.WasSuccessful)
+				FileOverviewModels = queryResult.Data.ToList();
+		}
     }
 }

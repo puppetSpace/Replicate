@@ -1,0 +1,11 @@
+﻿@inherits FileOverviewBase
+<div class="file-overview">
+    <div class="file-overview-header">
+        <h3>File overview</h3>
+        <span title="close" class="oi oi-x" @onclick="OnCloseClicked" />
+    </div>
+    @foreach (var file in Files)
+    {
+        <FileItem File="file" />
+    }
+</div>

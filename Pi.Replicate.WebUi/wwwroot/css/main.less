@@ -50,7 +50,6 @@
     }
 }
 
-
 .folder-add-form {
     padding: 1rem;
     display: flex;
@@ -72,8 +71,9 @@
 }
 
 .folder-overview {
-    display: flex;
-    flex-direction: column;
+    /*    display: flex;
+    flex-direction: column;*/
+    height: 100%;
 
     .folder-overview-data {
         h3 {
@@ -86,19 +86,12 @@
         border-bottom: 2px solid @color-white;
     }
 
-    .recipient-metadata {
-        display: flex;
-        flex-direction: column;
-        font-size: smaller;
-
-    }
-
     .folder-metadata {
         display: flex;
         flex-direction: column;
         font-size: smaller;
         margin-top: 0.5rem;
-        justify-content:center;
+        justify-content: center;
     }
 
     .folder-setting-link {
@@ -107,49 +100,28 @@
         margin-left: auto;
     }
 
-    .folder-overview-recipients {
+    .blade-rack {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
-        margin-top: 20px;
+        height: 100%;
 
+        .blade-recipients {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            flex: 1;
+            align-items: flex-start;
+        }
 
-        .recipient {
-            .recipient-header {
-                h4 {
-                    margin: 0;
-                }
+        .blade-side {
+            border-right: 20px solid @color-dark-fade-20;
+            border-radius: 10px;
+            margin-right: 15px;
+        }
 
-                h4, p {
-                    white-space: nowrap;
-                    text-overflow: ellipsis;
-                    overflow: hidden;
-                    width: 80%;
-                    text-align: center;
-                }
-
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .recipient-address {
-                font-size: smaller;
-                font-style: italic;
-            }
-
-            &:hover {
-                background-color: @color-white-fade-20;
-                color: #d7d7d7;
-                cursor: pointer;
-            }
-
-            background-color: @color-white-fade-10;
-            box-shadow: 0 6.4px 14.4px 0 @color-dark-fade-30, 0 1.2px 3.6px 0 @color-dark-fade-20;
-            padding: 10px;
-            border-radius: 5px;
-            width: 13rem;
-            margin: 10px;
+        .blade-files {
+            flex: 0.4;
         }
     }
 }

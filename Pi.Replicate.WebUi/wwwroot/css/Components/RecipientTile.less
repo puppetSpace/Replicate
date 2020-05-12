@@ -1,0 +1,44 @@
+﻿@import "../darkTheme_colors.less";
+.recipient-tile {
+    .recipient-header {
+        h4 {
+            margin: 0;
+        }
+
+        h4, p {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            width: 80%;
+            text-align: center;
+        }
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .recipient-address {
+        font-size: smaller;
+        font-style: italic;
+    }
+
+    .recipient-metadata {
+        display: flex;
+        flex-direction: column;
+        font-size: smaller;
+    }
+
+    &:hover {
+        background-color: @color-white-fade-20;
+        color: @color-grey;
+        cursor: pointer;
+    }
+
+    background-color: @color-white-fade-10;
+    box-shadow: 0 6.4px 14.4px 0 @color-dark-fade-30, 0 1.2px 3.6px 0 @color-dark-fade-20;
+    padding: 10px;
+    border-radius: 5px;
+    width: 13rem;
+    margin: 10px;
+}

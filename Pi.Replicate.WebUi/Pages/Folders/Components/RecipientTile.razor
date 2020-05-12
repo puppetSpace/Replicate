@@ -1,0 +1,34 @@
+﻿@inherits RecipientTileBase
+<div class="recipient-tile" @onclick="@(()=>Clicked.InvokeAsync(Recipient.RecipientId))">
+    <div class="recipient-header">
+        <h4 title="@Recipient.RecipientName">@Recipient.RecipientName</h4>
+        <p title="@Recipient.RecipientAddress" class="recipient-address">@Recipient.RecipientAddress</p>
+    </div>
+    <div class="recipient-metadata">
+        <span>
+            Files:
+            <span title="Files sent" class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @Recipient.AmountofFilesSent
+        </span>
+        <br />
+        <table>
+            <thead>
+                <tr><td colspan="2">Failed transmissions:</td></tr>
+                <tr></tr>
+            </thead>
+            <tbody>
+                <tr title="Current amount of failed transmitted file's info">
+                    <td>Fileinfo</td>
+                    <td>@Recipient.AmountOfFailedFileInfo</td>
+                </tr>
+                <tr title="Current amount of failed transmitted filechunks">
+                    <td>Chunks</td>
+                    <td>@Recipient.AmountOfFailedFileChunks</td>
+                </tr>
+                <tr title="Current amount of failed Eof messages">
+                    <td>Eof</td>
+                    <td>@Recipient.AmountOfFailedEofMessages</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

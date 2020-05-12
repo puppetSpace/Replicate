@@ -1,6 +1,5 @@
 ﻿@page "/folder/{folderId}"
 @inherits FolderOverviewBase
-
 <div class="folder-overview">
     <div class="folder-overview-data">
         <h3>@FolderOverviewModel.FolderName</h3>
@@ -16,42 +15,17 @@
             <span class="oi oi-cog" aria-hidden="true"></span>
         </NavLink>
     </div>
-    <div class="folder-overview-recipients">
-        @foreach (var recipient in FolderOverviewModel.Recipients.OrderBy(x => x.RecipientName))
+    <div class="blade-rack">
+        <div class="blade-recipients @(FileOverviewModels.Any() ? "blade-side" : "")">
+            @foreach (var recipient in FolderOverviewModel.Recipients.OrderBy(x => x.RecipientName))
+            {
+                <Pi.Replicate.WebUi.Pages.Folders.Components.RecipientTile Recipient="recipient" Clicked="RecipientClicked" />
+            }
+        </div>
+        @if (FileOverviewModels.Any())
         {
-            <div class="recipient" @onclick="@(()=>RecipientClicked(recipient.RecipientId))">
-                <div class="recipient-header">
-                    <h4 title="@recipient.RecipientName">@recipient.RecipientName</h4>
-                    <p title="@recipient.RecipientAddress" class="recipient-address">@recipient.RecipientAddress</p>
-                </div>
-                <div class="recipient-metadata">
-                    <span>
-                        Files:
-                        <span title="Files sent" class="oi oi-arrow-thick-top" aria-hidden="true"></span>  @recipient.AmountofFilesSent
-                        <span title="Files received" class="oi oi-arrow-thick-bottom space-before-10" aria-hidden="true"></span> @recipient.AmountOfFilesReceived
-                    </span>
-                    <br />
-                    <table>
-                        <thead>
-                            <tr><td colspan="2">Failed transmissions:</td></tr>
-                            <tr></tr>
-                        </thead>
-                        <tbody>
-                            <tr title="Current amount of failed transmitted file's info">
-                                <td>Fileinfo</td>
-                                <td>@recipient.AmountOfFailedFileInfo</td>
-                            </tr>
-                            <tr title="Current amount of failed transmitted filechunks">
-                                <td>Chunks</td>
-                                <td>@recipient.AmountOfFailedFileChunks</td>
-                            </tr>
-                            <tr title="Current amount of failed Eof messages">
-                                <td>Eof</td>
-                                <td>@recipient.AmountOfFailedEofMessages</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <div class="blade-files">
+                <Pi.Replicate.WebUi.Pages.Folders.Components.FileOverview Files="FileOverviewModels" OnCloseClicked="@(()=>FileOverviewModels.Clear())" />
             </div>
         }
     </div>

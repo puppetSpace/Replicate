@@ -28,14 +28,12 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 
 		private const string _recipientSelectStatement = @"
 			select re.Id RecipientId, re.[Name] RecipientName, re.[Address] RecipientAddress, ref.AmountofFilesSent
-			, count(fir.Id) AmountOfFilesReceived
 			, count(ftn.fileId) AmountOfFailedFileInfo
 			, count(ftn.FileChunkId) AmountOfFailedFileChunks
 			, count(ftn.EofMessageId) AmountOfFailedEofMessages
 			from dbo.Recipient re
 			inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id --and fre.FolderId = @FolderId
 			left join dbo.V_AmountOfFilesSentByRecipient ref on ref.RecipientId = re.Id and ref.FolderId = fre.FolderId
-			left join dbo.[File] fir on fir.FolderId = fre.FolderId and fir.Source = 1 and fir.[Status] = 2
 			left join dbo.FailedTransmission ftn on ftn.RecipientId = re.Id
 			where re.Verified = 1
 			group by re.Id, re.[Name], re.[Address],ref.AmountofFilesSent";

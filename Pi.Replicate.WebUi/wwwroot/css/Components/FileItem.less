@@ -1,0 +1,39 @@
+﻿@import "../darkTheme_colors.less";
+
+.file-item {
+    background-color: @color-white-fade-10;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
+
+    .file-item-header {
+        display: flex;
+
+        .file-item-name {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+
+        .file-item-version, .file-item-sent {
+            margin-left: 15px;
+            font-size: small;
+            align-self: center;
+            color: @color-grey;
+        }
+    }
+
+    .file-item-body {
+        margin-top: 5px;
+        font-size: smaller;
+
+        .file-item-metadata {
+            padding-left: 10px;
+        }
+
+        .file-item-previousversions {
+            margin-top: 10px;
+        }
+    }
+}

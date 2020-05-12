@@ -1,0 +1,37 @@
+﻿@inherits FileItemBase
+
+<div class="file-item">
+    <div class="file-item-header">
+        <div class="file-item-name" title="@File.Name">@File.Name</div>
+        <div title="version" class="file-item-version"><span class="oi oi-file" /> @File.Version</div>
+        <div title="% sent" class="file-item-sent"><span class="oi oi-arrow-thick-top" /> @(File.PercentageSent + "%")</div>
+    </div>
+    <div class="file-item-body">
+        <table>
+            <tr>
+                <td>Size</td>
+                <td class="file-item-metadata">@File.GetSizeDisplayModel()</td>
+            </tr>
+            <tr>
+                <td>Last Change</td>
+                <td class="file-item-metadata">@File.LastModifiedDate</td>
+            </tr>
+            <tr>
+                <td>Last Sent</td>
+                <td class="file-item-metadata">@File.LastSent</td>
+            </tr>
+        </table>
+        @if (File.Versions.Any())
+        {
+            <details class="file-item-previousversions">
+                <summary>Previous versions</summary>
+                <div>
+                    @foreach(var pv in File.Versions.OrderBy(x=>x.Version))
+                    {
+                        <FileItem File="pv" />
+                    }
+                </div>
+            </details>
+        }
+    </div>
+</div>
