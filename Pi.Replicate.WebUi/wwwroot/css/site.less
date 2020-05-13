@@ -23,17 +23,17 @@
     overflow: auto;
 
     &::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px @color-dark-fade-30;
-        background-color: @color-white-fade-10;
+        -webkit-box-shadow: inset 0 0 6px @bgcolor-secondary-fade-30;
+        background-color: @forecolor-primary-fade-10;
     }
 
     &::-webkit-scrollbar {
         width: 5px;
-        background-color: @color-white-fade-10;
+        background-color: @forecolor-primary-fade-10;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: @color-dark;
+        background-color: @bgcolor-secondary;
     }
 }
 
@@ -41,17 +41,17 @@
     overflow: auto;
 
     &::-webkit-scrollbar-track {
-        -webkit-box-shadow: inset 0 0 6px @color-dark-fade-30;
-        background-color: @color-white-fade-10;
+        -webkit-box-shadow: inset 0 0 6px @bgcolor-secondary-fade-30;
+        background-color: @forecolor-primary-fade-10;
     }
 
     &::-webkit-scrollbar {
         width: 10px;
-        background-color: @color-white-fade-10;
+        background-color: @forecolor-primary-fade-10;
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: @color-dark;
+        background-color: @bgcolor-secondary;
     }
 }
 
@@ -61,8 +61,8 @@ html, body {
 }
 
 body {
-    background-color: @color-dark-3;
-    color: @color-white;
+    background-color: @bgcolor-primary;
+    color: @forecolor-primary;
 }
 
 a, .btn-link {
@@ -89,9 +89,9 @@ app {
 }
 
 #blazor-error-ui {
-    background: @color-dark;
+    background: @bgcolor-secondary;
     bottom: 0;
-    box-shadow: 0 -1px 2px @color-dark-fade-20;
+    box-shadow: 0 -1px 2px @bgcolor-secondary-fade-20;
     display: none;
     left: 0;
     padding: 0.6rem 1.25rem 0.7rem 1.25rem;
@@ -117,8 +117,8 @@ app {
     margin-top: 5px;
 
     &:hover {
-        background-color: @color-white-fade-10;
-        color: @color-white;
+        background-color: @forecolor-primary-fade-10;
+        color: @forecolor-primary;
         cursor: pointer;
     }
 }
