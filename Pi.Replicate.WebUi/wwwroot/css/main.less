@@ -36,6 +36,7 @@
 .main {
     width: 100%;
     overflow: auto;
+    display:flex;
 
     h3 {
         font-size: x-large;
@@ -71,10 +72,8 @@
 }
 
 .folder-overview {
-    /*    display: flex;
-    flex-direction: column;*/
-    height: 100%;
-
+    display:flex;
+    flex-direction:column;
     .folder-overview-data {
         h3 {
             margin-right: 25px;
@@ -82,7 +81,6 @@
 
         display: flex;
         flex-direction: row;
-        flex: 1;
         border-bottom: 2px solid @forecolor-primary;
     }
 
@@ -101,9 +99,9 @@
     }
 
     .blade-rack {
+        flex:1;
         display: flex;
         flex-direction: row;
-        height: 100%;
 
         .blade-recipients {
             display: flex;
@@ -111,7 +109,7 @@
             flex-wrap: wrap;
             margin-top: 20px;
             flex: 1;
-            align-items: flex-start;
+            align-content:flex-start;
         }
 
         .blade-side {

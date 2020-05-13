@@ -32,7 +32,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 			, count(ftn.FileChunkId) AmountOfFailedFileChunks
 			, count(ftn.EofMessageId) AmountOfFailedEofMessages
 			from dbo.Recipient re
-			inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id --and fre.FolderId = @FolderId
+			inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id and fre.FolderId = @FolderId
 			left join dbo.V_AmountOfFilesSentByRecipient ref on ref.RecipientId = re.Id and ref.FolderId = fre.FolderId
 			left join dbo.FailedTransmission ftn on ftn.RecipientId = re.Id
 			where re.Verified = 1

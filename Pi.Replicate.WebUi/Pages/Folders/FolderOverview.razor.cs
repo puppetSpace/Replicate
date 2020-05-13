@@ -11,40 +11,37 @@ using Pi.Replicate.Application.Folders.Queries.GetFolderOverview;
 
 namespace Pi.Replicate.WebUi.Pages.Folders
 {
-    public class FolderOverviewBase : ComponentBase
-    {
+	public class FolderOverviewBase : ComponentBase
+	{
 
-        [Parameter]
-        public string FolderId { get; set; }
+		[Parameter]
+		public string FolderId { get; set; }
 
-        protected FolderOverviewModel FolderOverviewModel { get; set; } = new FolderOverviewModel();
+		protected FolderOverviewModel FolderOverviewModel { get; set; } = new FolderOverviewModel();
 
 		public List<FileOverviewModel> FileOverviewModels { get; set; } = new List<FileOverviewModel>();
 
 		[Inject]
-        protected IMediator Mediator { get; set; }
+		protected IMediator Mediator { get; set; }
 
-
-        protected override async Task OnInitializedAsync()
-        {
-            if (Guid.TryParse(FolderId, out var result))
-            {
+		//OninitializedAsync is only called once. So when navigating between folders won't trigger the method. Use this method instead
+		protected override async Task OnParametersSetAsync()
+		{
+			FolderOverviewModel = new FolderOverviewModel();
+			FileOverviewModels.Clear();
+			if (Guid.TryParse(FolderId, out var result))
+			{
 				var folderOverviewResult = await Mediator.Send(new GetFolderOverviewQuery { FolderId = result });
 				if (folderOverviewResult.WasSuccessful)
 					FolderOverviewModel = folderOverviewResult.Data;
+			}
+		}
 
-
-				var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = FolderOverviewModel.Recipients.First().RecipientId });
+			protected async Task RecipientClicked(Guid recipientId)
+			{
+				var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = recipientId });
 				if (queryResult.WasSuccessful)
 					FileOverviewModels = queryResult.Data.ToList();
 			}
-        }
-
-        protected async Task RecipientClicked(Guid recipientId)
-		{
-			var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = recipientId });
-			if (queryResult.WasSuccessful)
-				FileOverviewModels = queryResult.Data.ToList();
 		}
-    }
-}
+	}
