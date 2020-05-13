@@ -11,7 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Test.Processors
+namespace Pi.Replicate.Test.Services
 {
     [TestClass]
     public class FileCollectorTest

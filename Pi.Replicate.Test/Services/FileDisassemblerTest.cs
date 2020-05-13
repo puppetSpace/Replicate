@@ -11,10 +11,10 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Test.Processors
+namespace Pi.Replicate.Test.Services
 {
     [TestClass]
-    public class FileSplitterTest
+    public class FileDisassemblerTest
     {
         //[TestInitialize]
         //public void InitializeTest()
