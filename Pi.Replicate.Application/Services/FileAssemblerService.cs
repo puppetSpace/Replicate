@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using MediatR;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
-
+[assembly: InternalsVisibleTo("Pi.Replicate.Test")]
 namespace Pi.Replicate.Application.Services
 {
 	public class FileAssemblerService
@@ -52,7 +53,7 @@ namespace Pi.Replicate.Application.Services
 
 				var filePath = _pathBuilder.BuildPath(file.Path);
 
-				if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
+				if (System.IO.File.Exists(filePath) && FileLock.IsLocked(filePath, checkWriteAccess: true))
 				{
 					Log.Warning($"File '{filePath}' is locked for writing. unable overwrite file");
 				}
@@ -109,7 +110,7 @@ namespace Pi.Replicate.Application.Services
 					var chunks = await db.Query<byte[]>("SELECT [Value] FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @toSkip and @ToTake ORDER BY SEQUENCENO", new { FileId = eofMessage.FileId, ToSkip = toSkip, ToTake = toTake });
 					foreach (var chunk in chunks)
 						await sw.WriteAsync(chunk, 0, chunk.Length);
-					toSkip = toTake;
+					toSkip = toTake+1;
 					toTake += 10;
 				}
 				Log.Information($"File built to '{temppath}'");

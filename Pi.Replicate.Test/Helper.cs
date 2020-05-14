@@ -2,6 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Test
@@ -27,5 +28,10 @@ namespace Pi.Replicate.Test
 
             return new FileInfo(tempPath);
         }
+
+		public static ReadOnlyMemory<byte> GetReadOnlyMemory()
+		{
+			return Encoding.UTF8.GetBytes("thisISTest").AsMemory();
+		}
     }
 }
