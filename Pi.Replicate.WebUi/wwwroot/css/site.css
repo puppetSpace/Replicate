@@ -374,7 +374,13 @@ body {
 }
 a,
 .btn-link {
-  color: #0366d6;
+  color: #ffffff;
+}
+a:hover,
+.btn-link:hover {
+  cursor: pointer;
+  color: #ffffff;
+  text-decoration: none;
 }
 .btn-primary {
   color: #fff;

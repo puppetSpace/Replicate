@@ -66,7 +66,12 @@ body {
 }
 
 a, .btn-link {
-    color: #0366d6;
+    color: @forecolor-primary;
+    &:hover{
+        cursor:pointer;
+        color: @forecolor-primary;
+        text-decoration:none;
+    }
 }
 
 .btn-primary {
