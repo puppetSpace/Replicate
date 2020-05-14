@@ -10,6 +10,8 @@ using Serilog;
 
 namespace Pi.Replicate.Worker.Host
 {
+	//todo Add FileSource to TransmissionResult so we can track Incomming files to
+	// check for double changes in incomming files
 	public class Program
 	{
 		public static void Main(string[] args)

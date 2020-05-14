@@ -26,7 +26,12 @@ namespace Pi.Replicate.Data.Db
             return Connection.ExecuteAsync(query, parameters);
         }
 
-        public Task<TE> QuerySingle<TE>(string query, object parameters)
+		public Task<TE> Execute<TE>(string query, object parameters)
+		{
+			return Connection.ExecuteScalarAsync<TE>(query, parameters);
+		}
+
+		public Task<TE> QuerySingle<TE>(string query, object parameters)
         {
             return Connection.QueryFirstOrDefaultAsync<TE>(query, parameters);
         }
@@ -53,7 +58,9 @@ namespace Pi.Replicate.Data.Db
         {
             Connection?.Close();
         }
-    }
+
+
+	}
 
     public class DatabaseFactory : IDatabaseFactory
     {

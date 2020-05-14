@@ -12,5 +12,7 @@ namespace Pi.Replicate.Application.Common.Models
 		public int SequenceNo { get; set; }
 
 		public byte[] Value { get; set; }
+
+		public string Host { get; set; }
 	}
 }

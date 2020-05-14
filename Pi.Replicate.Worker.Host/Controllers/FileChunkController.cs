@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk;
+using Pi.Replicate.Domain;
+using Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,7 +25,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost("api/file/{fileId}/chunk")]
 		public async Task<IActionResult> Post(Guid fileId, [FromBody] FileChunkTransmissionModel model)
 		{
-			await _mediator.Send(new AddReceivedFileChunkCommand { FileId = fileId, SequenceNo = model.SequenceNo, Value = model.Value });
+			await _mediator.Send(new AddReceivedFileChunkCommand { FileId = fileId, SequenceNo = model.SequenceNo, Value = model.Value, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
 			return Ok();
 		}
     }

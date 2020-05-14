@@ -79,8 +79,9 @@ namespace Pi.Replicate.Application.Services
 				Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var chunkModel = _mapper.Map<FileChunkTransmissionModel>(fileChunk);
+				chunkModel.Host = Environment.MachineName; 
 				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
-				await _mediator.Send(new AddTransmissionResultCommand { FileId = fileChunk.FileId, FileChunkSequenceNo = fileChunk.SequenceNo, RecipientId = recipient.Id });
+				await _mediator.Send(new AddTransmissionResultCommand { FileId = fileChunk.FileId, FileChunkSequenceNo = fileChunk.SequenceNo, RecipientId = recipient.Id, Source = FileSource.Local });
 			}
 			catch (Exception ex)
 			{

@@ -77,6 +77,7 @@ create table dbo.TransmissionResult(
 	RecipientId uniqueidentifier NOT NULL,
 	FileId uniqueIdentifier NOT NULL,
 	FileChunkSequenceNo int NOT NULL,
+	[Source] int NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(Id),
 	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
@@ -153,7 +154,7 @@ select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
 from dbo.Recipient re
 inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id
 left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
-left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id
+left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id and trt.Source = 0
 left join dbo.EofMessage em on em.FileId = fi.Id
 where re.Verified = 1) a
 where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum

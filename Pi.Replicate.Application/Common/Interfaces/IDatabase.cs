@@ -13,8 +13,9 @@ namespace Pi.Replicate.Application.Common.Interfaces
         Task<ICollection<TResult>> Query<TFirst,TSecond,TThird,TResult>(string query, object parameters, Func<TFirst, TSecond, TThird, TResult> map, string splitOn = "Id");
         Task<TE> QuerySingle<TE>(string query, object parameters);
         Task Execute(string query, object parameters);
+        Task<TE> Execute<TE>(string query, object parameters);
 
-    }
+	}
 
     public interface IDatabaseFactory
     {

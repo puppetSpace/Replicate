@@ -15,13 +15,15 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
 		public double FileChunkSequenceNo { get; set; }
 
         public Guid RecipientId { get; set; }
+
+		public FileSource Source { get; set; }
 	}
 
 
     public class AddTransmissionResultCommandHandler : IRequestHandler<AddTransmissionResultCommand, Result>
     {
         private readonly IDatabase _database;
-        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo) VALUES(@Id,@RecipientId,@FileId, @FileChunkSequenceNo)";
+        private const string _insertStatement = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo, Source) VALUES(NEWID(),@RecipientId,@FileId, @FileChunkSequenceNo, @Source)";
 
         public AddTransmissionResultCommandHandler(IDatabase database)
         {
@@ -31,7 +33,7 @@ namespace Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult
         {
             using (_database)
             {
-                await _database.Execute(_insertStatement, new {Id=  Guid.NewGuid(), request.RecipientId,request.FileId,request.FileChunkSequenceNo });
+                await _database.Execute(_insertStatement, new {request.RecipientId,request.FileId,request.FileChunkSequenceNo, request.Source });
             }
 
 			return Result.Success();
