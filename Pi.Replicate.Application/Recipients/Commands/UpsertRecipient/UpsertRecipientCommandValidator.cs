@@ -16,6 +16,10 @@ namespace Pi.Replicate.Application.Recipients.Commands.UpsertRecipient
 				.NotEmpty()
 				.WithMessage("Address of a recipient cannot be empty");
 
+			RuleFor(x=>x.Verified)
+				.Equal(true)
+				.WithMessage("Cannot save a recipient that is not verified");
+
 			RuleFor(x => x.Address)
 				.MustAsync(async (x, c) =>
 				{

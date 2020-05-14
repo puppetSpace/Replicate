@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Observr;
 using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
 using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
+using Pi.Replicate.Domain;
 using Pi.Replicate.Infrastructure.Services;
 using Pi.Replicate.WebUi.Components;
 using Pi.Replicate.WebUi.Models;
@@ -16,10 +18,9 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages.Settings.Components
 {
-	public class RecipientsBase : ComponentBase, Observr.IObserver<SettingsSaveNotificationMessage>, IDisposable
+	public class RecipientsBase : ComponentBase
 	{
 		private List<RecipientViewModel> _toDeleteRecipients = new List<RecipientViewModel>();
-		private IDisposable _saveNotificationSubscription;
 
 		[Inject]
 		public ProbeService ProbeService { get; set; }
@@ -28,7 +29,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		public IMediator Mediator { get; set; }
 
 		[Inject]
-		protected IBroker SaveNotifier { get; set; }
+		protected IJSRuntime JSRuntime { get; set; }
 
 		protected Dialog Dialog { get; set; }
 
@@ -36,9 +37,7 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 
 		protected List<RecipientViewModel> Recipients { get; set; } = new List<RecipientViewModel>();
 
-		protected RecipientViewModel NewRecipient { get; set; }
-
-		public async Task Handle(SettingsSaveNotificationMessage value, CancellationToken cancellationToken)
+		public async Task<bool> Save()
 		{
 			ValidationMessages.Clear();
 			var saveTasks = new List<Task>();
@@ -52,51 +51,38 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 				await Task.WhenAll(saveTasks);
 				_toDeleteRecipients.Clear();
 				Recipients.ForEach(x => x.ResetState());
+				return true;
 			}
 			catch (ValidationException ex)
 			{
 				ValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
+				StateHasChanged();
+				await JSRuntime.InvokeVoidAsync("scrollIntoView", "settings-recipient-top");
+				return false;
 			}
-		}
-
-		public void Dispose()
-		{
-			_saveNotificationSubscription?.Dispose();
 		}
 
 		protected override async Task OnInitializedAsync()
 		{
-			_saveNotificationSubscription = SaveNotifier.Subscribe(this);
 			var recipientsResult = await Mediator.Send(new GetRecipientsForSettingsQuery());
 			if (recipientsResult.WasSuccessful)
 				Recipients = recipientsResult.Data.ToList();
 		}
 
-		protected void ShowAddRecipientDialog()
-		{
-			ValidationMessages.Clear();
-			NewRecipient = new RecipientViewModel();
-			NewRecipient.SetAsNew();
-			Dialog.Show();
-		}
-
 		protected void AddRecipient()
 		{
-			ValidateRecipient();
-			if (!ValidationMessages.Any())
-			{
-				Recipients.Insert(0, NewRecipient);
-				Dialog.Close();
-				_ = VerifyRecipient(NewRecipient);
-			}
+			var newRecipient = new RecipientViewModel();
+			newRecipient.SetAsNew();
+			Recipients.Insert(0, newRecipient);
 		}
 
 		protected async Task VerifyRecipient(RecipientViewModel recipientModel)
 		{
 			recipientModel.IsVerifying = true;
-			var result = await ProbeService.ProbeGet($"{recipientModel.Address}/api/probe");
+			var result = await ProbeService.ProbeGet<string>($"{recipientModel.Address}/api/probe");
 			recipientModel.Verified = result.IsSuccessful;
 			recipientModel.VerifyResult = result.IsSuccessful ? string.Empty : result.Message;
+			recipientModel.Name = result.ResponseData;
 			recipientModel.IsVerifying = false;
 			StateHasChanged();
 		}
@@ -105,19 +91,6 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		{
 			_toDeleteRecipients.Add(recipientModel);
 			Recipients.Remove(recipientModel);
-		}
-
-		private void ValidateRecipient()
-		{
-			ValidationMessages.Clear();
-			if (string.IsNullOrWhiteSpace(NewRecipient.Name))
-				ValidationMessages.Add("Name cannot be empty");
-			if (string.IsNullOrWhiteSpace(NewRecipient.Address))
-				ValidationMessages.Add("Address cannot be empty");
-			if (Recipients.Any(x => string.Equals(x.Name, NewRecipient.Name, StringComparison.OrdinalIgnoreCase)))
-				ValidationMessages.Add("Name already exists");
-			if (Recipients.Any(x => string.Equals(x.Address, NewRecipient.Address, StringComparison.OrdinalIgnoreCase)))
-				ValidationMessages.Add("Address already exists for a recipient");
 		}
 
 	}

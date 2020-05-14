@@ -2,9 +2,10 @@
 
 <div class="settings-recipients">
     <div class="recipient-header">
-        <h4>Recipients</h4>
-        <a @onclick="ShowAddRecipientDialog" title="add new recipient" class="selectable"><span class="oi oi-plus"></span></a>
+        <h4 id="settings-recipient-top">Recipients</h4>
+        <a @onclick="AddRecipient" title="add new recipient" class="selectable"><span class="oi oi-plus"></span></a>
     </div>
+    <ValidationDisplay ValidationMessages="ValidationMessages" />
     <div class="form-group scrollbar recipient-section">
         <table class="table table-striped">
             <thead>
@@ -28,7 +29,7 @@
                             }
                             else
                             {
-                                <a @onclick=@(()=>VerifyRecipient(recipient)) class="selectable"><span title="Contact the recipient to verify its existince" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
+                                <a @onclick=@(()=>VerifyRecipient(recipient)) class="selectable"><span title="Contact the recipient to verify its existince. This will also fill in the recipient's name" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
                                 @if (!string.IsNullOrWhiteSpace(recipient.VerifyResult))
                                 {
                                     <span title="@recipient.VerifyResult" class="oi oi-warning"></span>
@@ -44,11 +45,4 @@
             </tbody>
         </table>
     </div>
-    <Dialog @ref="Dialog" Title="Add new recipient" OnClose="@(()=>Dialog.Close())" OnSubmit="AddRecipient" TextSubmitButton="Add">
-        <ValidationDisplay ValidationMessages="ValidationMessages" />
-        <form>
-            <input type="text" class="form-control form-text" placeholder="Name" @bind="NewRecipient.Name" />
-            <input type="text" class="form-control form-text" placeholder="Address" @bind="NewRecipient.Address" />
-        </form>
-    </Dialog>
 </div>

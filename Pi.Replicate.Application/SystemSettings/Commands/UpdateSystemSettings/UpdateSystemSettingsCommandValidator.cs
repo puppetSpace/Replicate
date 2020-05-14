@@ -22,7 +22,7 @@ namespace Pi.Replicate.Application.SystemSettings.Commands.UpdateSystemSettings
 				.When(x => string.Equals(x.DateType,"number",StringComparison.OrdinalIgnoreCase));
 
 			RuleFor(x => x.Value)
-				.Must(x => int.TryParse(x, out var _))
+				.Must(x => int.Parse(x) > 0 )
 				.WithMessage(x => $"value of {x.Key} should be greater than 0")
 				.When(x => int.TryParse(x.Value, out var _) && string.Equals(x.DateType,"number",StringComparison.OrdinalIgnoreCase));
 

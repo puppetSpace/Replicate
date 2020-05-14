@@ -1,7 +1,7 @@
 ﻿@inherits GeneralBase;
 
     <div class="settings-general">
-        <h4>General</h4>
+        <h4 id="settings-general-top">General</h4>
         <ValidationDisplay ValidationMessages="ValidationMessages" />
         @foreach(var systemsetting in SystemSettings.OrderBy(x=>x.Key))
         {

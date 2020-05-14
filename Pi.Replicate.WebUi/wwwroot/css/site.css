@@ -191,6 +191,7 @@
   color: red;
   padding: 10px;
   margin-bottom: 20px;
+  margin-top: 10px;
 }
 .validation-summary ul {
   overflow-wrap: break-word;

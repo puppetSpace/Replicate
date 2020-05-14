@@ -17,22 +17,22 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages.Settings.Components
 {
-	public class GeneralBase : ComponentBase, Observr.IObserver<SettingsSaveNotificationMessage>, IDisposable
+	public class GeneralBase : ComponentBase
 	{
-		private IDisposable _saveNotificationSubscription;
 
 		[Inject]
 		public IMediator Mediator { get; set; }
 
 		[Inject]
-		protected IBroker SaveNotifier { get; set; }
+		protected IJSRuntime JSRuntime { get; set; }
 
 		public List<SystemSettingViewModel> SystemSettings { get; set; } = new List<SystemSettingViewModel>();
 
 		protected List<string> ValidationMessages { get; set; } = new List<string>();
 
-		public async Task Handle(SettingsSaveNotificationMessage value, CancellationToken cancellationToken)
+		public async Task<bool> Save()
 		{
+			ValidationMessages.Clear();
 			var saveTasks = new List<Task>();
 			foreach(var ss in SystemSettings.Where(x=>x.IsChanged))
 				saveTasks.Add(Mediator.Send(new UpdateSystemSettingsCommand { Key = ss.Key, Value = ss.Value, DateType = ss.DataType }));
@@ -41,22 +41,19 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 			{
 				await Task.WhenAll(saveTasks);
 				SystemSettings.ForEach(x => x.ResetState());
+				return true;
 			}
 			catch (ValidationException ex)
 			{
 				ValidationMessages = ex.Errors.Select(x => x.ErrorMessage).ToList();
 				StateHasChanged();
+				await JSRuntime.InvokeVoidAsync("scrollIntoView", "settings-general-top");
+				return false;
 			}
-		}
-
-		public void Dispose()
-		{
-			_saveNotificationSubscription?.Dispose();
 		}
 
 		protected override async Task OnInitializedAsync()
 		{
-			_saveNotificationSubscription = SaveNotifier.Subscribe(this);
 			var systemSettingResult = await Mediator.Send(new GetSystemSettingOverviewQuery());
 			if (systemSettingResult.WasSuccessful)
 				SystemSettings = systemSettingResult.Data.ToList();
