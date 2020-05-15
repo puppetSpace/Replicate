@@ -1,5 +1,7 @@
 ﻿@page "/"
+@inherits IndexBase
 
-<h1>Hello, world!</h1>
+<h1>@SystemOverview.MemoryUsage</h1>
+<h2>@SystemOverview.CpuUsage %</h2>
 
-Welcome to your new app.
+

@@ -148,14 +148,31 @@ create view dbo.V_AmountOfFilesSentByRecipient
 as
 select a.RecipientId,a.FolderId, count(a.FileId) AmountOfFilesSent
 from(
-select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
-,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum
-, (em.AmountOfChunks*(em.AmountOfChunks + 1)) / 2 ChunksChecksum
-from dbo.Recipient re
-inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id
-left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
-left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id and trt.Source = 0
-left join dbo.EofMessage em on em.FileId = fi.Id
-where re.Verified = 1) a
+	select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
+	,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum
+	, (em.AmountOfChunks*(em.AmountOfChunks + 1)) / 2 ChunksChecksum
+	from dbo.Recipient re
+	inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id
+	left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 0
+	left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id and trt.Source = 0
+	left join dbo.EofMessage em on em.FileId = fi.Id
+	where re.Verified = 1) a
+where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
+group by a.RecipientId,a.FolderId;
+
+
+create view dbo.V_AmountOfFilesReceivedByRecipient
+as
+select a.RecipientId,a.FolderId, count(a.FileId) AmountOfFilesSent
+from(
+	select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
+	,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum
+	, (em.AmountOfChunks*(em.AmountOfChunks + 1)) / 2 ChunksChecksum
+	from dbo.Recipient re
+	inner join dbo.FolderRecipient fre on fre.RecipientId = re.Id
+	left join dbo.[File] fi on fi.FolderId = fre.FolderId and fi.Source = 1
+	left join dbo.TransmissionResult trt on trt.FileId = fi.Id and trt.RecipientId = re.Id and trt.Source = 1
+	left join dbo.EofMessage em on em.FileId = fi.Id
+	where re.Verified = 1) a
 where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
 group by a.RecipientId,a.FolderId;

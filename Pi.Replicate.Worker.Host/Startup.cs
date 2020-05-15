@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -16,6 +17,7 @@ using Pi.Replicate.Application;
 using Pi.Replicate.Data;
 using Pi.Replicate.Infrastructure;
 using Pi.Replicate.Worker.Host.BackgroundWorkers;
+using Pi.Replicate.Worker.Host.Hubs;
 using Polly;
 
 namespace Pi.Replicate.Worker.Host
@@ -43,14 +45,20 @@ namespace Pi.Replicate.Worker.Host
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
 
+			services.AddSignalR();
 			services.AddControllers();
+			services.AddResponseCompression(opt =>
+			{
+				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
+			});
 
-			services.AddHostedService<FolderWorker>();
-			services.AddHostedService<FileExportWorker>();
-			services.AddHostedService<FileDisassemblerWorker>();
-			services.AddHostedService<FileChunkExportWorker>();
+			services.AddHostedService<SystemOverviewWatcher>();
+			//services.AddHostedService<FolderWorker>();
+			//services.AddHostedService<FileExportWorker>();
+			//services.AddHostedService<FileDisassemblerWorker>();
+			//services.AddHostedService<FileChunkExportWorker>();
 			//services.AddHostedService<FileAssemblerWorker>();
-			services.AddHostedService<RetryWorker>();
+			//services.AddHostedService<RetryWorker>();
 
 		}
 
@@ -71,6 +79,7 @@ namespace Pi.Replicate.Worker.Host
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllers();
+				endpoints.MapHub<SystemHub>("/systemHub");
 			});
 		}
 	}
