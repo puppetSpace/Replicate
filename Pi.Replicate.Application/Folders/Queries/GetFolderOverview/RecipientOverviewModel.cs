@@ -17,6 +17,8 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 
 		public int AmountofFilesSent { get; set; }
 
+		public int AmountofFilesReceived { get; set; }
+
 		public int AmountOfFailedFileInfo { get; set; }
 
 		public long AmountOfFailedFileChunks { get; set; }

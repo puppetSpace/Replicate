@@ -160,6 +160,7 @@ from(
 where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
 group by a.RecipientId,a.FolderId;
 
+GO
 
 create view dbo.V_AmountOfFilesReceivedByRecipient
 as
