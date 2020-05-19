@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Shared.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,18 +22,25 @@ namespace Pi.Replicate.WebUi.Pages
 
 		protected override async Task OnInitializedAsync()
 		{
-			var workerApiUrl = Configuration["AppSettings:WorkerApiBaseAdress"];
-			_hubConnection = new HubConnectionBuilder()
-				.WithUrl($"{workerApiUrl}/systemHub")
-				.Build();
-
-			_hubConnection.On<SystemOverview>("ReceiveSystemOverview", (so) =>
+			try
 			{
-				SystemOverview = so;
-				StateHasChanged();
-			});
+				var workerApiUrl = Configuration["AppSettings:WorkerApiBaseAdress"];
+				_hubConnection = new HubConnectionBuilder()
+					.WithUrl($"{workerApiUrl}/systemHub")
+					.Build();
 
-			await _hubConnection.StartAsync();
+				_hubConnection.On<SystemOverview>("ReceiveSystemOverview", (so) =>
+				{
+					SystemOverview = so;
+					StateHasChanged();
+				});
+
+				await _hubConnection.StartAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Failed to connect to Signalr hub of Worker");
+			}
 		}
 	}
 }

@@ -72,6 +72,7 @@
   width: 100%;
   overflow: auto;
   display: flex;
+  flex-direction: column;
 }
 .main h3 {
   font-size: x-large;
@@ -177,6 +178,21 @@
   padding-top: 10px;
 }
 .checkboxlistview li {
+  list-style: none;
+}
+.listview {
+  overflow-y: auto;
+  max-height: 300px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  width: fit-content;
+  padding-right: 1rem;
+}
+.listview ul {
+  padding-left: 10px;
+  padding-top: 10px;
+}
+.listview li {
   list-style: none;
 }
 .modal-content {
@@ -396,6 +412,7 @@ app {
 .flex-body {
   display: flex;
   overflow: auto;
+  flex: 1;
   /*    height:100%;*/
 }
 #blazor-error-ui {

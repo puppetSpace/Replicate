@@ -164,7 +164,7 @@ GO
 
 create view dbo.V_AmountOfFilesReceivedByRecipient
 as
-select a.RecipientId,a.FolderId, count(a.FileId) AmountOfFilesSent
+select a.RecipientId,a.FolderId, count(a.FileId) AmountOfFilesReceived
 from(
 	select distinct re.Id RecipientId, fre.FolderId,fi.Id FileId
 	,sum(trt.FileChunkSequenceNo) over (partition by re.id,fi.Id)  FileTransmisionChunkSequenceNoSum

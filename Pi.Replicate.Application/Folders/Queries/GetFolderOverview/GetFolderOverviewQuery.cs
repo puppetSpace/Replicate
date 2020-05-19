@@ -37,7 +37,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 			left join dbo.V_AmountOfFilesReceivedByRecipient rer on rer.RecipientId = re.Id and rer.FolderId = fre.FolderId
 			left join dbo.FailedTransmission ftn on ftn.RecipientId = re.Id
 			where re.Verified = 1
-			group by re.Id, re.[Name], re.[Address],ref.AmountofFilesSent";
+			group by re.Id, re.[Name], re.[Address],ref.AmountofFilesSent,rer.AmountOfFilesReceived";
 
 		public GetFolderOverviewQueryHandler(IDatabase database)
 		{

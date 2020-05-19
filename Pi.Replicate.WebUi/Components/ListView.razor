@@ -1,0 +1,19 @@
+﻿
+@typeparam TE
+<div class="listview scrollbar">
+    <ul>
+        @foreach (var item in Items)
+        {
+            @ListViewItem(item);
+        }
+    </ul>
+</div>
+@code{
+
+    [Parameter]
+    public IEnumerable<TE> Items { get; set; }
+
+    [Parameter]
+    public RenderFragment<TE> ListViewItem { get; set; }
+
+}

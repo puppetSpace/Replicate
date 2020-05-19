@@ -13,7 +13,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
     {
         public IActionResult Get()
 		{
-			return Ok(Environment.MachineName);
+			return Ok(System.Text.Json.JsonSerializer.Serialize(Environment.MachineName));
 		}
     }
 }

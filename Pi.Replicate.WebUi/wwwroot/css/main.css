@@ -29,6 +29,7 @@
   width: 100%;
   overflow: auto;
   display: flex;
+  flex-direction: column;
 }
 .main h3 {
   font-size: x-large;
