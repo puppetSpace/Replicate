@@ -7,6 +7,7 @@ using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Common;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -43,16 +44,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
 				var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
-				var runningTasks = new List<Task>();
-				var semaphore = new SemaphoreSlim(_amountOfConcurrentJobs);
+				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 				while (!incomingQueue.IsCompleted && !stoppingToken.IsCancellationRequested)
 				{
-					runningTasks.RemoveAll(x => x.IsCompleted);
 					var file = incomingQueue.Take(stoppingToken);
-
-					runningTasks.Add(Task.Run(async () =>
+					taskRunner.Add(async () =>
 					{
-						await semaphore.WaitAsync();
 						Log.Information($"'{file.Path}' is being processed");
 						var recipientsResult = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
 						if (recipientsResult.WasSuccessful)
@@ -71,8 +68,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 							Log.Information($"'{file.Path}' is processed");
 						}
-						semaphore.Release();
-					}));
+					});
 
 				}
 			});
