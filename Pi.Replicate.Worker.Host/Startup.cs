@@ -45,6 +45,12 @@ namespace Pi.Replicate.Worker.Host
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
 
+			services.AddHttpClient("webhook", client =>
+			{
+				client.DefaultRequestHeaders.Accept.Clear();
+				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			});
+
 			services.AddSignalR();
 			services.AddControllers();
 			services.AddResponseCompression(opt =>

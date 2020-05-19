@@ -21,6 +21,7 @@ namespace Pi.Replicate.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
 			services.AddSingleton<PathBuilder>();
             services.AddSingleton<WorkerQueueFactory>();
+			services.AddSingleton<WebhookService>();
             services.AddTransient<FileCollectorFactory>();
             services.AddTransient<FileDisassemblerService>();
             services.AddTransient<TransmissionService>();

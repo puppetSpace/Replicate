@@ -20,11 +20,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _amountOfConcurrentJobs;
 		private readonly IMediator _mediator;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
+		private readonly WebhookService _webhookService;
 
-		public FileAssemblerWorker(IConfiguration configuration, IMediator mediator, FileAssemblerServiceFactory fileAssemblerServiceFactory)
+		public FileAssemblerWorker(IConfiguration configuration, IMediator mediator, FileAssemblerServiceFactory fileAssemblerServiceFactory, WebhookService webhookService)
 		{
 			_mediator = mediator;
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
+			_webhookService = webhookService;
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileAssemblyJobs]);
 		}
@@ -66,6 +68,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				{
 					await semaphore.WaitAsync();
 					await _fileAssemblerServiceFactory.Get().ProcessFile(completedFile.File, completedFile.EofMessage);
+					_webhookService.NotifyFileAssembled(completedFile.File);
 					semaphore.Release();
 				}));
 			}
@@ -78,6 +81,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			foreach (var changedFile in changedFiles)
 			{
 				await _fileAssemblerServiceFactory.Get().ProcessFile(changedFile.File, changedFile.EofMessage);
+				_webhookService.NotifyFileAssembled(changedFile.File);
 			}
 		}
 	}

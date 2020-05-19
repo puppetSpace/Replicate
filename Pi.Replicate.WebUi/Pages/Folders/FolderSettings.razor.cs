@@ -73,11 +73,11 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 			await Mediator.Send(new UpdateRecipientsForFolderCommand { FolderId = parsedFolderId, ToAddRecipients = addedRecipients.ToList(), ToDeleteRecipients = deletedRecipients.ToList() });
 
 			foreach (var fwh in FolderWebhookViewModels.Where(x => x.IsChanged))
-				await Mediator.Send(new UpsertFolderWebhookCommand { FolderId = parsedFolderId, WebhookTypeId = fwh.WebhookTypeId, CallbackUrl = fwh.CallbackUrl });
+				await Mediator.Send(new UpsertFolderWebhookCommand { FolderId = parsedFolderId, WebhookTypeId = fwh.WebhookTypeId, WebhookTypeName = fwh.WebHookTypeName, CallbackUrl = fwh.CallbackUrl });
 
 			foreach (var newRecipient in addedRecipients)
 			{
-				//todo notify. Start processing existing files for these recipients
+				//todo notify. Start processing existing files for these recipients. should be done in de command
 			}
 
 			NavigationManager.NavigateTo($"/folder/{FolderId}");

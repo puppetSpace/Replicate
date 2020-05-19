@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Application.Services;
 using Serilog;
 using System.Threading.Tasks;
 
@@ -7,12 +8,13 @@ namespace Pi.Replicate.Worker.Host
 {
 	
 
-	public static class WorkerStatupExtension
+	public static class WorkerStartupExtension
 	{
 		public static IHost CleanUp(this IHost host)
 		{
 			var database = (IDatabase)host.Services.GetService(typeof(IDatabase));
-			var startup = new WorkerStartup(database);
+			var webhookService = (WebhookService)host.Services.GetService(typeof(WebhookService));
+			var startup = new WorkerStartup(database, webhookService);
 			startup.Initialize().GetAwaiter().GetResult();
 			return host;
 		}
@@ -20,13 +22,17 @@ namespace Pi.Replicate.Worker.Host
 		private class WorkerStartup
 		{
 			private readonly IDatabase _database;
+			private readonly WebhookService _webhookService;
 
-			public WorkerStartup(IDatabase database)
+			public WorkerStartup(IDatabase database, WebhookService webhookService)
 			{
 				_database = database;
+				_webhookService = webhookService;
 			}
 			public async Task Initialize()
 			{
+				Log.Information("Initializing webhook service");
+				await _webhookService.Initialize();
 				using (_database)
 				{
 					Log.Information("Deleting unprocessed files from database");
