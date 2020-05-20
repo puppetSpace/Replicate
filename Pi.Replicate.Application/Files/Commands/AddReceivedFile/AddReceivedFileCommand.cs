@@ -76,7 +76,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 		{
 			using (_database)
 			{
-				var folderId = CreateFolderIfNotExists(request.FolderName);
+				var folderId = await CreateFolderIfNotExists(request.FolderName);
 				await _database.Execute(_fileInsertStatement, new { request.Id, FolderId = folderId, request.Name, request.Size, request.Version, request.LastModifiedDate, request.Path, request.Signature, Source = FileSource.Remote });
 				await _database.Execute<Recipient>(_recipientCreationStatement, new { Address = request.SenderAddress, Name = request.Sender, FolderId = folderId });
 			}

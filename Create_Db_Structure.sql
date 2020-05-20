@@ -117,10 +117,10 @@ create table dbo.FolderWebhook(
 GO
 
 insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
-insert into dbo.SystemSetting VALUES(NEWID(),'FolderCrawlTriggerInterval','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
-insert into dbo.SystemSetting VALUES(NEWID(),'FileAssemblyTriggerInterval','10','number','The amount of time to wait to between each moment the application checks if all chunks have arrived for a file and assembly of files');
-insert into dbo.SystemSetting VALUES(NEWID(),'RetryTriggerInterval','10','number','The amount of time to wait between each moment the application retries sending failed data to the recipients');
-insert into dbo.SystemSetting VALUES(NEWID(),'FileSplitSizeOfChunksInBytes','1000000','number','A file will be split up into chunks. This setting defines the size of that chunk');
+insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFolderCrawl','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
+insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFileAssembly','10','number','The amount of time to wait to between each moment the application checks if all chunks have arrived for a file and assembly of files');
+insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalRetry','10','number','The amount of time to wait between each moment the application retries sending failed data to the recipients');
+insert into dbo.SystemSetting VALUES(NEWID(),'SizeOfChunksInBytes','1000000','number','A file will be split up into chunks. This setting defines the size of that chunk');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileDisassemblyJobs','10','number', 'Amount of files that ares allowed to be disassembled at the same time');
 insert into dbo.SystemSetting VALUES(NEWID(),'ConcurrentFileAssemblyJobs','10','number','Amount of files that ares allowed to be assembled at the same time');
 GO
@@ -128,16 +128,19 @@ GO
 insert into dbo.WebhookType VALUES(NEWID(),'FileDisassembled','When a file is completely processed and ready for transmission','{
     "name":"myfile.ext",
     "path":"d:\\examples\\Folder1\\myfile.ext",
+	"version":"1",
     "folder":"Folder1"
 }');
 insert into dbo.WebhookType VALUES(NEWID(),'FileAssembled','When a file is completely received and assembled','{
     "name":"myfile.ext",
     "path":"d:\\examples\\Folder1\\myfile.ext",
+	"version":"1",
     "folder":"Folder1"
 }');
 insert into dbo.WebhookType VALUES(NEWID(),'FileFailed','When processing of a file fails','{
     "name":"myfile.ext",
     "path":"d:\\examples\\Folder1\\myfile.ext",
+	"version":"1",
     "folder":"Folder1"
 }');
 

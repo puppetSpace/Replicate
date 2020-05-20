@@ -76,7 +76,7 @@ namespace Pi.Replicate.Application.Services
 			var foundFolder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
 			if (foundWebhook is object && !string.IsNullOrWhiteSpace(foundWebhook.CallbackUrl))
 			{
-				var postObject = new { name = file.Name, path = _pathBuilder.BuildPath(file.Path), folder = foundFolder?.Data?.Name };
+				var postObject = new { name = file.Name, path = _pathBuilder.BuildPath(file.Path), version=file.Version, folder = foundFolder?.Data?.Name };
 			
 				Log.Debug($"Webhook of type '{type}' for folder '{foundFolder?.Data?.Name}' calling '{foundWebhook.CallbackUrl}'");
 				var httpClient = _httpClientFactory.CreateClient("webhook");
