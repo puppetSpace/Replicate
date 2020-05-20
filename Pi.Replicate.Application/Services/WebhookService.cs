@@ -68,22 +68,16 @@ namespace Pi.Replicate.Application.Services
 
 		public void NotifyFileDisassembled(File file) => CallWebhook(file, _typeFileDisassembled).Forget();
 
-		public void NotifyFileFailed(File file, string message) => CallWebhook(file, _typeFileFailed, message).Forget();
+		public void NotifyFileFailed(File file) => CallWebhook(file, _typeFileFailed).Forget();
 
-		private async Task CallWebhook(File file, string type, string message = "")
+		private async Task CallWebhook(File file, string type)
 		{
 			var foundWebhook = _webhookCache.FirstOrDefault(x => string.Equals(x.WebhookTypeName, type) && x.FolderId == file.FolderId);
 			var foundFolder = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
 			if (foundWebhook is object && !string.IsNullOrWhiteSpace(foundWebhook.CallbackUrl))
 			{
-				dynamic postObject = new ExpandoObject();
-				postObject.name = file.Name;
-				postObject.path = _pathBuilder.BuildPath(file.Path);
-				postObject.folder = foundFolder?.Data?.Name;
-
-				if (!string.IsNullOrWhiteSpace(message))
-					postObject.message = message;
-
+				var postObject = new { name = file.Name, path = _pathBuilder.BuildPath(file.Path), folder = foundFolder?.Data?.Name };
+			
 				Log.Debug($"Webhook of type '{type}' for folder '{foundFolder?.Data?.Name}' calling '{foundWebhook.CallbackUrl}'");
 				var httpClient = _httpClientFactory.CreateClient("webhook");
 				try

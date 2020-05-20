@@ -63,7 +63,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 							else
 							{
 								await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
-								_webhookService.NotifyFileFailed(file,"Failed to process file. View errors in log to see what went wrong");
+								_webhookService.NotifyFileFailed(file);
 							}
 
 							Log.Information($"'{file.Path}' is processed");

@@ -138,8 +138,7 @@ insert into dbo.WebhookType VALUES(NEWID(),'FileAssembled','When a file is compl
 insert into dbo.WebhookType VALUES(NEWID(),'FileFailed','When processing of a file fails','{
     "name":"myfile.ext",
     "path":"d:\\examples\\Folder1\\myfile.ext",
-    "folder":"Folder1",
-    "error":"errormessage"
+    "folder":"Folder1"
 }');
 
 GO
