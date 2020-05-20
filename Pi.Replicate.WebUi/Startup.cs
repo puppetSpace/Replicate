@@ -31,12 +31,17 @@ namespace Pi.Replicate.WebUi
             services.AddRazorPages()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IDatabase>()); ;
             services.AddServerSideBlazor();
-            services.AddApplication();
+            services.AddWebApplication();
             services.AddData();
 			services.AddInfrastructure();
             services.AddObservr();
-            services.AddHttpClient();
-            services.AddSystemSettingsFromDatabase(Configuration);
+			services.AddHttpClient();
+			services.AddHttpClient("hostproxy",config=>
+			{
+				config.DefaultRequestHeaders.Accept.Clear();
+				config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			});
+			services.AddSystemSettingsFromDatabase(Configuration);
 			services.AddBlazoredToast();
 
 		}

@@ -13,20 +13,25 @@ namespace Pi.Replicate.Application
 {
     public static class DependencyInjection
     {
-        public static void AddApplication(this IServiceCollection services)
-        {
-            services.AddMediatR(Assembly.GetExecutingAssembly());
-            services.AddAutoMapper(typeof(MappingProfile).Assembly);
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
-			services.AddSingleton<PathBuilder>();
-            services.AddSingleton<WorkerQueueFactory>();
-			services.AddSingleton<WebhookService>();
-            services.AddTransient<FileCollectorFactory>();
-            services.AddTransient<FileDisassemblerService>();
-            services.AddTransient<TransmissionService>();
-            services.AddTransient<FileService>();
-            services.AddTransient<FileAssemblerServiceFactory>();
+		public static void AddWebApplication(this IServiceCollection services)
+		{
+			services.AddMediatR(Assembly.GetExecutingAssembly());
+			services.AddAutoMapper(typeof(MappingProfile).Assembly);
+			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
+			services.AddTransient<WorkerNotificationProxy>();
 		}
-    }
+
+		public static void AddHostApplication(this IServiceCollection services)
+		{
+			services.AddSingleton<PathBuilder>();
+			services.AddSingleton<WorkerQueueFactory>();
+			services.AddSingleton<WebhookService>();
+			services.AddTransient<FileCollectorFactory>();
+			services.AddTransient<FileDisassemblerService>();
+			services.AddTransient<TransmissionService>();
+			services.AddTransient<FileService>();
+			services.AddTransient<FileAssemblerServiceFactory>();
+		}
+	}
 }

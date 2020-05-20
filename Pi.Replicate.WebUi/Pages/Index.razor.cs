@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
 using Serilog;
 using System;
@@ -24,7 +25,7 @@ namespace Pi.Replicate.WebUi.Pages
 		{
 			try
 			{
-				var workerApiUrl = Configuration["AppSettings:WorkerApiBaseAdress"];
+				var workerApiUrl = Configuration[Constants.WorkerApiBaseAddressSetting];
 				_hubConnection = new HubConnectionBuilder()
 					.WithUrl($"{workerApiUrl}/systemHub")
 					.Build();
