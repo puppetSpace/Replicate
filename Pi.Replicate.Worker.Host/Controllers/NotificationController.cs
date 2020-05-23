@@ -26,5 +26,12 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			await _broker.Publish(folderWebhookChangeNotification);
 			return Ok();
 		}
-    }
+
+		[HttpPost]
+		public async Task<IActionResult> RecipientsAdded([FromBody] RecipientsAddedNotification recipientsAddedNotification)
+		{
+			//await _broker.Publish(folderWebhookChangeNotification);
+			return Ok();
+		}
+	}
 }
