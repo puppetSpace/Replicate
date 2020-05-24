@@ -25,7 +25,7 @@ namespace Pi.Replicate.Application
 		public static void AddHostApplication(this IServiceCollection services)
 		{
 			services.AddSingleton<PathBuilder>();
-			services.AddSingleton<WorkerQueueFactory>();
+			services.AddSingleton<WorkerQueueContainer>();
 			services.AddSingleton<WebhookService>();
 			services.AddTransient<FileCollectorFactory>();
 			services.AddTransient<FileDisassemblerService>();

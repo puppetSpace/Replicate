@@ -1,21 +1,20 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTransmission;
 using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTransmissions;
-using Pi.Replicate.Application.FailedTransmissions.Commands.AddFailedTransmission;
 using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChunkTransmissions;
+using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions;
+using Pi.Replicate.Application.Files.Queries.GetFailedFiles;
 using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Services;
+using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions;
-using Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTransmission;
-using Pi.Replicate.Application.Files.Queries.GetFailedFiles;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Domain;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
@@ -24,14 +23,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _triggerInterval;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
-		private readonly WorkerQueueFactory _workerQueueFactory;
+		private readonly WorkerQueueContainer _workerQueueContainer;
 
-		public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService, WorkerQueueFactory workerQueueFactory)
+		public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService, WorkerQueueContainer workerQueueContainer)
 		{
 			_triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
 			_mediator = mediator;
 			_transmissionService = transmissionService;
-			_workerQueueFactory = workerQueueFactory;
+			_workerQueueContainer = workerQueueContainer;
 		}
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -57,10 +56,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			var failedFilesResult = await _mediator.Send(new GetFailedFilesQuery());
 			if (failedFilesResult.WasSuccessful)
 			{
-				var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-				foreach(var failedFile in failedFilesResult.Data)
+				var queue = _workerQueueContainer.ToProcessFiles.Writer;
+				foreach (var failedFile in failedFilesResult.Data)
 				{
-					queue.Add(failedFile);
+					if(await queue.WaitToWriteAsync())
+						await queue.WriteAsync(failedFile);
 				}
 			}
 		}

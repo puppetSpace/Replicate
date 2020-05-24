@@ -1,18 +1,15 @@
-﻿using Pi.Replicate.Application.Notifications.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.FolderWebhooks.Notifications.FolderWebhookChanged;
 using Pi.Replicate.Shared;
-using Microsoft.Extensions.Configuration;
 using Serilog;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-    public class WorkerNotificationProxy
-    {
+	public class WorkerNotificationProxy
+	{
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly string _workerHostAddress;
 
@@ -22,12 +19,12 @@ namespace Pi.Replicate.Application.Services
 			_workerHostAddress = configuration[Constants.WorkerApiBaseAddressSetting];
 		}
 
-		public void PostFolderWebhookChanged(FolderWebhookChangeNotification folderWebhookChangeNotification)
+		public void PostFolderWebhookChanged(FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
 			PostFolderWebhookChangedTask(folderWebhookChangeNotification).Forget();
 		}
 
-		private async Task PostFolderWebhookChangedTask(FolderWebhookChangeNotification folderWebhookChangeNotification)
+		private async Task PostFolderWebhookChangedTask(FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
 			try
 			{

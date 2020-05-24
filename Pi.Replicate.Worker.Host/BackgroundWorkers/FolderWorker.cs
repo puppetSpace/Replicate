@@ -21,19 +21,19 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _triggerInterval;
 		private readonly IMediator _mediator;
 		private readonly FileCollectorFactory _fileCollectorFactory;
-		private readonly WorkerQueueFactory _workerQueueFactory;
+		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileService _fileService;
 
 		public FolderWorker(IConfiguration configuration
 			, IMediator mediator
 			, FileCollectorFactory fileCollectorFactory
-			, WorkerQueueFactory workerQueueFactory
+			, WorkerQueueContainer workerQueueContainer
 			, FileService fileService)
 		{
 			_triggerInterval = int.Parse(configuration[Constants.FolderCrawlTriggerInterval]);
 			_mediator = mediator;
 			_fileCollectorFactory = fileCollectorFactory;
-			_workerQueueFactory = workerQueueFactory;
+			_workerQueueContainer = workerQueueContainer;
 			_fileService = fileService;
 		}
 
@@ -75,34 +75,29 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
 		{
-			var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+			var queue = _workerQueueContainer.ToSendFiles.Writer;
 			foreach (var newFile in newFiles)
 			{
 				var createdFile = await _fileService.CreateNewFile(folder, newFile);
 				if (createdFile is object)
 				{
 					Log.Debug($"Adding '{createdFile.Path}' to queue");
-					if (queue.Any(x => string.Equals(x.Path, createdFile.Path)))
-						Log.Information($"{createdFile.Path} already present in queue for processing");
-					else
-						queue.Add(createdFile);
+					if (await queue.WaitToWriteAsync())
+						await queue.WriteAsync(createdFile);
 				}
 			}
 		}
 
 		private async Task ProcessChangedFiles(Folder folder, List<System.IO.FileInfo> changedFiles)
 		{
-			var queue = _workerQueueFactory.Get<File>(WorkerQueueType.ToSendFiles);
+			var queue = _workerQueueContainer.ToSendFiles.Writer;
 			foreach (var changedFile in changedFiles)
 			{
 				var updatedFile = await _fileService.CreateUpdateFile(folder, changedFile);
 				if (updatedFile is object)
 				{
-					Log.Debug($"Adding '{updatedFile.Path}' to queue");
-					if (queue.Any(x => string.Equals(x.Path, updatedFile.Path)))
-						Log.Information($"{updatedFile.Path} already present in queue for processing");
-					else
-						queue.Add(updatedFile);
+					if(await queue.WaitToWriteAsync())
+						await queue.WriteAsync(updatedFile);
 				}
 			}
 		}

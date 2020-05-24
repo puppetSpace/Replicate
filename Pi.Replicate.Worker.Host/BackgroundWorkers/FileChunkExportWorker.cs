@@ -11,12 +11,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	public class FileChunkExportWorker : BackgroundService
 	{
-		private readonly WorkerQueueFactory _workerQueueFactory;
+		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly TransmissionService _transmissionService;
 
-		public FileChunkExportWorker(WorkerQueueFactory workerQueueFactory, TransmissionService transmissionService)
+		public FileChunkExportWorker(WorkerQueueContainer workerQueueContainer, TransmissionService transmissionService)
 		{
-			_workerQueueFactory = workerQueueFactory;
+			_workerQueueContainer = workerQueueContainer;
 			_transmissionService = transmissionService;
 		}
 
@@ -25,11 +25,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			var th = new Thread(async () =>
 			{
 				Log.Information($"Starting {nameof(FileChunkExportWorker)}");
-				var queue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
-				while (!queue.IsCompleted || !stoppingToken.IsCancellationRequested)
+				var queue = _workerQueueContainer.ToSendChunks.Reader;
+				while (await queue.WaitToReadAsync() || !stoppingToken.IsCancellationRequested)
 				{
-					var chunkPackage = queue.Take();
-					await _transmissionService.SendFileChunk(chunkPackage.Value, chunkPackage.Key);
+					var chunkPackage = await queue.ReadAsync();
+					await _transmissionService.SendFileChunk(chunkPackage.filechunk, chunkPackage.recipient);
 				}
 			});
 			th.Start();

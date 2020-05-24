@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Application.Notifications.Models;
+using Pi.Replicate.Application.FolderWebhooks.Notifications.FolderWebhookChanged;
 using Pi.Replicate.Application.Services;
 using System;
 using System.Threading;
@@ -41,7 +41,7 @@ namespace Pi.Replicate.Application.FolderWebhooks.Commands.UpsertFolderWebhook
 			using (_database)
 			{
 				await _database.Execute(_upsertStatement, new { request.FolderId, request.WebhookTypeId, request.CallbackUrl });
-				_workerProxy.PostFolderWebhookChanged(new FolderWebhookChangeNotification { FolderId = request.FolderId, WebhookType = request.WebhookTypeName });
+				_workerProxy.PostFolderWebhookChanged(new FolderWebhookChangedNotification { FolderId = request.FolderId, WebhookType = request.WebhookTypeName });
 				return Result.Success();
 			}
 		}

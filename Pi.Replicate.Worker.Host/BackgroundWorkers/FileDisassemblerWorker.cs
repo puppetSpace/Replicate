@@ -19,18 +19,18 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class FileDisassemblerWorker : BackgroundService
 	{
 		private readonly int _amountOfConcurrentJobs;
-		private readonly WorkerQueueFactory _workerQueueFactory;
+		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
 		private readonly WebhookService _webhookService;
 
-		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueFactory workerQueueFactory
+		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService, IMediator mediator
 			, TransmissionService transmissionService, WebhookService webhookService)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
-			_workerQueueFactory = workerQueueFactory;
+			_workerQueueContainer = workerQueueContainer;
 			_fileProcessService = fileProcessService;
 			_mediator = mediator;
 			_transmissionService = transmissionService;
@@ -39,15 +39,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
-			var th = new Thread(() =>
+			var th = new Thread(async () =>
 			{
 				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
-				var incomingQueue = _workerQueueFactory.Get<File>(WorkerQueueType.ToProcessFiles);
-				var outgoingQueue = _workerQueueFactory.Get<KeyValuePair<Recipient, FileChunk>>(WorkerQueueType.ToSendChunks);
+				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
+				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
 				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
-				while (!incomingQueue.IsCompleted && !stoppingToken.IsCancellationRequested)
+				while (await incomingQueue.WaitToReadAsync() && !stoppingToken.IsCancellationRequested)
 				{
-					var file = incomingQueue.Take(stoppingToken);
+					var file = await incomingQueue.ReadAsync(stoppingToken);
 					taskRunner.Add(async () =>
 					{
 						Log.Information($"'{file.Path}' is being processed");
@@ -78,12 +78,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			return Task.CompletedTask;
 		}
 
-		private async Task<EofMessage> SplitFile(File file, ICollection<Recipient> recipients, BlockingCollection<KeyValuePair<Recipient, FileChunk>> queue)
+		private async Task<EofMessage> SplitFile(File file, ICollection<Recipient> recipients, System.Threading.Channels.ChannelWriter<(Recipient recipient, FileChunk filechunk)> writer)
 		{
-			void ChunkCreatedCallBack(FileChunk fileChunk)
+			async Task ChunkCreatedCallBack(FileChunk fileChunk)
 			{
 				foreach (var recipient in recipients)
-					queue.Add(new KeyValuePair<Recipient, FileChunk>(recipient, fileChunk));
+				{
+					if(await writer.WaitToWriteAsync())
+						await writer.WriteAsync((recipient, fileChunk));
+				}
 			}
 
 			return await _fileProcessService.ProcessFile(file, ChunkCreatedCallBack);

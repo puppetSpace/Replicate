@@ -34,7 +34,7 @@ namespace Pi.Replicate.Application.Services
         }
 
 
-        public async Task<EofMessage> ProcessFile(File file, Action<FileChunk> chunkCreatedDelegate)
+        public async Task<EofMessage> ProcessFile(File file, Func<FileChunk,Task> chunkCreatedDelegate)
         {
             var path = _pathBuilder.BuildPath(file.Path);
 			EofMessage eofMessage = null;
@@ -61,7 +61,7 @@ namespace Pi.Replicate.Application.Services
             return eofMessage;
         }
 
-		private async Task<EofMessage> ProcessNewFile(File file, string path, Action<FileChunk> chunkCreatedDelegate)
+		private async Task<EofMessage> ProcessNewFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
 		{
 			int sequenceNo = 0;
 			Log.Information($"Compressing file '{path}'");
@@ -76,7 +76,7 @@ namespace Pi.Replicate.Application.Services
 				while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
 				{
 					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory.ToArray());
-					chunkCreatedDelegate(fileChunk);
+					await chunkCreatedDelegate(fileChunk);
 				}
 			}
 
@@ -98,7 +98,7 @@ namespace Pi.Replicate.Application.Services
 			}
 		}
 
-		private async Task<EofMessage> ProcessChangedFile(File file, string path, Action<FileChunk> chunkCreatedDelegate)
+		private async Task<EofMessage> ProcessChangedFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
         {
             int amountOfChunks = 0;
 
@@ -120,7 +120,7 @@ namespace Pi.Replicate.Application.Services
 				while (indexOfSlice < delta.Length)
 				{
 					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
-					chunkCreatedDelegate(fileChunk);
+					await chunkCreatedDelegate(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;
 				}
