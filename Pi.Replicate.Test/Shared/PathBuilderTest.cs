@@ -16,7 +16,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
 			Assert.AreEqual(rootPath, pathBuilder.BasePath);
@@ -27,7 +27,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = @"";
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
 			File file = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "FileFolder", "test1.txt")), System.Guid.Empty, @"D:\Test");
@@ -41,7 +41,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
 			var folder = new Folder() { Name = "FolderTest" };
@@ -55,7 +55,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 			var folderPath = pathBuilder.BuildPath(null);
 
@@ -67,7 +67,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
 			var filePath = pathBuilder.BuildPath(null);
@@ -80,7 +80,7 @@ namespace Pi.Replicate.Test.Shared
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
 			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x["ReplicateBasePath"]).Returns(rootPath);
+			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
 			var pathBuilder = new PathBuilder(configurationMock.Object);
 
 			File file = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(rootPath, "FileFolder", "test1.txt")), System.Guid.Empty, pathBuilder.BasePath);
