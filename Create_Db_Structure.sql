@@ -37,6 +37,13 @@ create table dbo.[File](
 	CONSTRAINT FK_File_Folder FOREIGN KEY(FolderId) REFERENCES dbo.Folder(Id) on DELETE CASCADE,
 );
 GO
+EXEC sys.sp_addextendedproperty @name=N'Comment', @value=N'0=Local, 1=Remote' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'File', @level2type=N'COLUMN',@level2name=N'Source'
+GO
+
+EXEC sys.sp_addextendedproperty @name=N'Comment', @value=N'0=Normal,
+1=Failed,
+2=Assembled' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'File', @level2type=N'COLUMN',@level2name=N'Status'
+GO
 
 create table dbo.EofMessage(
 	Id uniqueidentifier NOT NULL,
@@ -84,6 +91,9 @@ create table dbo.TransmissionResult(
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
+EXEC sys.sp_addextendedproperty @name=N'Comment', @value=N'0=Local, 1=Remote' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'TransmissionResult', @level2type=N'COLUMN',@level2name=N'Source'
+GO
+
 
 create table dbo.SystemSetting(
 	Id uniqueidentifier NOT NULL,
