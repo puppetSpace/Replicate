@@ -17,6 +17,7 @@ using Pi.Replicate.Application;
 using Pi.Replicate.Data;
 using Pi.Replicate.Infrastructure;
 using Pi.Replicate.Worker.Host.BackgroundWorkers;
+using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Hubs;
 using Polly;
 
@@ -57,6 +58,7 @@ namespace Pi.Replicate.Worker.Host
 			{
 				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 			});
+			services.AddTransient<TelemetryProxy>();
 
 			services.AddHostedService<SystemOverviewWatcher>();
 			services.AddHostedService<FolderWorker>();

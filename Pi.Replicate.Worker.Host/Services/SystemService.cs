@@ -17,7 +17,9 @@ namespace Pi.Replicate.Worker.Host.Services
 			using(var process = Process.GetCurrentProcess())
 			{
 				overview.MemoryUsage = ByteDisplayConverter.Convert(process.PrivateMemorySize64);
-				overview.CpuUsage = await GetCpuUsage(process);
+				var gcMemoryInfo = GC.GetGCMemoryInfo();
+				overview.MemoryUsagePercentage = (process.PrivateMemorySize64 / gcMemoryInfo.TotalAvailableMemoryBytes) * 100;
+				overview.CpuUsagePercentage = await GetCpuUsage(process);
 			}
 
 			return overview;

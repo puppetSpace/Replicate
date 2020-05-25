@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Hubs;
 using Pi.Replicate.Worker.Host.Services;
 using System.Threading;
@@ -9,11 +10,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	public class SystemOverviewWatcher : BackgroundService
 	{
-		private readonly IHubContext<SystemHub> _hubContext;
+		private readonly TelemetryProxy _telemetryProxy;
 
-		public SystemOverviewWatcher(IHubContext<SystemHub> hubContext)
+		public SystemOverviewWatcher(TelemetryProxy telemetryProxy)
 		{
-			_hubContext = hubContext;
+			_telemetryProxy = telemetryProxy;
 		}
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -24,7 +25,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				{
 					var systemservice = new SystemService();
 					var overview = await systemservice.GetSystemOverview();
-					await _hubContext.Clients.All.SendAsync("ReceiveSystemOverview", overview);
+					await _telemetryProxy.SendSystemOverview(overview);
 					await Task.Delay(2000);
 				}
 			});

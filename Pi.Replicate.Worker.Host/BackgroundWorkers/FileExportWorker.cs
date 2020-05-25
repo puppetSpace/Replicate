@@ -2,19 +2,15 @@ using MediatR;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
 using Pi.Replicate.Application.Folders.Queries.GetFolder;
-using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Serilog;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	//todo retry mechanisme in database
-	//todo don't send signature. Generate signature when file is retrieved
 	public class FileExportWorker : BackgroundService
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;
@@ -45,7 +41,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 						var recipients = file is RequestFile rf ? rf.Recipients : folderResult.Data.Recipients;
 						foreach (var recipient in recipients)
 							await _communicationService.SendFile(folderResult.Data, file, recipient);
-						
+
 						if (await outgoingQueue.WaitToWriteAsync())
 							await outgoingQueue.WriteAsync(file);
 					}
