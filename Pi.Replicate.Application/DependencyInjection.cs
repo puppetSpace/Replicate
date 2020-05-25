@@ -13,17 +13,12 @@ namespace Pi.Replicate.Application
 {
     public static class DependencyInjection
     {
-		public static void AddWebApplication(this IServiceCollection services)
+		public static void AddApplication(this IServiceCollection services)
 		{
 			services.AddMediatR(Assembly.GetExecutingAssembly());
 			services.AddAutoMapper(typeof(MappingProfile).Assembly);
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
-			services.AddTransient<WorkerNotificationProxy>();
-		}
-
-		public static void AddHostApplication(this IServiceCollection services)
-		{
 			services.AddSingleton<PathBuilder>();
 			services.AddSingleton<WorkerQueueContainer>();
 			services.AddSingleton<WebhookService>();
@@ -32,6 +27,7 @@ namespace Pi.Replicate.Application
 			services.AddTransient<TransmissionService>();
 			services.AddTransient<FileService>();
 			services.AddTransient<FileAssemblerServiceFactory>();
+			services.AddTransient<WorkerNotificationProxy>();
 		}
 	}
 }

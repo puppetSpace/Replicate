@@ -7,7 +7,6 @@ using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTr
 using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChunkTransmissions;
 using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions;
 using Pi.Replicate.Application.Files.Queries.GetFailedFiles;
-using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -73,8 +72,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			{
 				foreach (var ff in failedFilesResult.Data)
 				{
-					var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = ff.File.Id });
-					var wasSucessful = await _transmissionService.SendFile(ff.Folder, ff.File, signatureResult.Data, ff.Recipient);
+					var wasSucessful = await _transmissionService.SendFile(ff.Folder, ff.File, ff.Recipient);
 					if (wasSucessful)
 						await _mediator.Send(new DeleteFailedFileTransmissionCommand { FileId = ff.File.Id, RecipientId = ff.Recipient.Id });
 				}

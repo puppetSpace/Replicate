@@ -31,7 +31,7 @@ namespace Pi.Replicate.WebUi
             services.AddRazorPages()
                 .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<IDatabase>()); ;
             services.AddServerSideBlazor();
-            services.AddWebApplication();
+            services.AddApplication();
             services.AddData();
 			services.AddInfrastructure();
             services.AddObservr();

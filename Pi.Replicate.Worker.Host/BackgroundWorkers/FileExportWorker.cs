@@ -1,7 +1,6 @@
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Queries.GetSignatureOfFile;
 using Pi.Replicate.Application.Folders.Queries.GetFolder;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
