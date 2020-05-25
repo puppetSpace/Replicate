@@ -60,8 +60,8 @@ namespace Pi.Replicate.Application.Services
 				else
 				{
 					Log.Information($"Decompressing file '{tempPath}'");
-					await _compressionService.Decompress(tempPath, _pathBuilder.BuildPath(file.Path));
-					Log.Information($"File decompressed to '{_pathBuilder.BuildPath(file.Path)}'");
+					await _compressionService.Decompress(tempPath, filePath);
+					Log.Information($"File decompressed to '{filePath}'");
 					await MarkFileAsCompleted(file);
 				}
 
@@ -122,7 +122,7 @@ namespace Pi.Replicate.Application.Services
 				return null;
 			}
 		}
-
+		
 		private void DeleteTempPath(string tempPath)
 		{
 			try
@@ -138,8 +138,10 @@ namespace Pi.Replicate.Application.Services
 
 		private async Task MarkFileAsCompleted(File file)
 		{
-			Log.Information($"Mark '{file.Path}' as completed and deleting chunks");
-			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2 WHERE Id = @FileId", new { FileId = file.Id });
+			Log.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
+			var filePath = _pathBuilder.BuildPath(file.Path);
+			var signature = _deltaService.CreateSignature(filePath);
+			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature WHERE Id = @FileId", new { FileId = file.Id, Signature = signature });
 			await _database.Execute("DELETE FROM dbo.FileChunk WHERE FileId = @FileId", new { FileId = file.Id });
 		}
 	}
