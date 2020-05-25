@@ -18,8 +18,6 @@ namespace Pi.Replicate.Application.Common.Models
 
         public int Version { get; set; }
 
-        public byte[] Signature { get; set; }
-
         public DateTime LastModifiedDate { get; set; }
 
         public string Path { get; set; }

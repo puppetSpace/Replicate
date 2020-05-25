@@ -1,18 +1,17 @@
-﻿using MediatR;
-using Pi.Replicate.Application.Common.Interfaces;
+﻿using AutoMapper;
+using MediatR;
 using Pi.Replicate.Application.Common.Queues;
+using Pi.Replicate.Application.Files.Queries.GetFilesForFolder;
 using Pi.Replicate.Domain;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Folders.Notifications.RecipientsAddedToFolder
 {
-    public class RecipientsAddedToFolderNotification : INotification
-    {
+	public class RecipientsAddedToFolderNotification : INotification
+	{
 		public Guid FolderId { get; set; }
 
 		public List<Recipient> Recipients { get; set; }
@@ -20,18 +19,29 @@ namespace Pi.Replicate.Application.Folders.Notifications.RecipientsAddedToFolder
 
 	public class RecipientsAddedToFolderNotificationHandler : INotificationHandler<RecipientsAddedToFolderNotification>
 	{
-		private readonly IDatabase _database;
+		private readonly IMediator _mediator;
+		private readonly IMapper _mapper;
 		private readonly WorkerQueueContainer _workerQueueContainer;
 
-		public RecipientsAddedToFolderNotificationHandler(IDatabase database, WorkerQueueContainer workerQueueContainer)
+		public RecipientsAddedToFolderNotificationHandler(IMediator mediator, IMapper mapper, WorkerQueueContainer workerQueueContainer)
 		{
-			_database = database;
+			_mediator = mediator;
+			_mapper = mapper;
 			_workerQueueContainer = workerQueueContainer;
 		}
 
-		public Task Handle(RecipientsAddedToFolderNotification notification, CancellationToken cancellationToken)
+		public async Task Handle(RecipientsAddedToFolderNotification notification, CancellationToken cancellationToken)
 		{
-			throw new NotImplementedException();
+			var fileResult = await _mediator.Send(new GetFilesForFolderQuery(notification.FolderId));
+			if (fileResult.WasSuccessful)
+			{
+				foreach (var file in fileResult.Data)
+				{
+					var requestedFile = _mapper.Map<RequestFile>(file);
+					requestedFile.Recipients = notification.Recipients;
+					await _workerQueueContainer.ToSendFiles.Writer.WriteAsync(requestedFile, cancellationToken);
+				}
+			}
 		}
 	}
 }

@@ -23,8 +23,6 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 
 		public int Version { get; set; }
 
-		public byte[] Signature { get; set; }
-
 		public DateTime LastModifiedDate { get; set; }
 
 		public string Path { get; set; }
@@ -43,9 +41,9 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 		private const string _folderIdSelectStatement = "SELECT Id FROM dbo.Folder WHERE Name = @Name";
 		private const string _fileInsertStatement = @"
 			IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
-				INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)
+				INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Source)
 			ELSE
-				UPDATE dbo.[File] SET Size = @Size, LastModifiedDate = @LastModifiedDate, Signature = @Signature WHERE Id = @Id";
+				UPDATE dbo.[File] SET Size = @Size, LastModifiedDate = @LastModifiedDate WHERE Id = @Id";
 
 		private const string _recipientCreationStatement = @"
 			BEGIN
@@ -77,7 +75,7 @@ namespace Pi.Replicate.Application.Files.Commands.AddReceivedFile
 			using (_database)
 			{
 				var folderId = await CreateFolderIfNotExists(request.FolderName);
-				await _database.Execute(_fileInsertStatement, new { request.Id, FolderId = folderId, request.Name, request.Size, request.Version, request.LastModifiedDate, request.Path, request.Signature, Source = FileSource.Remote });
+				await _database.Execute(_fileInsertStatement, new { request.Id, FolderId = folderId, request.Name, request.Size, request.Version, request.LastModifiedDate, request.Path, Source = FileSource.Remote });
 				await _database.Execute<Recipient>(_recipientCreationStatement, new { Address = request.SenderAddress, Name = request.Sender, FolderId = folderId });
 			}
 

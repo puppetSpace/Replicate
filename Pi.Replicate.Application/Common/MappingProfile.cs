@@ -18,6 +18,7 @@ namespace Pi.Replicate.Application.Common
 
 		private void InitializeMappings()
 		{
+			CreateMap<Domain.File, Domain.RequestFile>();
 			CreateMap<Domain.File, FileTransmissionModel>();
 			CreateMap<Domain.FileChunk, FileChunkTransmissionModel>()
 				.ForMember(x => x.Value, opt => opt.MapFrom((x, y) => x.Value.ToArray()));

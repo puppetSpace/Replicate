@@ -65,8 +65,8 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 				return;
 			}
 			var selectedRecipients = Recipients.Where(x => x.IsChecked).Select(x => x.Data).ToList();
-			var deletedRecipients = _originalSelectedRecipients.Where(x => !selectedRecipients.Any(y => y.Id == x.Id)).Select(x => x.Id);
-			var addedRecipients = selectedRecipients.Where(x => !_originalSelectedRecipients.Any(y => y.Id == x.Id)).Select(x => x.Id);
+			var deletedRecipients = _originalSelectedRecipients.Where(x => !selectedRecipients.Any(y => y.Id == x.Id));
+			var addedRecipients = selectedRecipients.Where(x => !_originalSelectedRecipients.Any(y => y.Id == x.Id));
 
 			var parsedFolderId = Guid.Parse(FolderId);
 

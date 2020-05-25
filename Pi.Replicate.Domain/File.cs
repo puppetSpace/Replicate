@@ -52,4 +52,9 @@ namespace Pi.Replicate.Domain
             };
         }
 	}
+
+	public class RequestFile : File
+	{
+		public ICollection<Recipient> Recipients { get; set; }
+	}
 }

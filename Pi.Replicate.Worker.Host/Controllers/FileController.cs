@@ -22,7 +22,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
 			Log.Information($"File data received from {Request.HttpContext.Connection.RemoteIpAddress}");
-			await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderName = model.FolderName, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Signature = model.Signature, Version = model.Version, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
+			await _mediator.Send(new AddReceivedFileCommand { Id = model.Id, FolderName = model.FolderName, LastModifiedDate = model.LastModifiedDate, Name = model.Name, Path = model.Path, Size = model.Size, Version = model.Version, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
 			return Ok();
 		}
 	}

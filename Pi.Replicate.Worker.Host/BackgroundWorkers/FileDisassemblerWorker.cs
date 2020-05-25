@@ -9,8 +9,10 @@ using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Common;
 using Serilog;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -41,23 +43,24 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
+				Log.Information($"Starting {nameof(Host.BackgroundWorkers.FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
-				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
+				var taskRunner = new TaskRunner((int)_amountOfConcurrentJobs);
 				while (await incomingQueue.WaitToReadAsync() && !stoppingToken.IsCancellationRequested)
 				{
 					var file = await incomingQueue.ReadAsync(stoppingToken);
-					taskRunner.Add(async () =>
+					taskRunner.Add((async () =>
 					{
 						Log.Information($"'{file.Path}' is being processed");
-						var recipientsResult = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
-						if (recipientsResult.WasSuccessful)
+						var recipients = await GetRecipients(file);
+
+						if (recipients.Any())
 						{
-							var eofMessage = await SplitFile(file, recipientsResult.Data, outgoingQueue);
+							var eofMessage = await SplitFile(file, recipients, outgoingQueue);
 							if (eofMessage is object)
 							{
-								await FinializeFileProcess(eofMessage, recipientsResult.Data);
+								await FinializeFileProcess(eofMessage, recipients);
 								_webhookService.NotifyFileDisassembled(file);
 							}
 							else
@@ -68,7 +71,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 							Log.Information($"'{file.Path}' is processed");
 						}
-					});
+					}));
 
 				}
 			});
@@ -78,13 +81,28 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			return Task.CompletedTask;
 		}
 
+		private async Task<List<Recipient>> GetRecipients(File file)
+		{
+			var recipients = new List<Recipient>();
+			if (file is RequestFile rf)
+				recipients = rf.Recipients.ToList();
+			else
+			{
+				var recipientsResult = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
+				if (recipientsResult.WasSuccessful)
+					recipients = recipientsResult.Data.ToList();
+			}
+
+			return recipients;
+		}
+
 		private async Task<EofMessage> SplitFile(File file, ICollection<Recipient> recipients, System.Threading.Channels.ChannelWriter<(Recipient recipient, FileChunk filechunk)> writer)
 		{
 			async Task ChunkCreatedCallBack(FileChunk fileChunk)
 			{
 				foreach (var recipient in recipients)
 				{
-					if(await writer.WaitToWriteAsync())
+					if (await writer.WaitToWriteAsync())
 						await writer.WriteAsync((recipient, fileChunk));
 				}
 			}

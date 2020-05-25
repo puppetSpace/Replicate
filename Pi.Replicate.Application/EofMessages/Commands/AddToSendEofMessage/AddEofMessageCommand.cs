@@ -18,7 +18,9 @@ namespace Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage
 	public class AddToSendSentEofMessageCommandHandler : IRequestHandler<AddToSendEofMessageCommand, Result<EofMessage>>
 	{
 		private readonly IDatabase _database;
-		private const string _insertStatement = "INSERT INTO dbo.EofMessage(Id,FileId,AmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)";
+		private const string _insertStatement = @"
+		IF NOT EXISTS (SELECT 1 FROM dbo.EofMessage WHERE FileId = @FileId)	
+			INSERT INTO dbo.EofMessage(Id,FileId,AmountOfChunks) VALUES(@Id,@FileId,@AmountOfChunks)";
 
 		public AddToSendSentEofMessageCommandHandler(IDatabase database)
 		{

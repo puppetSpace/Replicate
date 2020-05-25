@@ -7,12 +7,15 @@ using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
 using Serilog;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	//todo retry mechanisme in database
+	//todo don't send signature. Generate signature when file is retrieved
 	public class FileExportWorker : BackgroundService
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;
@@ -37,12 +40,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				{
 					var file = await incomingQueue.ReadAsync();
 					var folderResult = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
-					var signatureResult = await _mediator.Send(new GetSignatureOfFileQuery { FileId = file.Id });
-					if (folderResult.WasSuccessful && signatureResult.WasSuccessful)
+
+					if (folderResult.WasSuccessful)
 					{
-						foreach (var recipient in folderResult.Data.Recipients)
-							await _communicationService.SendFile(folderResult.Data, file, signatureResult.Data, recipient);
-						if(await outgoingQueue.WaitToWriteAsync())
+						var recipients = file is RequestFile rf ? rf.Recipients : folderResult.Data.Recipients;
+						foreach (var recipient in recipients)
+							await _communicationService.SendFile(folderResult.Data, file, recipient);
+						
+						if (await outgoingQueue.WaitToWriteAsync())
 							await outgoingQueue.WriteAsync(file);
 					}
 				}
