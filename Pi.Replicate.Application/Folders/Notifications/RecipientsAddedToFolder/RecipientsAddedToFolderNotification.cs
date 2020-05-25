@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Application.Recipients.Notifications.RecipientsAddedToFolder
+namespace Pi.Replicate.Application.Folders.Notifications.RecipientsAddedToFolder
 {
     public class RecipientsAddedToFolderNotification : INotification
     {

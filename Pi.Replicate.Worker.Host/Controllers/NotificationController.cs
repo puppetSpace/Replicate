@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Observr;
 using Pi.Replicate.Application.FolderWebhooks.Notifications.FolderWebhookChanged;
-using Pi.Replicate.Application.Recipients.Notifications.RecipientsAddedToFolder;
+using Pi.Replicate.Application.Folders.Notifications.RecipientsAddedToFolder;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Controllers

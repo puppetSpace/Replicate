@@ -30,7 +30,7 @@ namespace Pi.Replicate.Test.Services
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var calculatedAmountOfChunks = Math.Ceiling((double)compressedFile.Length / int.Parse(configuration.Object[Constants.FileSplitSizeOfChunksInBytes]));
 			int amountOfCalls = 0;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; }) ;
 
 			var mediator = CreateMediatorEofMessageMock();
 
@@ -50,7 +50,7 @@ namespace Pi.Replicate.Test.Services
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			int amountOfCalls = 0;
 			int eofMessageAmountOfChunks = 0;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk,Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
 			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
@@ -77,7 +77,7 @@ namespace Pi.Replicate.Test.Services
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			int amountOfCalls = 0;
 			bool getPreviousSignatureOfFileQueryCalled = false;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk,Task>(x => { amountOfCalls++;return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
 			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
@@ -106,7 +106,7 @@ namespace Pi.Replicate.Test.Services
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			int amountOfCalls = 0;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk,Task>(x => { amountOfCalls++;return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
 			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
@@ -132,7 +132,7 @@ namespace Pi.Replicate.Test.Services
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			int amountOfCalls = 0;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk,Task>(x => { amountOfCalls++;return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
 			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
@@ -162,7 +162,7 @@ namespace Pi.Replicate.Test.Services
 			using var fs = fileInfo.OpenWrite();
 
 			int amountOfCalls = 0;
-			var chunkCreated = new Action<FileChunk>(x => amountOfCalls++);
+			var chunkCreated = new Func<FileChunk,Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
 			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
