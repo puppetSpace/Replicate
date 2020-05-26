@@ -26,10 +26,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
 		private readonly WebhookService _webhookService;
+		private readonly PathBuilder _pathBuilder;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService, IMediator mediator
-			, TransmissionService transmissionService, WebhookService webhookService)
+			, TransmissionService transmissionService, WebhookService webhookService
+			, PathBuilder pathBuilder)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueContainer = workerQueueContainer;
@@ -37,42 +39,49 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_mediator = mediator;
 			_transmissionService = transmissionService;
 			_webhookService = webhookService;
+			_pathBuilder = pathBuilder;
 		}
 
 		protected override Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(Host.BackgroundWorkers.FileDisassemblerWorker)}");
+				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
 				var taskRunner = new TaskRunner((int)_amountOfConcurrentJobs);
 				while (await incomingQueue.WaitToReadAsync() && !stoppingToken.IsCancellationRequested)
 				{
 					var file = await incomingQueue.ReadAsync(stoppingToken);
-					taskRunner.Add((async () =>
+					if (System.IO.File.Exists(_pathBuilder.BuildPath(file.Path)))
 					{
-						Log.Information($"'{file.Path}' is being processed");
-						var recipients = await GetRecipients(file);
-
-						if (recipients.Any())
+						taskRunner.Add((async () =>
 						{
-							var eofMessage = await SplitFile(file, recipients, outgoingQueue);
-							if (eofMessage is object)
-							{
-								await FinializeFileProcess(eofMessage, recipients);
-								_webhookService.NotifyFileDisassembled(file);
-							}
-							else
-							{
-								await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
-								_webhookService.NotifyFileFailed(file);
-							}
+							Log.Information($"'{file.Path}' is being processed");
+							var recipients = await GetRecipients(file);
 
-							Log.Information($"'{file.Path}' is processed");
-						}
-					}));
+							if (recipients.Any())
+							{
+								var eofMessage = await SplitFile(file, recipients, outgoingQueue);
+								if (eofMessage is object)
+								{
+									await FinializeFileProcess(eofMessage, recipients);
+									_webhookService.NotifyFileDisassembled(file);
+								}
+								else
+								{
+									await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
+									_webhookService.NotifyFileFailed(file);
+								}
 
+								Log.Information($"'{file.Path}' is processed");
+							}
+						}));
+					}
+					else
+					{
+						Log.Information($"File '{file.Path}' does not exist");
+					}
 				}
 			});
 
