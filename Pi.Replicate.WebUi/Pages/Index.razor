@@ -1,7 +1,22 @@
 ﻿@page "/"
 @inherits IndexBase
 
-<h1>@SystemOverview.MemoryUsage</h1>
-<h2>@SystemOverview.CpuUsagePercentage %</h2>
+<div class="site-overview">
+    <div class="site-overview-tiles">
+        <div class="site-overview-tile">
+            <span class="site-overview-tile-title">Files processed for upload</span>
+            <span class="oi oi-arrow-thick-top site-overview-tile-symbol" />
+            <span class="site-overview-tile-value">@OverviewModel.AmountOfFilesProcessedForDownload</span>
+        </div>
 
-
+        <div class="site-overview-tile">
+            <span class="site-overview-tile-title">Files received and processed</span>
+            <span class="oi oi-arrow-thick-bottom site-overview-tile-symbol" />
+            <span class="site-overview-tile-value">@OverviewModel.AmountOfFilesProcessedForDownload</span>
+        </div>
+        <div class="site-overview-tile">
+            <h1>@SystemOverview.MemoryUsage</h1>
+            <h2>@SystemOverview.CpuUsagePercentage %</h2>
+        </div>
+    </div>
+</div>

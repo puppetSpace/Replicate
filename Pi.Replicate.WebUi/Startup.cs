@@ -11,6 +11,7 @@ using Pi.Replicate.Application;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Data;
 using Pi.Replicate.Infrastructure;
+using Pi.Replicate.WebUi.Services;
 using Serilog;
 
 namespace Pi.Replicate.WebUi
@@ -42,6 +43,7 @@ namespace Pi.Replicate.WebUi
 				config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
 			services.AddSystemSettingsFromDatabase(Configuration);
+			services.AddTransient<OverviewService>();
 			services.AddBlazoredToast();
 
 		}

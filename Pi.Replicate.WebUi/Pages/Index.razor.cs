@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
+using Pi.Replicate.WebUi.Models;
+using Pi.Replicate.WebUi.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -19,7 +21,12 @@ namespace Pi.Replicate.WebUi.Pages
 		[Inject]
 		public IConfiguration Configuration { get; set; }
 
+		[Inject]
+		public OverviewService OverviewService { get; set; }
+
 		protected SystemOverview SystemOverview { get; set; } = new SystemOverview();
+
+		protected OverviewModel OverviewModel { get; set; } = new OverviewModel();
 
 		protected override async Task OnInitializedAsync()
 		{
@@ -37,6 +44,7 @@ namespace Pi.Replicate.WebUi.Pages
 				});
 
 				await _hubConnection.StartAsync();
+				OverviewModel = await OverviewService.GetOverview();
 			}
 			catch (Exception ex)
 			{
