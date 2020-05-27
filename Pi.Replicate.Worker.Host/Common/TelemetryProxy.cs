@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Hubs;
+using Serilog.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,20 @@ namespace Pi.Replicate.Worker.Host.Common
 		public async Task SendSystemOverview(SystemOverview systemOverview)
 		{
 			await _hubContext.Clients.All.SendAsync("ReceiveSystemOverview", systemOverview);
+
+		}
+
+		private static Dictionary<LogEventLevel, string> _shortLogNames = new Dictionary<LogEventLevel, string> { 
+			  { LogEventLevel.Debug, "DBG"}
+			, { LogEventLevel.Error, "ERR"}
+			, { LogEventLevel.Fatal, "FTL"}
+			, { LogEventLevel.Information, "INF"}
+			, { LogEventLevel.Verbose, "VER"}
+			, { LogEventLevel.Warning, "WRN"}};
+		internal async Task SendLog(LogEvent evt)
+		{
+			var logMessage = new LogMessage($"[{evt.Timestamp:HH:mm:ss} {_shortLogNames[evt.Level]}] {evt.RenderMessage()}", evt.Level);
+			await _hubContext.Clients.All.SendAsync("ReceiveLog",logMessage);
 		}
 
 		//count not available on Channel yet

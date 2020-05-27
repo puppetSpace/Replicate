@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Pi.Replicate.Data;
 using Serilog;
 
 namespace Pi.Replicate.Worker.Host
 {
-	//todo Add FileSource to TransmissionResult so we can track Incomming files to
-	// check for double changes in incomming files
+	// todo check for double changes in incomming files
 	public class Program
 	{
 		public static void Main(string[] args)
@@ -28,7 +28,12 @@ namespace Pi.Replicate.Worker.Host
 			.CreateLogger();
 
 
-			CreateHostBuilder(args).Build().CleanUp().Run();
+			CreateHostBuilder(args)
+				.Build()
+				.AddSystemSettingsFromDatabase()
+				.AttachLogSinks()
+				.CleanUp()
+				.Run();
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>

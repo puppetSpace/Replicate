@@ -37,7 +37,6 @@ namespace Pi.Replicate.Worker.Host
 		{
 			services.AddApplication();
 			services.AddData();
-			services.AddSystemSettingsFromDatabase(Configuration);
 			services.AddInfrastructure();
 			services.AddObservr();
 			services.AddHttpClient("default", client =>

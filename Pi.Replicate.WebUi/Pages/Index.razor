@@ -15,8 +15,27 @@
             <span class="site-overview-tile-value">@OverviewModel.AmountOfFilesProcessedForDownload</span>
         </div>
         <div class="site-overview-tile">
-            <h1>@SystemOverview.MemoryUsage</h1>
-            <h2>@SystemOverview.CpuUsagePercentage %</h2>
+            <span class="site-overview-tile-title">Workerhost Telemetry</span>
+            <span class="oi oi-pulse site-overview-tile-symbol" />
+            <table class="site-overview-tile-value site-overview-tile-valuegrid">
+                <tr>
+                    <td>Memory:</td>
+                    <td>@SystemOverview.MemoryUsage</td>
+                </tr>
+                <tr>
+                    <td>Processor:</td>
+                    <td>@Math.Ceiling(SystemOverview.CpuUsagePercentage)</td>
+                </tr>
+            </table>
         </div>
+    </div>
+    <div class="site-overview-log">
+        <h4>Current log messages</h4>
+        <ul class="scrollbar-px-10">
+            @foreach(var logItem in LogItems)
+        {
+            <li class="@(FormLogMessageClass(logItem.Level))">@logItem.Content</li>
+        }
+        </ul>
     </div>
 </div>

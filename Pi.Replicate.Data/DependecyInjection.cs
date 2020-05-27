@@ -9,6 +9,7 @@ using Pi.Replicate.Domain;
 using MediatR;
 using Pi.Replicate.Application.SystemSettings.Queries.GetSystemSettingsForConfiguration;
 using System;
+using Microsoft.Extensions.Hosting;
 
 namespace Pi.Replicate.Data
 {
@@ -20,9 +21,10 @@ namespace Pi.Replicate.Data
 			services.AddTransient<IDatabaseFactory, DatabaseFactory>();
 		}
 
-		public static void AddSystemSettingsFromDatabase(this IServiceCollection services, IConfiguration configuration)
+		public static IHost AddSystemSettingsFromDatabase(this IHost host)
 		{
-			var mediator = services.BuildServiceProvider().GetService<IMediator>();
+			var mediator = host.Services.GetService<IMediator>();
+			var configuration = host.Services.GetService<IConfiguration>();
 			var systemSettingResult = mediator.Send(new GetSystemSettingsForConfigurationQuery()).GetAwaiter().GetResult();
 			if (systemSettingResult.WasSuccessful)
 			{
@@ -33,6 +35,8 @@ namespace Pi.Replicate.Data
 			{
 				throw new InvalidOperationException("Unable to add systemsettings to configuration");
 			}
+
+			return host;
 		}
 	}
 }

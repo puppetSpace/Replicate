@@ -42,7 +42,6 @@ namespace Pi.Replicate.WebUi
 				config.DefaultRequestHeaders.Accept.Clear();
 				config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
-			services.AddSystemSettingsFromDatabase(Configuration);
 			services.AddTransient<OverviewService>();
 			services.AddBlazoredToast();
 

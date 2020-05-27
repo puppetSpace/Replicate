@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Pi.Replicate.Data;
 using Serilog;
 
 namespace Pi.Replicate.WebUi
@@ -27,7 +28,10 @@ namespace Pi.Replicate.WebUi
 			.WriteTo.Console()
 			.CreateLogger();
 
-			CreateHostBuilder(args).Build().Run();
+			CreateHostBuilder(args)
+				.Build()
+				.AddSystemSettingsFromDatabase()
+				.Run();
 		}
 
 		public static IHostBuilder CreateHostBuilder(string[] args) =>
