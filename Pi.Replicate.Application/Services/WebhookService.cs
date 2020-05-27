@@ -15,7 +15,16 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-	public class WebhookService : Observr.IObserver<FolderWebhookChangedNotification>
+	public interface IWebhookService
+	{
+		Task Initialize();
+		void NotifyFileAssembled(File file);
+		void NotifyFileDisassembled(File file);
+		void NotifyFileFailed(File file);
+	}
+
+
+	public class WebhookService : Observr.IObserver<FolderWebhookChangedNotification>, IWebhookService
 	{
 		private const string _typeFileAssembled = "FileAssembled";
 		private const string _typeFileDisassembled = "FileDisassembled";
@@ -94,7 +103,6 @@ namespace Pi.Replicate.Application.Services
 			}
 
 		}
-
 
 		private class WebhookCacheItem
 		{

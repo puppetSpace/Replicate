@@ -4,6 +4,7 @@ using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Files.Queries.GetCompletedFiles;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Common;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -20,13 +21,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _amountOfConcurrentJobs;
 		private readonly IMediator _mediator;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
-		private readonly WebhookService _webhookService;
 
-		public FileAssemblerWorker(IConfiguration configuration, IMediator mediator, FileAssemblerServiceFactory fileAssemblerServiceFactory, WebhookService webhookService)
+		public FileAssemblerWorker(IConfiguration configuration, IMediator mediator, FileAssemblerServiceFactory fileAssemblerServiceFactory)
 		{
 			_mediator = mediator;
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
-			_webhookService = webhookService;
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileAssemblyJobs]);
 		}
@@ -59,21 +58,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task AssembleNewFiles(IEnumerable<CompletedFileDto> newFiles)
 		{
-			var runningTasks = new List<Task>();
-			var semaphore = new SemaphoreSlim(_amountOfConcurrentJobs);
-
+			var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 			foreach (var completedFile in newFiles)
 			{
-				runningTasks.Add(Task.Run(async () =>
+				taskRunner.Add(async () =>
 				{
-					await semaphore.WaitAsync();
 					await _fileAssemblerServiceFactory.Get().ProcessFile(completedFile.File, completedFile.EofMessage);
-					_webhookService.NotifyFileAssembled(completedFile.File);
-					semaphore.Release();
-				}));
+				});
 			}
-			await Task.WhenAll(runningTasks);
-			runningTasks.Clear();
+			await taskRunner.WaitTillComplete();
 		}
 
 		private async Task ApplyChangedToExistingFiles(IEnumerable<CompletedFileDto> changedFiles)
@@ -81,7 +74,6 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			foreach (var changedFile in changedFiles)
 			{
 				await _fileAssemblerServiceFactory.Get().ProcessFile(changedFile.File, changedFile.EofMessage);
-				_webhookService.NotifyFileAssembled(changedFile.File);
 			}
 		}
 	}

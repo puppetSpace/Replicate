@@ -26,12 +26,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
-		private readonly WebhookService _webhookService;
+		private readonly IWebhookService _webhookService;
 		private readonly PathBuilder _pathBuilder;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService, IMediator mediator
-			, TransmissionService transmissionService, WebhookService webhookService
+			, TransmissionService transmissionService, IWebhookService webhookService
 			, PathBuilder pathBuilder)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);

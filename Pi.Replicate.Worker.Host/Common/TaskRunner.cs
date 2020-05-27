@@ -28,5 +28,10 @@ namespace Pi.Replicate.Worker.Host.Common
 				_semaphoreSlim.Release();
 			}));
 		}
+
+		public async Task WaitTillComplete()
+		{
+			await Task.WhenAll(_runningTasks);
+		}
     }
 }

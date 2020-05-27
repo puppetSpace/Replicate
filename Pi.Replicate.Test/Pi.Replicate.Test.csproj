@@ -24,7 +24,7 @@
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
     <PackageReference Include="Moq" Version="4.13.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.1.0" />
@@ -39,6 +39,7 @@
     <ProjectReference Include="..\Pi.Replicate.Domain\Pi.Replicate.Domain.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Infrastructure\Pi.Replicate.Infrastructure.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.WebUi\Pi.Replicate.WebUi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

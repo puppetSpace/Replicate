@@ -16,16 +16,19 @@ namespace Pi.Replicate.Application.Services
 		private readonly PathBuilder _pathBuilder;
 		private readonly IDeltaService _deltaService;
 		private readonly IDatabase _database;
+		private readonly IWebhookService _webhookService;
 
 		public FileAssemblerService(ICompressionService compressionService
 			, PathBuilder pathBuilder
 			, IDeltaService deltaService
-			, IDatabase database)
+			, IDatabase database
+			, IWebhookService webhookService)
 		{
 			_pathBuilder = pathBuilder;
 			_compressionService = compressionService;
 			_deltaService = deltaService;
 			_database = database;
+			_webhookService = webhookService;
 		}
 
 		public async Task ProcessFile(File file, EofMessage eofMessage)
@@ -143,6 +146,7 @@ namespace Pi.Replicate.Application.Services
 			var signature = _deltaService.CreateSignature(filePath);
 			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature WHERE Id = @FileId", new { FileId = file.Id, Signature = signature });
 			await _database.Execute("DELETE FROM dbo.FileChunk WHERE FileId = @FileId", new { FileId = file.Id });
+			_webhookService.NotifyFileAssembled(file);
 		}
 	}
 
@@ -152,22 +156,25 @@ namespace Pi.Replicate.Application.Services
 		private readonly PathBuilder _pathBuilder;
 		private readonly IDeltaService _deltaService;
 		private readonly IDatabaseFactory _databaseFactory;
+		private readonly IWebhookService _webhookService;
 
 		public FileAssemblerServiceFactory(ICompressionService compressionService
 			, PathBuilder pathBuilder
 			, IDeltaService deltaService
-			, IDatabaseFactory databaseFactory)
+			, IDatabaseFactory databaseFactory
+			, IWebhookService webhookService)
 		{
 			_compressionService = compressionService;
 			_pathBuilder = pathBuilder;
 			_deltaService = deltaService;
 			_databaseFactory = databaseFactory;
+			_webhookService = webhookService;
 		}
 
 		//to make sure that every thread get's its own instance of IDatabase
 		public FileAssemblerService Get()
 		{
-			return new FileAssemblerService(_compressionService, _pathBuilder, _deltaService, _databaseFactory.Get());
+			return new FileAssemblerService(_compressionService, _pathBuilder, _deltaService, _databaseFactory.Get(), _webhookService);
 		}
 	}
 }

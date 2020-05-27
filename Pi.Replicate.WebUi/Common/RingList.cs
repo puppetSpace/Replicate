@@ -17,7 +17,7 @@ namespace Pi.Replicate.WebUi.Common
 
 		public new void AddFirst(TE value)
 		{
-			if(Count > _limit)
+			if(Count >= _limit)
 				RemoveLast();
 			base.AddFirst(new LinkedListNode<TE>(value));
 		}

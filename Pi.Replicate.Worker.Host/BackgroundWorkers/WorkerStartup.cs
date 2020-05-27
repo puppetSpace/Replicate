@@ -20,7 +20,7 @@ namespace Pi.Replicate.Worker.Host
 		public static IHost CleanUp(this IHost host)
 		{
 			var database = host.Services.GetService<IDatabase>();
-			var webhookService = host.Services.GetService<WebhookService>();
+			var webhookService = host.Services.GetService<IWebhookService>();
 			var startup = new WorkerStartup(database, webhookService);
 			startup.Initialize().GetAwaiter().GetResult();
 			return host;
@@ -44,9 +44,9 @@ namespace Pi.Replicate.Worker.Host
 		private class WorkerStartup
 		{
 			private readonly IDatabase _database;
-			private readonly WebhookService _webhookService;
+			private readonly IWebhookService _webhookService;
 
-			public WorkerStartup(IDatabase database, WebhookService webhookService)
+			public WorkerStartup(IDatabase database, IWebhookService webhookService)
 			{
 				_database = database;
 				_webhookService = webhookService;
