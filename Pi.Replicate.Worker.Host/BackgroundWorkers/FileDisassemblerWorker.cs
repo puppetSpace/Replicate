@@ -41,7 +41,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_pathBuilder = pathBuilder;
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new Thread(async () =>
 			{
@@ -78,7 +78,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 			th.Start();
 
-			return Task.CompletedTask;
+			await Task.Delay(Timeout.Infinite);
 		}
 
 		private async Task<List<Recipient>> GetRecipients(File file)

@@ -20,7 +20,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_transmissionService = transmissionService;
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new Thread(async () =>
 			{
@@ -34,7 +34,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			});
 			th.Start();
 
-			return Task.CompletedTask;
+			await Task.Delay(Timeout.Infinite);
 		}
 	}
 }

@@ -32,7 +32,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_workerQueueContainer = workerQueueContainer;
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new Thread(async () =>
 			{
@@ -46,7 +46,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 			});
 			th.Start();
-			return Task.CompletedTask;
+			await Task.Delay(Timeout.Infinite);
 		}
 
 		private async Task RetryFailedFiles()

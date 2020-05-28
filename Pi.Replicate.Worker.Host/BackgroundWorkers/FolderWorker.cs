@@ -37,7 +37,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_fileService = fileService;
 		}
 
-		protected override Task ExecuteAsync(CancellationToken stoppingToken)
+		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new System.Threading.Thread(async () =>
 			{
@@ -70,7 +70,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			});
 			th.Start();
 
-			return Task.CompletedTask;
+			await Task.Delay(Timeout.Infinite);
 		}
 
 		private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
