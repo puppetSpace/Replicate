@@ -40,6 +40,7 @@ namespace Pi.Replicate.WebUi.Pages
 				var workerApiUrl = Configuration[Constants.WorkerApiBaseAddressSetting];
 				_hubConnection = new HubConnectionBuilder()
 					.WithUrl($"{workerApiUrl}/systemHub")
+					.WithAutomaticReconnect()
 					.Build();
 
 				_hubConnection.On<SystemOverview>("ReceiveSystemOverview", (so) =>
