@@ -189,7 +189,6 @@ namespace Pi.Replicate.Test.Services
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
-			var eofMessageAmountOfChunks = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
