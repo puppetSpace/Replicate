@@ -260,7 +260,7 @@ namespace Pi.Replicate.Test.Processors
 
 		private Mock<IConfiguration> CreateConfigurationMock()
 		{
-			int minimumAmountOfBytesRentedByArrayPool = 128;
+			var minimumAmountOfBytesRentedByArrayPool = 128;
 			var configurationMock = new Mock<IConfiguration>();
 			configurationMock.Setup(x => x[It.IsAny<string>()]).Returns<string>(x =>
 				x switch

@@ -28,7 +28,7 @@ namespace Pi.Replicate.Test.Services
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var calculatedAmountOfChunks = Math.Ceiling((double)compressedFile.Length / int.Parse(configuration.Object[Constants.FileSplitSizeOfChunksInBytes]));
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mediator = CreateMediatorEofMessageMock();
@@ -48,8 +48,8 @@ namespace Pi.Replicate.Test.Services
 			var pathBuilder = new PathBuilder(configuration.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			int amountOfCalls = 0;
-			int eofMessageAmountOfChunks = 0;
+			var amountOfCalls = 0;
+			var eofMessageAmountOfChunks = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -76,8 +76,8 @@ namespace Pi.Replicate.Test.Services
 			var pathBuilder = new PathBuilder(configuration.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			int amountOfCalls = 0;
-			bool getPreviousSignatureOfFileQueryCalled = false;
+			var amountOfCalls = 0;
+			var getPreviousSignatureOfFileQueryCalled = false;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -107,7 +107,7 @@ namespace Pi.Replicate.Test.Services
 			var pathBuilder = new PathBuilder(configuration.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -134,7 +134,7 @@ namespace Pi.Replicate.Test.Services
 			var pathBuilder = new PathBuilder(configuration.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -165,7 +165,7 @@ namespace Pi.Replicate.Test.Services
 
 			using var fs = fileInfo.OpenWrite();
 
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -188,8 +188,8 @@ namespace Pi.Replicate.Test.Services
 			var pathBuilder = new PathBuilder(configuration.Object);
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			int amountOfCalls = 0;
-			int eofMessageAmountOfChunks = 0;
+			var amountOfCalls = 0;
+			var eofMessageAmountOfChunks = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -214,7 +214,7 @@ namespace Pi.Replicate.Test.Services
 
 			using var fs = fileInfo.OpenWrite();
 
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var mockmockMediator = new Mock<IMediator>();
@@ -240,7 +240,7 @@ namespace Pi.Replicate.Test.Services
 
 			using var fs = fileInfo.OpenWrite();
 
-			int amountOfCalls = 0;
+			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 			var isFailedFileRequestCalled = false;
 			var mockmockMediator = new Mock<IMediator>();
@@ -265,7 +265,7 @@ namespace Pi.Replicate.Test.Services
 
 		private Mock<IConfiguration> CreateConfigurationMock()
 		{
-			int minimumAmountOfBytesRentedByArrayPool = 128;
+			var minimumAmountOfBytesRentedByArrayPool = 128;
 			var configurationMock = new Mock<IConfiguration>();
 			configurationMock.Setup(x => x[It.IsAny<string>()]).Returns<string>(x =>
 				x switch

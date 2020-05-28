@@ -74,7 +74,7 @@ namespace Pi.Replicate.Application.Services
 
 		private async Task<EofMessage> ProcessNewFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
 		{
-			int sequenceNo = 0;
+			var sequenceNo = 0;
 			Log.Information($"Compressing file '{path}'");
 			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 			await _compressionService.Compress(path, pathOfCompressed);
@@ -111,7 +111,7 @@ namespace Pi.Replicate.Application.Services
 
 		private async Task<EofMessage> ProcessChangedFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
         {
-            int amountOfChunks = 0;
+            var amountOfChunks = 0;
 
 			var result = await _mediator.Send(new GetPreviousSignatureOfFileQuery() { FileId = file.Id });
 			if (!result.WasSuccessful || result.Data.IsEmpty)
@@ -127,7 +127,7 @@ namespace Pi.Replicate.Application.Services
 
 				Log.Information($"Splitting up delta of changed file '{file.Path}'");
 				var indexOfSlice = 0;
-				int sequenceNo = 0;
+				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
 					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
