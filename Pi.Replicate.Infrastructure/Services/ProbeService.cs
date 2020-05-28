@@ -1,4 +1,5 @@
 ﻿using Pi.Replicate.Shared;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,7 @@ namespace Pi.Replicate.Infrastructure.Services
 			}
 			catch (Exception ex)
 			{
+				Log.Error(ex, "Failed to probe");
 				return new ProbeResult<TE>(isSuccessful: false, ex.Message,default);
 			}
 		}

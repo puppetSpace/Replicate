@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Observr;
 using Pi.Replicate.Application.Folders.Queries.GetFolderList;
 using Pi.Replicate.Domain;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,7 @@ namespace Pi.Replicate.WebUi.Shared
         {
             await InvokeAsync(()=>
             {
+				Log.Information("Notified of new folder");
                 Folders.Add(new FolderListItem { Id = value.Id, Name = value.Name });
                 Folders = Folders.OrderBy(x=>x).ToList();
                 StateHasChanged();
