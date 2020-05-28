@@ -26,12 +26,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
-		private readonly IWebhookService _webhookService;
 		private readonly PathBuilder _pathBuilder;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService, IMediator mediator
-			, TransmissionService transmissionService, IWebhookService webhookService
+			, TransmissionService transmissionService
 			, PathBuilder pathBuilder)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
@@ -39,7 +38,6 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			_fileProcessService = fileProcessService;
 			_mediator = mediator;
 			_transmissionService = transmissionService;
-			_webhookService = webhookService;
 			_pathBuilder = pathBuilder;
 		}
 
@@ -65,15 +63,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 							{
 								var eofMessage = await SplitFile(file, recipients, outgoingQueue);
 								if (eofMessage is object)
-								{
 									await FinializeFileProcess(eofMessage, recipients);
-									_webhookService.NotifyFileDisassembled(file);
-								}
-								else
-								{
-									await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
-									_webhookService.NotifyFileFailed(file);
-								}
 
 								Log.Information($"'{file.Path}' is processed");
 							}

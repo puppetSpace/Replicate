@@ -118,7 +118,7 @@ namespace Pi.Replicate.Test.Processors
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]",StringComparison.OrdinalIgnoreCase)));
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FIleChunk",StringComparison.OrdinalIgnoreCase)));
+			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FileChunk",StringComparison.OrdinalIgnoreCase)));
 		}
 
 		[TestMethod]
@@ -232,6 +232,30 @@ namespace Pi.Replicate.Test.Processors
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FIleChunk", StringComparison.OrdinalIgnoreCase)));
 			Assert.IsFalse(domainFile.IsNew());
+		}
+
+		[TestMethod]
+		public async Task ProcessFile_ChangedFile_CallToWebhookShouldBeMade()
+		{
+			var configMock = CreateConfigurationMock();
+			var pathBuilder = new PathBuilder(configMock.Object);
+			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, pathBuilder.BasePath);
+			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
+			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var databaseMock = new Mock<IDatabase>();
+			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
+				.ReturnsAsync((string x, dynamic y) => new List<byte[]>());
+			databaseMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<object>()));
+
+			var deltaServiceMock = new Mock<IDeltaService>();
+			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
+
+			var webhookIsCalled = false;
+			var webhookMock = Helper.GetWebhookServiceMock(x => { webhookIsCalled = true; }, x => { }, x => { });
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
+
+			Assert.IsTrue(webhookIsCalled);
 		}
 
 		private Mock<IConfiguration> CreateConfigurationMock()

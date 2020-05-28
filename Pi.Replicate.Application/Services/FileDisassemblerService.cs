@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage;
+using Pi.Replicate.Application.Files.Commands.MarkFileAsFailed;
 using Pi.Replicate.Application.Files.Queries.GetPreviousSignatureOfFile;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
@@ -19,19 +20,22 @@ namespace Pi.Replicate.Application.Services
         private readonly PathBuilder _pathBuilder;
         private readonly IDeltaService _deltaService;
         private readonly IMediator _mediator;
+		private readonly IWebhookService _webhookService;
 
-        public FileDisassemblerService(IConfiguration configuration
+		public FileDisassemblerService(IConfiguration configuration
             , ICompressionService compressionService
             , PathBuilder pathBuilder
             , IDeltaService deltaService
-            , IMediator mediator)
+            , IMediator mediator
+			, IWebhookService webhookService)
         {
             _sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
             _compressionService = compressionService;
             _pathBuilder = pathBuilder;
             _deltaService = deltaService;
             _mediator = mediator;
-        }
+			_webhookService = webhookService;
+		}
 
 
         public async Task<EofMessage> ProcessFile(File file, Func<FileChunk,Task> chunkCreatedDelegate)
@@ -47,16 +51,23 @@ namespace Pi.Replicate.Application.Services
 						eofMessage = await ProcessNewFile(file, path, chunkCreatedDelegate);
 					else
 						eofMessage = await ProcessChangedFile(file, path, chunkCreatedDelegate);
+
+					if(eofMessage is object)
+						_webhookService.NotifyFileDisassembled(file);
+
 				}
 				catch (Exception ex)
 				{
 					Log.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
+					await HandleFailed(file);
 				}
 			}
             else
             {
                 Log.Warning($"File '{path}' does not exist or is locked. File will not be processed");
-            }
+				await HandleFailed(file);
+
+			}
 
             return eofMessage;
         }
@@ -137,6 +148,12 @@ namespace Pi.Replicate.Application.Services
 				return eofResult.Data;
 			else
 				return null;
+		}
+
+		private async Task HandleFailed(File file)
+		{
+			await _mediator.Send(new MarkFileAsFailedCommand { FileId = file.Id });
+			_webhookService.NotifyFileFailed(file);
 		}
 	}
 }
