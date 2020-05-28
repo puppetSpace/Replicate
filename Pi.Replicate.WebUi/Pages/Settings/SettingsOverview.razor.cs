@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages.Settings
 {
+	//todo notify user of unsaved setting when navigating away
 	public class SettingsOverviewBase : ComponentBase
 	{
 
