@@ -59,9 +59,9 @@ namespace Pi.Replicate.Worker.Host.Processing
 	public class FileCollectorFactory
 	{
 		private readonly PathBuilder _pathBuilder;
-		private readonly FileRepository _fileRepository;
+		private readonly IFileRepository _fileRepository;
 
-		public FileCollectorFactory(PathBuilder pathBuilder, FileRepository fileRepository)
+		public FileCollectorFactory(PathBuilder pathBuilder, IFileRepository fileRepository)
 		{
 			_pathBuilder = pathBuilder;
 			_fileRepository = fileRepository;

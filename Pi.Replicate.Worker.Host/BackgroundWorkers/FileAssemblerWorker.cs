@@ -19,11 +19,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _triggerInterval;
 		private readonly int _amountOfConcurrentJobs;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
-		private readonly FileRepository _fileRepository;
+		private readonly IFileRepository _fileRepository;
 
 		public FileAssemblerWorker(IConfiguration configuration
 			, FileAssemblerServiceFactory fileAssemblerServiceFactory
-			, FileRepository fileRepository)
+			, IFileRepository fileRepository)
 		{
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
 			_fileRepository = fileRepository;

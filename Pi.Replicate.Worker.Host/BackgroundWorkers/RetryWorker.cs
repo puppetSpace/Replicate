@@ -16,13 +16,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _triggerInterval;
 		private readonly TransmissionService _transmissionService;
 		private readonly WorkerQueueContainer _workerQueueContainer;
-		private readonly FileRepository _fileRepository;
+		private readonly IFileRepository _fileRepository;
 		private readonly TransmissionRepository _transmissionRepository;
 
 		public RetryWorker(IConfiguration configuration
 			, TransmissionService transmissionService
 			, WorkerQueueContainer workerQueueContainer
-			, FileRepository fileRepository
+			, IFileRepository fileRepository
 			, TransmissionRepository transmissionRepository
 			)
 		{

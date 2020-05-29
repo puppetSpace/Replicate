@@ -17,6 +17,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			services.AddTransient<FileDisassemblerService>();
 			services.AddTransient<FileAssemblerServiceFactory>();
 			services.AddTransient<FileChunkService>();
+			services.AddTransient<TransmissionService>();
 			services.AddSingleton<IWebhookService, WebhookService>();
 		}
     }

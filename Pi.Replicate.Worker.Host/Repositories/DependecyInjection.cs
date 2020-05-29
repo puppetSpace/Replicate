@@ -12,10 +12,10 @@ namespace Pi.Replicate.Worker.Host.Repositories
         public static void AddRepositories(this IServiceCollection services)
 		{
 			services.AddTransient<FolderRepository>();
-			services.AddTransient<FileRepository>();
+			services.AddTransient<IFileRepository,FileRepository>();
 			services.AddTransient<TransmissionRepository>();
 			services.AddTransient<RecipientRepository>();
-			services.AddTransient<EofMessageRepository>();
+			services.AddTransient<IEofMessageRepository,EofMessageRepository>();
 			services.AddTransient<WebhookRepository>();
 		}
     }

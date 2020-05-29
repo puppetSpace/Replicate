@@ -18,12 +18,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FolderRepository _folderRepository;
-		private readonly FileRepository _fileRepository;
+		private readonly IFileRepository _fileRepository;
 		private readonly TransmissionService _communicationService;
 		private readonly IDisposable _recipientsAddedNotificationSubscription;
 
 		public FileExportWorker(FolderRepository folderRepository
-			, FileRepository fileRepository
+			, IFileRepository fileRepository
 			, TransmissionService communicationService
 			, WorkerQueueContainer workerQueueContainer
 			, IBroker broker)

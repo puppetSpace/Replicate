@@ -1,5 +1,5 @@
-using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Models;
 using Serilog;
 using System;
@@ -109,7 +109,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				{
 					//best way is to get the chunks in chunks. If a file exists out of 1000 * 1Mb files and load that into memory, you are gonna have a bad time
 					var chunks = await db.Query<byte[]>("SELECT [Value] FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @toSkip and @ToTake ORDER BY SEQUENCENO", new { FileId = eofMessage.FileId, ToSkip = toSkip, ToTake = toTake });
-					foreach (var chunk in chunks)
+					foreach (var chunk in chunks.Data)
 						await sw.WriteAsync(chunk, 0, chunk.Length);
 					toSkip = toTake + 1;
 					toTake += 10;

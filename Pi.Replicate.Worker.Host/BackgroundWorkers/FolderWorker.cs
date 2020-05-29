@@ -60,10 +60,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 							}
 						}
 					}
+					Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 				}
-
-				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
-				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 			});
 			th.Start();
 
