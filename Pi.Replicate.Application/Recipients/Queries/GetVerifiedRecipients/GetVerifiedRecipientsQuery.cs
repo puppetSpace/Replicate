@@ -1,20 +1,17 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
-using System;
+using Pi.Replicate.Shared.Models;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Recipients.Queries.GetVerifiedRecipients
 {
-    public class GetVerifiedRecipientsQuery : IRequest<Result<ICollection<Recipient>>>
-    {
-        
-    }
+	public class GetVerifiedRecipientsQuery : IRequest<Result<ICollection<Recipient>>>
+	{
+
+	}
 
 	public class GetVerifiedRecipientsQueryHandler : IRequestHandler<GetVerifiedRecipientsQuery, Result<ICollection<Recipient>>>
 	{

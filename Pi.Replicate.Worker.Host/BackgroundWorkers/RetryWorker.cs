@@ -1,15 +1,9 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.FailedTransmissions.Commands.DeleteFailedTransmission;
-using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedEofMessageTransmissions;
-using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileChunkTransmissions;
-using Pi.Replicate.Application.FailedTransmissions.Queries.GetFailedFileTransmissions;
-using Pi.Replicate.Application.Files.Queries.GetFailedFiles;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Processing;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
 using System;
 using System.Threading;
@@ -20,16 +14,23 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class RetryWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
-		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
 		private readonly WorkerQueueContainer _workerQueueContainer;
+		private readonly FileRepository _fileRepository;
+		private readonly TransmissionRepository _transmissionRepository;
 
-		public RetryWorker(IConfiguration configuration, IMediator mediator, TransmissionService transmissionService, WorkerQueueContainer workerQueueContainer)
+		public RetryWorker(IConfiguration configuration
+			, TransmissionService transmissionService
+			, WorkerQueueContainer workerQueueContainer
+			, FileRepository fileRepository
+			, TransmissionRepository transmissionRepository
+			)
 		{
 			_triggerInterval = int.TryParse(configuration[Constants.RetryTriggerInterval], out var interval) ? interval : 10;
-			_mediator = mediator;
 			_transmissionService = transmissionService;
 			_workerQueueContainer = workerQueueContainer;
+			_fileRepository = fileRepository;
+			_transmissionRepository = transmissionRepository;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -52,13 +53,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task RetryFailedFiles()
 		{
 			Log.Information($"Adding failed file back on queue");
-			var failedFilesResult = await _mediator.Send(new GetFailedFilesQuery());
+			var failedFilesResult = await _fileRepository.GetFailedFiles();
 			if (failedFilesResult.WasSuccessful)
 			{
 				var queue = _workerQueueContainer.ToProcessFiles.Writer;
 				foreach (var failedFile in failedFilesResult.Data)
 				{
-					if(await queue.WaitToWriteAsync())
+					if (await queue.WaitToWriteAsync())
 						await queue.WriteAsync(failedFile);
 				}
 			}
@@ -67,14 +68,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task RetryFailedTransmisionFiles()
 		{
 			Log.Information($"Retrying to send files that have failed");
-			var failedFilesResult = await _mediator.Send(new GetFailedFileTransmissionsForRetryQuery());
+			var failedFilesResult = await _transmissionRepository.GetFailedFileTransmission();
 			if (failedFilesResult.WasSuccessful)
 			{
 				foreach (var ff in failedFilesResult.Data)
 				{
-					var wasSucessful = await _transmissionService.SendFile(ff.Folder, ff.File, ff.Recipient);
+					var wasSucessful = await _transmissionService.SendFile(ff.Item2, ff.Item1, ff.Item3);
 					if (wasSucessful)
-						await _mediator.Send(new DeleteFailedFileTransmissionCommand { FileId = ff.File.Id, RecipientId = ff.Recipient.Id });
+						await _transmissionRepository.DeleteFailedFileTransmission(ff.Item1.Id, ff.Item3.Id);
 				}
 			}
 		}
@@ -82,14 +83,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task RetryFailedTransmissionEofMessages()
 		{
 			Log.Information($"Retrying to send eof messages that have failed");
-			var failedEofMessagesResult = await _mediator.Send(new GetFailedEofMessageTransmissionsForRetryQuery());
+			var failedEofMessagesResult = await _transmissionRepository.GetFailedEofMessageTransmission();
 			if (failedEofMessagesResult.WasSuccessful)
 			{
 				foreach (var fem in failedEofMessagesResult.Data)
 				{
-					var wasSuccessful = await _transmissionService.SendEofMessage(fem.EofMessage, fem.Recipient);
+					var wasSuccessful = await _transmissionService.SendEofMessage(fem.Item1, fem.Item2);
 					if (wasSuccessful)
-						await _mediator.Send(new DeleteFailedEofMessageTransmissionCommand { EofMessageId = fem.EofMessage.Id, RecipientId = fem.Recipient.Id });
+						await _transmissionRepository.DeleteFailedEofMessageTransmission(fem.Item1.Id, fem.Item2.Id);
 				}
 			}
 		}
@@ -97,14 +98,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task RetryFailedTransmissionFileChunks()
 		{
 			Log.Information($"Retrying to send filechunks that have failed");
-			var failedChunksResult = await _mediator.Send(new GetFailedFileChunkTransmissionsForRetryQuery());
+			var failedChunksResult = await _transmissionRepository.GetFailedFileChunkTransmission();
 			if (failedChunksResult.WasSuccessful)
 			{
 				foreach (var fc in failedChunksResult.Data)
 				{
-					var wasSuccessful = await _transmissionService.SendFileChunk(fc.FileChunk, fc.Recipient);
+					var wasSuccessful = await _transmissionService.SendFileChunk(fc.Item1, fc.Item2);
 					if (wasSuccessful)
-						await _mediator.Send(new DeleteFailedFileChunkTransmissionCommand { FileChunkId = fc.FileChunk.Id, RecipientId = fc.Recipient.Id });
+						await _transmissionRepository.DeleteFailedFileChunkTransmission(fc.Item1.Id, fc.Item2.Id);
 				}
 			}
 		}

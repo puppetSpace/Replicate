@@ -1,17 +1,14 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Infrastructure.Services;
+using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Services;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Pi.Replicate.Shared;
-using Microsoft.Extensions.Configuration;
-using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Domain;
-using System.Buffers;
-using System.Collections.Generic;
-using System.Dynamic;
+using Pi.Replicate.Worker.Host.Models;
 
 namespace Pi.Replicate.Test.Processors
 {
@@ -24,7 +21,7 @@ namespace Pi.Replicate.Test.Processors
 			var stream = System.IO.File.Create(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt"));
 			stream.Close();
 		}
-		
+
 		[TestMethod]
 		public async Task ProcessFile_NewFile_QueryToGetChunkShouldGetCalledTwice()
 		{
@@ -114,11 +111,11 @@ namespace Pi.Replicate.Test.Processors
 				.Callback((string x, dynamic y) => executedStatements.Add(x));
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object,webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]",StringComparison.OrdinalIgnoreCase)));
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FileChunk",StringComparison.OrdinalIgnoreCase)));
+			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));
+			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FileChunk", StringComparison.OrdinalIgnoreCase)));
 		}
 
 		[TestMethod]
@@ -142,7 +139,7 @@ namespace Pi.Replicate.Test.Processors
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object,webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(2, amountofTimesQueryCalled);
@@ -172,7 +169,7 @@ namespace Pi.Replicate.Test.Processors
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object,webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(11, toSkipSum);
@@ -200,7 +197,7 @@ namespace Pi.Replicate.Test.Processors
 				.Callback(() => isApplyDeltaCalled = true);
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object,webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(isApplyDeltaCalled);
@@ -226,7 +223,7 @@ namespace Pi.Replicate.Test.Processors
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object,webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));

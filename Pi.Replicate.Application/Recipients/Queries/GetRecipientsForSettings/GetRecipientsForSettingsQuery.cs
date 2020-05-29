@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared.Models;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;

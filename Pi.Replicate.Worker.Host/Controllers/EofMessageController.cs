@@ -1,9 +1,9 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using Pi.Replicate.Application.Common.Models;
-using Pi.Replicate.Application.EofMessages.Commands.AddReceivedEofMessage;
+﻿using Microsoft.AspNetCore.Mvc;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Repositories;
 using Serilog;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Controllers
@@ -11,19 +11,20 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class EofMessageController : ControllerBase
 	{
-		private readonly IMediator _mediator;
+		private readonly EofMessageRepository _eofMessageRepository;
 
-		public EofMessageController(IMediator mediator)
+		public EofMessageController(EofMessageRepository eofMessageRepository)
 		{
-			_mediator = mediator;
+			_eofMessageRepository = eofMessageRepository;
 		}
 
 		[HttpPost("api/file/{fileId}/eot")]
 		public async Task<IActionResult> Post(Guid fileId, [FromBody] EofMessageTransmissionModel model)
 		{
 			Log.Information($"Eof message received from {Request.HttpContext.Connection.RemoteIpAddress}");
-			await _mediator.Send(new AddReceivedEofMessageCommand { FileId = fileId, AmountOfChunks = model.AmountOfChunks });
-			return Ok();
+			var eofMessage = EofMessage.Build(fileId, model.AmountOfChunks);
+			var result = await _eofMessageRepository.AddReceivedEofMessage(eofMessage);
+			return result.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 		}
 
 	}

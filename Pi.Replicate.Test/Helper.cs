@@ -1,5 +1,6 @@
 ﻿using Moq;
-using Pi.Replicate.Application.Services;
+using Pi.Replicate.Worker.Host;
+using Pi.Replicate.Worker.Host.Services;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -31,20 +32,25 @@ namespace Pi.Replicate.Test
             return new FileInfo(tempPath);
         }
 
+		public static byte[] GetByteArray()
+		{
+			return Encoding.UTF8.GetBytes("thisISTest");
+		}
+
 		public static ReadOnlyMemory<byte> GetReadOnlyMemory()
 		{
 			return Encoding.UTF8.GetBytes("thisISTest").AsMemory();
 		}
 
-		public static Mock<IWebhookService> GetWebhookServiceMock(Action<Domain.File> notifyFileAssembled
-			, Action<Domain.File> notifyFileDisassembled
-			, Action<Domain.File> notifyFileFailed
+		public static Mock<IWebhookService> GetWebhookServiceMock(Action<Worker.Host.Models.File> notifyFileAssembled
+			, Action<Worker.Host.Models.File> notifyFileDisassembled
+			, Action<Worker.Host.Models.File> notifyFileFailed
 			)
 		{
 			var mock = new Mock<IWebhookService>();
-			mock.Setup(x => x.NotifyFileAssembled(It.IsAny<Domain.File>())).Callback(notifyFileAssembled);
-			mock.Setup(x => x.NotifyFileDisassembled(It.IsAny<Domain.File>())).Callback(notifyFileDisassembled);
-			mock.Setup(x => x.NotifyFileFailed(It.IsAny<Domain.File>())).Callback(notifyFileFailed);
+			mock.Setup(x => x.NotifyFileAssembled(It.IsAny<Worker.Host.Models.File>())).Callback(notifyFileAssembled);
+			mock.Setup(x => x.NotifyFileDisassembled(It.IsAny<Worker.Host.Models.File>())).Callback(notifyFileDisassembled);
+			mock.Setup(x => x.NotifyFileFailed(It.IsAny<Worker.Host.Models.File>())).Callback(notifyFileFailed);
 
 			return mock;
 		}

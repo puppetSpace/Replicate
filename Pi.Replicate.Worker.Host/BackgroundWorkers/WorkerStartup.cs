@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Application.Services;
 using Pi.Replicate.Worker.Host.Common;
-using Pi.Replicate.Worker.Host.Hubs;
+using Pi.Replicate.Worker.Host.Data;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
 using Serilog.Core;
 using System;
@@ -14,15 +12,37 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host
 {
-	
+
 	public static class WorkerStartupExtension
 	{
-		public static IHost CleanUp(this IHost host)
+		public static IHost InitializeWorker(this IHost host)
 		{
-			var database = host.Services.GetService<IDatabase>();
-			var webhookService = host.Services.GetService<IWebhookService>();
-			var startup = new WorkerStartup(database, webhookService);
-			startup.Initialize().GetAwaiter().GetResult();
+			using (var database = host.Services.GetService<IDatabase>())
+			{
+				var webhookService = host.Services.GetService<IWebhookService>();
+				var startup = new WorkerStartup(database, webhookService);
+				startup.Initialize().GetAwaiter().GetResult();
+			}
+			return host;
+		}
+
+		public static IHost AddSystemSettingsFromDatabase(this IHost host)
+		{
+			var configuration = host.Services.GetService<IConfiguration>();
+			using (var database = host.Services.GetService<IDatabase>())
+			{
+				var systemsettingsResult = database.Query<SystemSettingDto>("SELECT [Key],[Value] FROM dbo.SystemSetting", null).GetAwaiter().GetResult();
+				if (systemsettingsResult.WasSuccessful)
+				{
+					foreach (var systemSetting in systemsettingsResult.Data)
+						configuration[systemSetting.Key] = systemSetting.Value;
+				}
+				else
+				{
+					throw new InvalidOperationException("Unable to add systemsettings to configuration");
+				}
+			}
+
 			return host;
 		}
 
@@ -31,10 +51,10 @@ namespace Pi.Replicate.Worker.Host
 			var telemetryProxy = host.Services.GetService<TelemetryProxy>();
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Sink((ILogEventSink)Log.Logger)
-				.WriteTo.Observers(events=> events.Do(async evt=> 
-				{
-					await telemetryProxy.SendLog(evt);
-				}).Subscribe())
+				.WriteTo.Observers(events => events.Do(async evt =>
+				 {
+					 await telemetryProxy.SendLog(evt);
+				 }).Subscribe())
 				.CreateLogger();
 			return host;
 		}
@@ -64,6 +84,13 @@ namespace Pi.Replicate.Worker.Host
 					await _database.Execute("DELETE from dbo.EofMessage where fileid not in (select fileId from dbo.TransmissionResult)", null);
 				}
 			}
+		}
+
+		private class SystemSettingDto
+		{
+			public string Key { get; set; }
+
+			public string Value { get; set; }
 		}
 	}
 }

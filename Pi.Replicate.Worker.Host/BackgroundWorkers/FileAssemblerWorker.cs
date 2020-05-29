@@ -1,15 +1,14 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Files.Queries.GetCompletedFiles;
-using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Common;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,13 +18,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	{
 		private readonly int _triggerInterval;
 		private readonly int _amountOfConcurrentJobs;
-		private readonly IMediator _mediator;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
+		private readonly FileRepository _fileRepository;
 
-		public FileAssemblerWorker(IConfiguration configuration, IMediator mediator, FileAssemblerServiceFactory fileAssemblerServiceFactory)
+		public FileAssemblerWorker(IConfiguration configuration
+			, FileAssemblerServiceFactory fileAssemblerServiceFactory
+			, FileRepository fileRepository)
 		{
-			_mediator = mediator;
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
+			_fileRepository = fileRepository;
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileAssemblyJobs]);
 		}
@@ -37,11 +38,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				Log.Information($"Starting {nameof(FileAssemblerWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
-					var completedFilesResult = await _mediator.Send(new GetCompletedFilesQuery());
+					var completedFilesResult = await _fileRepository.GetCompletedFiles();
 					if (completedFilesResult.WasSuccessful)
 					{
-						var newFiles = completedFilesResult.Data.Where(x => x.File.IsNew());
-						var changedFiles = completedFilesResult.Data.Where(x => !x.File.IsNew()).OrderBy(x => x.File.Version);
+						var newFiles = completedFilesResult.Data.Where(x => x.Item1.IsNew());
+						var changedFiles = completedFilesResult.Data.Where(x => !x.Item1.IsNew()).OrderBy(x => x.Item1.Version);
 						await AssembleNewFiles(newFiles);
 						await ApplyChangedToExistingFiles(changedFiles);
 
@@ -56,24 +57,24 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			await Task.Delay(Timeout.Infinite);
 		}
 
-		private async Task AssembleNewFiles(IEnumerable<CompletedFileDto> newFiles)
+		private async Task AssembleNewFiles(IEnumerable<(File file, EofMessage eofMesssage)> newFiles)
 		{
 			var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 			foreach (var completedFile in newFiles)
 			{
 				taskRunner.Add(async () =>
 				{
-					await _fileAssemblerServiceFactory.Get().ProcessFile(completedFile.File, completedFile.EofMessage);
+					await _fileAssemblerServiceFactory.Get().ProcessFile(completedFile.file, completedFile.eofMesssage);
 				});
 			}
 			await taskRunner.WaitTillComplete();
 		}
 
-		private async Task ApplyChangedToExistingFiles(IEnumerable<CompletedFileDto> changedFiles)
+		private async Task ApplyChangedToExistingFiles(IEnumerable<(File file, EofMessage eofMesssage)> changedFiles)
 		{
 			foreach (var changedFile in changedFiles)
 			{
-				await _fileAssemblerServiceFactory.Get().ProcessFile(changedFile.File, changedFile.EofMessage);
+				await _fileAssemblerServiceFactory.Get().ProcessFile(changedFile.file, changedFile.eofMesssage);
 			}
 		}
 	}

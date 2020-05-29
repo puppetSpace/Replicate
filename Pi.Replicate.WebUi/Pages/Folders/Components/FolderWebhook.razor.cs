@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Pi.Replicate.Application.Folders.Queries.GetFolderSettings;
-using Pi.Replicate.Infrastructure.Services;
+using Pi.Replicate.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

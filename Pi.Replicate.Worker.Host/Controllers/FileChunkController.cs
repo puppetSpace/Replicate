@@ -1,32 +1,28 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Pi.Replicate.Application.Common.Models;
-using Pi.Replicate.Application.FileChunks.Commands.AddReceivedFileChunk;
-using Pi.Replicate.Domain;
-using Pi.Replicate.TransmissionResults.Commands.AddTransmissionResult;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Services;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Controllers
 {
 	[ApiController]
-    public class FileChunkController : ControllerBase
-    {
-		private readonly IMediator _mediator;
+	public class FileChunkController : ControllerBase
+	{
+		private readonly FileChunkService _fileChunkService;
 
-		public FileChunkController(IMediator mediator)
+		public FileChunkController(FileChunkService fileChunkService)
 		{
-			_mediator = mediator;
+			_fileChunkService = fileChunkService;
 		}
 
 		[HttpPost("api/file/{fileId}/chunk")]
 		public async Task<IActionResult> Post(Guid fileId, [FromBody] FileChunkTransmissionModel model)
 		{
-			await _mediator.Send(new AddReceivedFileChunkCommand { FileId = fileId, SequenceNo = model.SequenceNo, Value = model.Value, Sender = model.Host, SenderAddress = Request.HttpContext.Connection.RemoteIpAddress.ToString() });
-			return Ok();
+			var result = await _fileChunkService.AddReceivedFileChunk(fileId, model.SequenceNo, model.Value, model.Host, Request.HttpContext.Connection.RemoteIpAddress.ToString());
+			return result.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 		}
-    }
+	}
 }

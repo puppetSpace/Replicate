@@ -1,16 +1,12 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Commands.MarkFileAsFailed;
-using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForFolder;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Common;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Processing;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
-using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -24,20 +20,21 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _amountOfConcurrentJobs;
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileDisassemblerService _fileProcessService;
-		private readonly IMediator _mediator;
 		private readonly TransmissionService _transmissionService;
+		private readonly RecipientRepository _recipientRepository;
 		private readonly PathBuilder _pathBuilder;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
-			, FileDisassemblerService fileProcessService, IMediator mediator
+			, FileDisassemblerService fileProcessService
 			, TransmissionService transmissionService
+			, RecipientRepository recipientRepository
 			, PathBuilder pathBuilder)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueContainer = workerQueueContainer;
 			_fileProcessService = fileProcessService;
-			_mediator = mediator;
 			_transmissionService = transmissionService;
+			_recipientRepository = recipientRepository;
 			_pathBuilder = pathBuilder;
 		}
 
@@ -48,7 +45,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
-				var taskRunner = new TaskRunner((int)_amountOfConcurrentJobs);
+				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 				while (await incomingQueue.WaitToReadAsync() && !stoppingToken.IsCancellationRequested)
 				{
 					var file = await incomingQueue.ReadAsync(stoppingToken);
@@ -88,7 +85,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				recipients = rf.Recipients.ToList();
 			else
 			{
-				var recipientsResult = await _mediator.Send(new GetRecipientsForFolderQuery { FolderId = file.FolderId });
+				var recipientsResult = await _recipientRepository.GetRecipientsForFolder(file.FolderId);
 				if (recipientsResult.WasSuccessful)
 					recipients = recipientsResult.Data.ToList();
 			}

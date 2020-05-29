@@ -1,16 +1,13 @@
-﻿using MediatR;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Files.Processing;
-using Pi.Replicate.Application.Folders.Queries.GetFoldersToCrawl;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Processing;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,19 +16,19 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class FolderWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
-		private readonly IMediator _mediator;
+		private readonly FolderRepository _folderRespository;
 		private readonly FileCollectorFactory _fileCollectorFactory;
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileService _fileService;
 
 		public FolderWorker(IConfiguration configuration
-			, IMediator mediator
+			, FolderRepository folderRespository
 			, FileCollectorFactory fileCollectorFactory
 			, WorkerQueueContainer workerQueueContainer
 			, FileService fileService)
 		{
 			_triggerInterval = int.Parse(configuration[Constants.FolderCrawlTriggerInterval]);
-			_mediator = mediator;
+			_folderRespository = folderRespository;
 			_fileCollectorFactory = fileCollectorFactory;
 			_workerQueueContainer = workerQueueContainer;
 			_fileService = fileService;
@@ -44,10 +41,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				Log.Information($"Starting {nameof(FolderWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
-					var result = await _mediator.Send(new GetFoldersToCrawlQuery(), stoppingToken);
-					if (result.WasSuccessful)
+					var queryResult = await _folderRespository.GetFoldersToCrawl();
+					if (queryResult.WasSuccessful)
 					{
-						foreach (var folder in result.Data)
+						foreach (var folder in queryResult.Data)
 						{
 							try
 							{
@@ -63,22 +60,22 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 							}
 						}
 					}
-
-					Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
-					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 				}
+
+				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 			});
 			th.Start();
 
 			await Task.Delay(Timeout.Infinite);
 		}
 
-		private async Task ProcessNewFiles(Folder folder, List<System.IO.FileInfo> newFiles)
+		private async Task ProcessNewFiles(CrawledFolder folder, List<System.IO.FileInfo> newFiles)
 		{
 			var queue = _workerQueueContainer.ToSendFiles.Writer;
 			foreach (var newFile in newFiles)
 			{
-				var createdFile = await _fileService.CreateNewFile(folder, newFile);
+				var createdFile = await _fileService.CreateNewFile(folder.Id, newFile);
 				if (createdFile is object)
 				{
 					Log.Debug($"Adding '{createdFile.Path}' to queue");
@@ -88,15 +85,15 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			}
 		}
 
-		private async Task ProcessChangedFiles(Folder folder, List<System.IO.FileInfo> changedFiles)
+		private async Task ProcessChangedFiles(CrawledFolder folder, List<System.IO.FileInfo> changedFiles)
 		{
 			var queue = _workerQueueContainer.ToSendFiles.Writer;
 			foreach (var changedFile in changedFiles)
 			{
-				var updatedFile = await _fileService.CreateUpdateFile(folder, changedFile);
+				var updatedFile = await _fileService.CreateUpdateFile(folder.Id, changedFile);
 				if (updatedFile is object)
 				{
-					if(await queue.WaitToWriteAsync())
+					if (await queue.WaitToWriteAsync())
 						await queue.WriteAsync(updatedFile);
 				}
 			}

@@ -2,25 +2,20 @@
 using MediatR;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Observr;
 using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
 using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
-using Pi.Replicate.Domain;
-using Pi.Replicate.Infrastructure.Services;
+using Pi.Replicate.Shared;
 using Pi.Replicate.WebUi.Components;
-using Pi.Replicate.WebUi.Models;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages.Settings.Components
 {
 	public class RecipientsBase : ComponentBase
 	{
-		private List<RecipientViewModel> _toDeleteRecipients = new List<RecipientViewModel>();
+		private readonly List<RecipientViewModel> _toDeleteRecipients = new List<RecipientViewModel>();
 
 		[Inject]
 		public ProbeService ProbeService { get; set; }

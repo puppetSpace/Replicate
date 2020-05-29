@@ -1,17 +1,13 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using Pi.Replicate.Shared.Models;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Recipients.Commands.DeleteRecipient
 {
-    public class DeleteRecipientCommand : IRequest<Result>
-    {
+	public class DeleteRecipientCommand : IRequest<Result>
+	{
 		public string Name { get; set; }
 	}
 

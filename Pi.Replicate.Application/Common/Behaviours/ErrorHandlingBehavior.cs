@@ -1,9 +1,7 @@
 ﻿using MediatR;
+using Pi.Replicate.Shared.Models;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,7 +20,7 @@ namespace Pi.Replicate.Application.Common.Behaviours
 			{
 				Log.Error(ex, $"Error occured while executing '{typeof(TRequest).Name}'");
 
-				if(typeof(TResponse).IsGenericType)
+				if (typeof(TResponse).IsGenericType)
 				{
 					var typeArguments = typeof(TResponse).GetGenericArguments();
 					return Activator.CreateInstance(typeof(Result<>).MakeGenericType(typeArguments)) as TResponse;

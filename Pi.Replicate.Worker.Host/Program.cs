@@ -32,7 +32,7 @@ namespace Pi.Replicate.Worker.Host
 				.Build()
 				.AddSystemSettingsFromDatabase()
 				.AttachLogSinks()
-				.CleanUp()
+				.InitializeWorker()
 				.Run();
 		}
 

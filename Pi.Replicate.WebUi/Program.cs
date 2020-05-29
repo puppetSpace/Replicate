@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Pi.Replicate.Data;
+using Pi.Replicate.Application.Common.Interfaces;
 using Serilog;
+using System;
 
 namespace Pi.Replicate.WebUi
 {
@@ -41,5 +36,28 @@ namespace Pi.Replicate.WebUi
 					webBuilder.UseStartup<Startup>();
 				})
 			.UseSerilog();
+	}
+
+	public static class HostExtensions
+	{
+		public static IHost AddSystemSettingsFromDatabase(this IHost host)
+		{
+			var configuration = host.Services.GetService<IConfiguration>();
+			using (var database = host.Services.GetService<IDatabase>())
+			{
+				var systemsettingsResult = database.Query<SystemSettingDto>("SELECT [Key],[Value] FROM dbo.SystemSetting", null).GetAwaiter().GetResult();
+				foreach (var systemSetting in systemsettingsResult)
+					configuration[systemSetting.Key] = systemSetting.Value;
+			}
+
+			return host;
+		}
+
+		private class SystemSettingDto
+		{
+			public string Key { get; set; }
+
+			public string Value { get; set; }
+		}
 	}
 }

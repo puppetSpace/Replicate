@@ -1,8 +1,6 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Observr;
-using Pi.Replicate.Application.FolderWebhooks.Notifications.FolderWebhookChanged;
-using Pi.Replicate.Application.Folders.Notifications.RecipientsAddedToFolder;
+using Pi.Replicate.Shared.Models;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Controllers
@@ -11,24 +9,24 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class NotificationController : ControllerBase
 	{
-		private readonly IMediator _mediator;
+		private readonly IBroker _broker;
 
-		public NotificationController(IMediator mediator)
+		public NotificationController(IBroker broker)
 		{
-			_mediator = mediator;
+			_broker = broker;
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> FolderWebhookChange([FromBody] FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
-			await _mediator.Publish(folderWebhookChangeNotification);
+			await _broker.Publish(folderWebhookChangeNotification);
 			return Ok();
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> RecipientsAddedToFolder([FromBody] RecipientsAddedToFolderNotification recipientsAddedNotification)
 		{
-			await _mediator.Publish(recipientsAddedNotification);
+			await _broker.Publish(recipientsAddedNotification);
 			return Ok();
 		}
 	}

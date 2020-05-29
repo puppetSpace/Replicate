@@ -1,27 +1,67 @@
-using MediatR;
 using Microsoft.Extensions.Hosting;
-using Pi.Replicate.Application.Common.Queues;
-using Pi.Replicate.Application.Folders.Queries.GetFolder;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
+using Observr;
+using Pi.Replicate.Shared.Models;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Processing;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Serilog;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	//todo retry mechanisme in database
-	public class FileExportWorker : BackgroundService
+	public class FileExportWorker : BackgroundService, Observr.IObserver<RecipientsAddedToFolderNotification>
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;
-		private readonly IMediator _mediator;
+		private readonly FolderRepository _folderRepository;
+		private readonly FileRepository _fileRepository;
 		private readonly TransmissionService _communicationService;
+		private readonly IDisposable _recipientsAddedNotificationSubscription;
 
-		public FileExportWorker(IMediator mediator, TransmissionService communicationService, WorkerQueueContainer workerQueueContainer)
+		public FileExportWorker(FolderRepository folderRepository
+			, FileRepository fileRepository
+			, TransmissionService communicationService
+			, WorkerQueueContainer workerQueueContainer
+			, IBroker broker)
 		{
-			_mediator = mediator;
+			_folderRepository = folderRepository;
+			_fileRepository = fileRepository;
 			_communicationService = communicationService;
 			_workerQueueContainer = workerQueueContainer;
+			_recipientsAddedNotificationSubscription = broker.Subscribe(this);
+		}
+
+		public async Task Handle(RecipientsAddedToFolderNotification value, CancellationToken cancellationToken)
+		{
+			Log.Information("Handling notification that recipients are added");
+			Log.Debug($"Getting files of folder '{value.FolderId}' for following recipients: '{string.Join(", ", value.Recipients)}'");
+			var filesResult = await _fileRepository.GetFilesForFolder(value.FolderId);
+			var folderResult = await _folderRepository.GetFolder(value.FolderId);
+			if (filesResult.WasSuccessful && folderResult.WasSuccessful)
+			{
+				var neededRecipients = folderResult.Data.Recipients?.Where(x => value.Recipients.Any(y => y == x.Id)).ToList();
+				foreach (var file in filesResult.Data)
+				{
+					var requestFile = new RequestFile
+					{
+						Id = file.Id,
+						FolderId = file.FolderId,
+						LastModifiedDate = file.LastModifiedDate,
+						Name = file.Name,
+						Path = file.Path,
+						Size = file.Size,
+						Source = file.Source,
+						Version = file.Version,
+						Recipients = neededRecipients
+					};
+
+					await _workerQueueContainer.ToSendFiles.Writer.WriteAsync(requestFile, cancellationToken);
+				}
+			}
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -34,7 +74,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				while (await incomingQueue.WaitToReadAsync() || !stoppingToken.IsCancellationRequested)
 				{
 					var file = await incomingQueue.ReadAsync();
-					var folderResult = await _mediator.Send(new GetFolderQuery { FolderId = file.FolderId });
+					var folderResult = await _folderRepository.GetFolder(file.FolderId);
 
 					if (folderResult.WasSuccessful)
 					{
@@ -51,6 +91,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			th.Start();
 
 			await Task.Delay(Timeout.Infinite);
+			_recipientsAddedNotificationSubscription.Dispose();
 		}
 	}
 }

@@ -5,7 +5,7 @@
     <div class="folderwebhook-input">
         <input type="text" id="@(FolderWebhook.WebHookTypeName)" class="form-control form-text" @bind="FolderWebhook.CallbackUrl" />
         <input type="button" class="btn btn-secondary" value="Test" @onclick="TestWebhook" />
-        @if (ProbeResult != Pi.Replicate.Infrastructure.Services.ProbeResult.EmptyResult)
+        @if (ProbeResult != Pi.Replicate.Shared.ProbeResult.EmptyResult)
         {
             @if (ProbeResult.IsSuccessful)
             {

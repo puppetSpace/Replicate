@@ -1,25 +1,22 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Observr;
-using Pi.Replicate.Application;
-using Pi.Replicate.Data;
-using Pi.Replicate.Infrastructure;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.BackgroundWorkers;
 using Pi.Replicate.Worker.Host.Common;
+using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Hubs;
+using Pi.Replicate.Worker.Host.Processing;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using Polly;
+using System;
+using System.Linq;
+using System.Net.Http.Headers;
 
 namespace Pi.Replicate.Worker.Host
 {
@@ -35,10 +32,20 @@ namespace Pi.Replicate.Worker.Host
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddApplication();
-			services.AddData();
-			services.AddInfrastructure();
+			services.AddTransient<IDatabase, Database>();
+			services.AddTransient<IDatabaseFactory, DatabaseFactory>();
+			services.AddSingleton<PathBuilder>();
+			services.AddTransient<FileCollectorFactory>();
+			services.AddSingleton<WorkerQueueContainer>();
+			services.AddTransient<TelemetryProxy>();
+			services.AddRepositories();
+			services.AddWorkerServices();
+			services.AddBackgroundServices();
+
 			services.AddObservr();
+			services.AddSignalR();
+			services.AddControllers();
+
 			services.AddHttpClient("default", client =>
 			{
 				client.DefaultRequestHeaders.Accept.Clear();
@@ -51,22 +58,11 @@ namespace Pi.Replicate.Worker.Host
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
 
-			services.AddSignalR();
-			services.AddControllers();
+			
 			services.AddResponseCompression(opt =>
 			{
 				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 			});
-			services.AddTransient<TelemetryProxy>();
-
-			services.AddHostedService<SystemOverviewWatcher>();
-			services.AddHostedService<FolderWorker>();
-			services.AddHostedService<FileExportWorker>();
-			services.AddHostedService<FileDisassemblerWorker>();
-			services.AddHostedService<FileChunkExportWorker>();
-			services.AddHostedService<FileAssemblerWorker>();
-			services.AddHostedService<RetryWorker>();
-
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

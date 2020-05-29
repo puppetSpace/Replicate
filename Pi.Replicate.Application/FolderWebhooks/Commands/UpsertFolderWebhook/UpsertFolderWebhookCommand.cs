@@ -1,8 +1,7 @@
 ﻿using MediatR;
-using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Application.FolderWebhooks.Notifications.FolderWebhookChanged;
 using Pi.Replicate.Application.Services;
+using Pi.Replicate.Shared.Models;
 using System;
 using System.Threading;
 using System.Threading.Tasks;

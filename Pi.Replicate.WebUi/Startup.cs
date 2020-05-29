@@ -10,7 +10,7 @@ using Observr;
 using Pi.Replicate.Application;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Data;
-using Pi.Replicate.Infrastructure;
+using Pi.Replicate.Shared;
 using Pi.Replicate.WebUi.Services;
 using Serilog;
 
@@ -34,7 +34,6 @@ namespace Pi.Replicate.WebUi
             services.AddServerSideBlazor();
             services.AddApplication();
             services.AddData();
-			services.AddInfrastructure();
             services.AddObservr();
 			services.AddHttpClient();
 			services.AddHttpClient("hostproxy",config=>
@@ -42,6 +41,7 @@ namespace Pi.Replicate.WebUi
 				config.DefaultRequestHeaders.Accept.Clear();
 				config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
+			services.AddTransient<ProbeService>();
 			services.AddTransient<OverviewService>();
 			services.AddBlazoredToast();
 

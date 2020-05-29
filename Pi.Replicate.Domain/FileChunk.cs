@@ -12,7 +12,6 @@ namespace Pi.Replicate.Domain
 
         public ReadOnlyMemory<byte> Value { get; private set; }
 
-
         public static FileChunk Build(Guid fileId, int sequenceNo, ReadOnlyMemory<byte> value)
         {
             return new FileChunk

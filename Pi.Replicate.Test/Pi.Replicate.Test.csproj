@@ -37,9 +37,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Pi.Replicate.Application\Pi.Replicate.Application.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Domain\Pi.Replicate.Domain.csproj" />
-    <ProjectReference Include="..\Pi.Replicate.Infrastructure\Pi.Replicate.Infrastructure.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
     <ProjectReference Include="..\Pi.Replicate.WebUi\Pi.Replicate.WebUi.csproj" />
+    <ProjectReference Include="..\Pi.Replicate.Worker.Host\Pi.Replicate.Worker.Host.csproj" />
   </ItemGroup>
 
   <ItemGroup>

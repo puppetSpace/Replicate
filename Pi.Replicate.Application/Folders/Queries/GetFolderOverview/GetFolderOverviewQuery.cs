@@ -1,6 +1,7 @@
 using MediatR;
 using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Shared.Models;
 using Serilog;
 using System;
 using System.Threading;

@@ -4,6 +4,7 @@ using Pi.Replicate.Application.Common;
 using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Domain;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

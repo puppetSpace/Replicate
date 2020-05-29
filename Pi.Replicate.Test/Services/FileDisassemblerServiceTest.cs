@@ -2,14 +2,11 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Application.Common;
-using Pi.Replicate.Application.Common.Interfaces;
-using Pi.Replicate.Application.EofMessages.Commands.AddToSendEofMessage;
-using Pi.Replicate.Application.Files.Commands.MarkFileAsFailed;
-using Pi.Replicate.Application.Services;
-using Pi.Replicate.Domain;
-using Pi.Replicate.Infrastructure.Services;
 using Pi.Replicate.Shared;
+using Pi.Replicate.Shared.Models;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Services;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,10 +28,14 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mediator = CreateMediatorEofMessageMock();
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(),webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
@@ -52,17 +53,15 @@ namespace Pi.Replicate.Test.Services
 			var eofMessageAmountOfChunks = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())))
-				.Callback<IRequest<Result<EofMessage>>, CancellationToken>((x, c) =>
-			 {
-				 if (x is AddToSendEofMessageCommand eof)
-					 eofMessageAmountOfChunks = eof.AmountOfChunks;
-			 });
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success())
+				.Callback<EofMessage>(x => eofMessageAmountOfChunks = x.AmountOfChunks);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mockmockMediator.Object,webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 			Assert.AreEqual(eofMessageAmountOfChunks, amountOfCalls);
@@ -80,20 +79,19 @@ namespace Pi.Replicate.Test.Services
 			var getPreviousSignatureOfFileQueryCalled = false;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
-				.ReturnsAsync((IBaseRequest x, CancellationToken y) =>
-				 {
-					 getPreviousSignatureOfFileQueryCalled = true;
-					 return Result<ReadOnlyMemory<byte>>.Success(Helper.GetReadOnlyMemory());
-				 });
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync((IBaseRequest x, CancellationToken y) => Result<EofMessage>.Success(new EofMessage()));
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
+				.ReturnsAsync(() => Result<byte[]>.Success(Helper.GetByteArray()))
+				.Callback<Guid>(x=>getPreviousSignatureOfFileQueryCalled = true);
+
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
 
 			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, mockmockMediator.Object,webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
@@ -110,16 +108,18 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
-				.ReturnsAsync((IBaseRequest x, CancellationToken y) => Result<ReadOnlyMemory<byte>>.Success(Helper.GetReadOnlyMemory()));
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync((IBaseRequest x, CancellationToken y) => Result<EofMessage>.Success(new EofMessage()));
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
+				.ReturnsAsync(() => Result<byte[]>.Success(Helper.GetByteArray()));
+
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
 
 			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, mockmockMediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
@@ -137,17 +137,18 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<ReadOnlyMemory<byte>>>>(), It.IsAny<CancellationToken>()))
-				.ReturnsAsync((IBaseRequest x, CancellationToken y) => Result<ReadOnlyMemory<byte>>.Success(Helper.GetReadOnlyMemory()));
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
+				.ReturnsAsync(() => Result<byte[]>.Success(Helper.GetByteArray()));
 
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync((IBaseRequest x, CancellationToken y) => Result<EofMessage>.Success(new EofMessage()));
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
 
 			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, mockmockMediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
@@ -168,12 +169,15 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())));
+			var fileRepositoryMock = new Mock<IFileRepository>();
+
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mockmockMediator.Object,webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 
@@ -191,14 +195,16 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())));
-			
+			var fileRepositoryMock = new Mock<IFileRepository>();
+
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
+
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { webhookCalled = true; }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mockmockMediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 			Assert.IsTrue(webhookCalled);
@@ -216,13 +222,15 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())));
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
+
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { webhookCalled = true; });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mockmockMediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
 
 
@@ -242,21 +250,20 @@ namespace Pi.Replicate.Test.Services
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 			var isFailedFileRequestCalled = false;
-			var mockmockMediator = new Mock<IMediator>();
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())));
-			mockmockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result.Success()))
-				.Callback<IRequest<Result>, CancellationToken>((x, c) =>
-				{
-					if (x is MarkFileAsFailedCommand)
-						isFailedFileRequestCalled = true;
-				});
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.UpdateFileAsFailed(It.IsAny<Guid>()))
+				.ReturnsAsync(() => Result.Success())
+				.Callback<Guid>(x => isFailedFileRequestCalled = true);
+
+			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
+			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
+				.ReturnsAsync(() => Result.Success());
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), mockmockMediator.Object, webhookMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
-
 
 			Assert.IsTrue(isFailedFileRequestCalled);
 
@@ -283,15 +290,5 @@ namespace Pi.Replicate.Test.Services
 			deltaServiceMock.Setup(x => x.CreateDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>())).Returns(() => Helper.GetReadOnlyMemory());
 			return deltaServiceMock;
 		}
-
-		private Mock<IMediator> CreateMediatorEofMessageMock()
-		{
-			var mockMediator = new Mock<IMediator>();
-			mockMediator.Setup(x => x.Send(It.IsAny<IRequest<Result<EofMessage>>>(), It.IsAny<CancellationToken>()))
-				.Returns(Task.FromResult(Result<EofMessage>.Success(new EofMessage())));
-
-			return mockMediator;
-		}
-
 	}
 }
