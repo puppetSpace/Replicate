@@ -26,7 +26,9 @@ namespace Pi.Replicate.Worker.Host.Repositories
 	{
 		private readonly IDatabase _database;
 
-		private const string _insertStatementFile = "INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
+		private const string _insertStatementFile = @"
+				IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
+					INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
 		private const string _selectStatementGetLastVersionOfFile = "SELECT TOP 1 Id, FolderId,Version, LastModifiedDate, Name,Path,Size,Source FROM dbo.[File] WHERE FolderId = @FolderId and Path = @Path order by Version desc";
 		private const string _selectStatementGetFilesForFolder = @"
 			select Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source

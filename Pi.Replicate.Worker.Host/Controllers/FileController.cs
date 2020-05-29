@@ -17,13 +17,13 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	{
 		private readonly FolderRepository _folderRepository;
 		private readonly RecipientRepository _recipientRepository;
-		private readonly FileRepository _fileRespository;
+		private readonly IFileRepository _fileRespository;
 		private readonly PathBuilder _pathBuilder;
 		private readonly IBroker _broker;
 
 		public FileController(FolderRepository folderRepository
 			, RecipientRepository recipientRepository
-			, FileRepository fileRespository
+			, IFileRepository fileRespository
 			, PathBuilder pathBuilder
 			, IBroker broker)
 		{
@@ -37,12 +37,13 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
-			Log.Information($"File data received from {Request.HttpContext.Connection.RemoteIpAddress}");
+			var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
+			Log.Information($"File data received from {ipAddress}");
 			var folderCreation = await AddFolder(model.FolderName);
 			if (folderCreation.WasSuccessful)
 			{
 				var fileResult = await _fileRespository.AddNewFile(new File { Id = model.Id, FolderId = folderCreation.Data, Name = model.Name, Size = model.Size, Version = model.Version, LastModifiedDate = model.LastModifiedDate, Path = model.Path, Source = FileSource.Remote });
-				var recipientResult = await _recipientRepository.AddRecipientToFolder(model.Host, Request.HttpContext.Connection.RemoteIpAddress.ToString(), folderCreation.Data);
+				var recipientResult = await _recipientRepository.AddRecipientToFolder(model.Host, $"https://{ipAddress}:{Request.HttpContext.Connection.RemotePort}", folderCreation.Data);
 				return fileResult.WasSuccessful && recipientResult.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 			}
 			else

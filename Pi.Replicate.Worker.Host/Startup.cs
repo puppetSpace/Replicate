@@ -18,6 +18,7 @@ using System;
 using System.Linq;
 using System.Net.Http.Headers;
 
+//todo inject DatabaseFactory in Respositories.
 namespace Pi.Replicate.Worker.Host
 {
 	public class Startup

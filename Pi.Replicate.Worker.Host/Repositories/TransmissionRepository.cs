@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-    public class TransmissionRepository
-    {
+	public class TransmissionRepository
+	{
 		private readonly IDatabase _database;
 
 		private const string _insertStatementAddTransmissionResult = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo, Source) VALUES(NEWID(),@RecipientId,@FileId, @FileChunkSequenceNo, @Source)";
@@ -56,7 +56,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			_database = database;
 		}
 
-		public async Task<Result> AddTransmissionResult(Guid fileId,Guid recipientId, int fileChunkSequenceNo, FileSource fileSource)
+		public async Task<Result> AddTransmissionResult(Guid fileId, Guid recipientId, int fileChunkSequenceNo, FileSource fileSource)
 		{
 			using (_database)
 			{
@@ -80,24 +80,24 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			}
 		}
 
-		public async Task<Result> AddFailedFileChunkTransmission(Guid fileChunkId,Guid fileId, Guid recipientId, int sequenceNo, byte[] value)
+		public async Task<Result> AddFailedFileChunkTransmission(Guid fileChunkId, Guid fileId, Guid recipientId, int sequenceNo, byte[] value)
 		{
 			using (_database)
 			{
-				var resultFailedFileChunk = await _database.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId });
 				//the filechunk must be save so it can be retrieved again for resend
-				var resultFileChunk = await _database.Execute(_insertStatementFileChunk, new { Id = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value});
+				var resultFileChunk = await _database.Execute(_insertStatementFileChunk, new { Id = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value });
+				var resultFailedFileChunk = await _database.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId });
 
 				return resultFailedFileChunk.WasSuccessful && resultFileChunk.WasSuccessful ? Result.Success() : Result.Failure();
 			}
 		}
 
-		public async Task<Result<ICollection<(File,Folder,Recipient)>>> GetFailedFileTransmission()
+		public async Task<Result<ICollection<(File, Folder, Recipient)>>> GetFailedFileTransmission()
 		{
 			using (_database)
 			{
-				return  await _database.Query<File, Folder, Recipient, (File, Folder, Recipient)>(_selectStatementGetFailedFileTransmission, null
-				, (fi, fo, re) => (fi,fo,re));
+				return await _database.Query<File, Folder, Recipient, (File, Folder, Recipient)>(_selectStatementGetFailedFileTransmission, null
+				, (fi, fo, re) => (fi, fo, re));
 
 			}
 		}

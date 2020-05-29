@@ -11,9 +11,9 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class EofMessageController : ControllerBase
 	{
-		private readonly EofMessageRepository _eofMessageRepository;
+		private readonly IEofMessageRepository _eofMessageRepository;
 
-		public EofMessageController(EofMessageRepository eofMessageRepository)
+		public EofMessageController(IEofMessageRepository eofMessageRepository)
 		{
 			_eofMessageRepository = eofMessageRepository;
 		}
