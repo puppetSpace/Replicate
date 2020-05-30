@@ -11,7 +11,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 {
 	public class FolderRepository
 	{
-		private readonly IDatabase _database;
+		private readonly IDatabaseFactory _database;
 
 		private const string _selectStatementGetFoldersToCrawl = "SELECT Id, Name FROM dbo.Folder";
 		private const string _selectStatementGetFolderName = "SELECT Name FROM dbo.Folder WHERE Id = @Id";
@@ -35,23 +35,25 @@ namespace Pi.Replicate.Worker.Host.Repositories
 				SELECT @folderId;
 			END";
 
-		public FolderRepository(IDatabase database)
+		public FolderRepository(IDatabaseFactory database)
 		{
 			_database = database;
 		}
 
 		public async Task<Result<ICollection<CrawledFolder>>> GetFoldersToCrawl()
 		{
-			using (_database)
-				return await _database.Query<CrawledFolder>(_selectStatementGetFoldersToCrawl, null);
+			var db = _database.Get();
+			using (db)
+				return await db.Query<CrawledFolder>(_selectStatementGetFoldersToCrawl, null);
 		}
 
 		public async Task<Result<Folder>> GetFolder(Guid folderId)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				var folder = await _database.QuerySingle<Folder>(_selectStatementGetFolder, new { Id = folderId });
-				var recipients = await _database.Query<Recipient>(_selectStatementFolderRecipients, new { folderId });
+				var folder = await db.QuerySingle<Folder>(_selectStatementGetFolder, new { Id = folderId });
+				var recipients = await db.Query<Recipient>(_selectStatementFolderRecipients, new { folderId });
 				if (folder.WasSuccessful)
 				{
 					folder.Data.Recipients = recipients?.Data;
@@ -64,14 +66,16 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<string>> GetFolderName(Guid folderId)
 		{
-			using (_database)
-				return await _database.QuerySingle<string>(_selectStatementGetFolderName, new { Id = folderId });
+			var db = _database.Get();
+			using (db)
+				return await db.QuerySingle<string>(_selectStatementGetFolderName, new { Id = folderId });
 		}
 
 		public async Task<Result<Guid>> AddFolder(string name)
 		{
-			using (_database)
-				return await _database.Execute<Guid>(_insertStatementAddFolder, new { Name = name });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute<Guid>(_insertStatementAddFolder, new { Name = name });
 		}
 	}
 }

@@ -11,7 +11,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 {
     public class RecipientRepository
     {
-		private readonly IDatabase _database;
+		private readonly IDatabaseFactory _database;
 
 		private const string _selectStatementGetRecipientsForFolder = @"
 			SELECT re.Id,re.Name,re.Address 
@@ -37,21 +37,23 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			END";
 
 
-		public RecipientRepository(IDatabase database)
+		public RecipientRepository(IDatabaseFactory database)
 		{
 			_database = database;
 		}
 
 		public async Task<Result<ICollection<Recipient>>> GetRecipientsForFolder(Guid folderId)
 		{
-			using (_database)
-				return await _database.Query<Recipient>(_selectStatementGetRecipientsForFolder, new { FolderId = folderId });
+			var db = _database.Get();
+			using (db)
+				return await db.Query<Recipient>(_selectStatementGetRecipientsForFolder, new { FolderId = folderId });
 		}
 
 		public async Task<Result> AddRecipientToFolder(string recipientName, string recipientAddress,Guid folderId)
 		{
-			using(_database)
-				return await _database.Execute(_insertStatementAddRecipientToFolder, new { Address = recipientAddress, Name = recipientName, FolderId = folderId });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_insertStatementAddRecipientToFolder, new { Address = recipientAddress, Name = recipientName, FolderId = folderId });
 		}
     }
 }

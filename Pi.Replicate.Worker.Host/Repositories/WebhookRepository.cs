@@ -24,7 +24,8 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<ICollection<Webhook>>> GetWebhooks()
 		{
-			return await _database.Query<Webhook>(_selectStatementGetWebhooks, null);
+			using(_database)
+				return await _database.Query<Webhook>(_selectStatementGetWebhooks, null);
 		}
     }
 }

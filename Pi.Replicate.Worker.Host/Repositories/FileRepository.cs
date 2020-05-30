@@ -24,7 +24,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 	public class FileRepository : IFileRepository
 	{
-		private readonly IDatabase _database;
+		private readonly IDatabaseFactory _database;
 
 		private const string _insertStatementFile = @"
 				IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
@@ -57,7 +57,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			having sum(fc.SequenceNo) = (eme.AmountOfChunks*(eme.AmountOfChunks+1)) / 2";
 		private const string _selectStatementGetFailedFiles = "SELECT Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source FROM dbo.[File] WHERE [Status] = 1";
 
-		public FileRepository(IDatabase database)
+		public FileRepository(IDatabaseFactory database)
 		{
 			_database = database;
 		}
@@ -65,8 +65,9 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result> AddNewFile(File file, byte[] signature)
 		{
-			using (_database)
-				return await _database.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, Signature = signature, file.Source });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, Signature = signature, file.Source });
 		}
 
 		public async Task<Result> AddNewFile(File file)
@@ -76,44 +77,48 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<File>> GetLastVersionOfFile(Guid folderId, string relativePath)
 		{
-			using (_database)
-				return await _database.QuerySingle<File>(_selectStatementGetLastVersionOfFile, new { FolderId = folderId, Path = relativePath });
+			var db = _database.Get();
+			using (db)
+				return await db.QuerySingle<File>(_selectStatementGetLastVersionOfFile, new { FolderId = folderId, Path = relativePath });
 		}
 
 		public async Task<Result<ICollection<File>>> GetFilesForFolder(Guid folderId)
 		{
-			using (_database)
-				return await _database.Query<File>(_selectStatementGetFilesForFolder, new { FolderId = folderId });
+			var db = _database.Get();
+			using (db)
+				return await db.Query<File>(_selectStatementGetFilesForFolder, new { FolderId = folderId });
 		}
 
 		public async Task<Result<byte[]>> GetSignatureOfPreviousFile(Guid fileId)
 		{
-			using (_database)
-				return await _database.QuerySingle<byte[]>(_selectStatementGetSignatureOfPreviousFile, new { FileId = fileId });
+			var db = _database.Get();
+			using (db)
+				return await db.QuerySingle<byte[]>(_selectStatementGetSignatureOfPreviousFile, new { FileId = fileId });
 		}
 
 		public async Task<Result<ICollection<(File, EofMessage)>>> GetCompletedFiles()
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Query<File, EofMessage, (File file, EofMessage eofMessage)>(_selectStatementGetCompletedFiles, null
+				return await db.Query<File, EofMessage, (File file, EofMessage eofMessage)>(_selectStatementGetCompletedFiles, null
 					, (f, e) => (f, e));
 			}
 		}
 
 		public async Task<Result<ICollection<File>>> GetFailedFiles()
 		{
-			using (_database)
-			{
-				using (_database)
-					return await _database.Query<File>(_selectStatementGetFailedFiles, null);
-			}
+			var db = _database.Get();
+			using (db)
+				return await db.Query<File>(_selectStatementGetFailedFiles, null);
+			
 		}
 
 		public async Task<Result> UpdateFileAsFailed(Guid fileId)
 		{
-			using (_database)
-				return await _database.Execute(_updateStatementUpdateFileAsFailed, new { Id = fileId });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_updateStatementUpdateFileAsFailed, new { Id = fileId });
 		}
 	}
 }

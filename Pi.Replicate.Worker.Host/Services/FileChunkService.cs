@@ -12,7 +12,7 @@ namespace Pi.Replicate.Worker.Host.Services
 	//no need to use repositories here. Passing the byte array to too many methods can increase memory
 	public class FileChunkService
 	{
-		private readonly IDatabase _database;
+		private readonly IDatabaseFactory _database;
 		private const string _insertStatementAddReceivedFileChunk = @"
 			IF NOT EXISTS (SELECT 1 FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo = @SequenceNo)
 				INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,[Value]) VALUES(@Id,@FileId,@SequenceNo,@Value)
@@ -36,17 +36,18 @@ namespace Pi.Replicate.Worker.Host.Services
 			END";
 		private const string _insertTransmissionStatementAddReceivedFileChunk = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo, Source) VALUES(NEWID(),@RecipientId,@FileId, @FileChunkSequenceNo, @Source)";
 
-		public FileChunkService(IDatabase database)
+		public FileChunkService(IDatabaseFactory database)
 		{
 			_database = database;
 		}
 		public async Task<Result> AddReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				var fileChunk = await _database.Execute(_insertStatementAddReceivedFileChunk, new { Id = Guid.NewGuid(), FileId = fileId, SequenceNo = sequenceNo, Value = value });
-				var recipientId = await _database.Execute<Guid>(_recipientCreationStatementAddReceivedFileChunk, new { Name = sender, Address = senderAddress });
-				var transmissionMessage = await _database.Execute(_insertTransmissionStatementAddReceivedFileChunk, new { RecipientId = recipientId.Data, FileId = fileId, FileChunkSequenceNo = sequenceNo, Source = FileSource.Remote });
+				var fileChunk = await db.Execute(_insertStatementAddReceivedFileChunk, new { Id = Guid.NewGuid(), FileId = fileId, SequenceNo = sequenceNo, Value = value });
+				var recipientId = await db.Execute<Guid>(_recipientCreationStatementAddReceivedFileChunk, new { Name = sender, Address = senderAddress });
+				var transmissionMessage = await db.Execute(_insertTransmissionStatementAddReceivedFileChunk, new { RecipientId = recipientId.Data, FileId = fileId, FileChunkSequenceNo = sequenceNo, Source = FileSource.Remote });
 				return fileChunk.WasSuccessful && recipientId.WasSuccessful && transmissionMessage.WasSuccessful ? Result.Success() : Result.Failure();
 			}
 		}

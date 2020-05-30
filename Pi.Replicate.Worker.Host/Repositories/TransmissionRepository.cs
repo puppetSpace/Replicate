@@ -11,7 +11,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 {
 	public class TransmissionRepository
 	{
-		private readonly IDatabase _database;
+		private readonly IDatabaseFactory _database;
 
 		private const string _insertStatementAddTransmissionResult = "INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo, Source) VALUES(NEWID(),@RecipientId,@FileId, @FileChunkSequenceNo, @Source)";
 		private const string _insertStatementAddFailedFileTransmission = @"
@@ -51,42 +51,46 @@ namespace Pi.Replicate.Worker.Host.Repositories
 																INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value) VALUES(@Id,@FileId,@SequenceNo,@Value)
 															END";
 
-		public TransmissionRepository(IDatabase database)
+		public TransmissionRepository(IDatabaseFactory database)
 		{
 			_database = database;
 		}
 
 		public async Task<Result> AddTransmissionResult(Guid fileId, Guid recipientId, int fileChunkSequenceNo, FileSource fileSource)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Execute(_insertStatementAddTransmissionResult, new { RecipientId = recipientId, FileId = fileId, FileChunkSequenceNo = fileChunkSequenceNo, Source = fileSource });
+				return await db.Execute(_insertStatementAddTransmissionResult, new { RecipientId = recipientId, FileId = fileId, FileChunkSequenceNo = fileChunkSequenceNo, Source = fileSource });
 			}
 		}
 
 		public async Task<Result> AddFailedFileTransmission(Guid fileId, Guid recipientId)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Execute(_insertStatementAddFailedFileTransmission, new { Id = Guid.NewGuid(), recipientId, FileId = fileId });
+				return await db.Execute(_insertStatementAddFailedFileTransmission, new { Id = Guid.NewGuid(), recipientId, FileId = fileId });
 			}
 		}
 
 		public async Task<Result> AddFailedEofMessageTransmission(Guid eofMessageId, Guid recipientId)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Execute(_insertStatementAddFailedEofMessageTransmission, new { Id = Guid.NewGuid(), recipientId, EofMessageId = eofMessageId });
+				return await db.Execute(_insertStatementAddFailedEofMessageTransmission, new { Id = Guid.NewGuid(), recipientId, EofMessageId = eofMessageId });
 			}
 		}
 
 		public async Task<Result> AddFailedFileChunkTransmission(Guid fileChunkId, Guid fileId, Guid recipientId, int sequenceNo, byte[] value)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
 				//the filechunk must be save so it can be retrieved again for resend
-				var resultFileChunk = await _database.Execute(_insertStatementFileChunk, new { Id = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value });
-				var resultFailedFileChunk = await _database.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId });
+				var resultFileChunk = await db.Execute(_insertStatementFileChunk, new { Id = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value });
+				var resultFailedFileChunk = await db.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId });
 
 				return resultFailedFileChunk.WasSuccessful && resultFileChunk.WasSuccessful ? Result.Success() : Result.Failure();
 			}
@@ -94,9 +98,10 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<ICollection<(File, Folder, Recipient)>>> GetFailedFileTransmission()
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Query<File, Folder, Recipient, (File, Folder, Recipient)>(_selectStatementGetFailedFileTransmission, null
+				return await db.Query<File, Folder, Recipient, (File, Folder, Recipient)>(_selectStatementGetFailedFileTransmission, null
 				, (fi, fo, re) => (fi, fo, re));
 
 			}
@@ -104,40 +109,45 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<ICollection<(EofMessage, Recipient)>>> GetFailedEofMessageTransmission()
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Query<EofMessage, Recipient, (EofMessage, Recipient)>(_selectStatementGetFailedEofMessageTransmission, null
+				return await db.Query<EofMessage, Recipient, (EofMessage, Recipient)>(_selectStatementGetFailedEofMessageTransmission, null
 				, (em, re) => (em, re));
 			}
 		}
 
 		public async Task<Result<ICollection<(FileChunk, Recipient)>>> GetFailedFileChunkTransmission()
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				return await _database.Query<FileChunk, Recipient, (FileChunk, Recipient)>(_selectStatementGetFailedFileChunkTransmission, null
+				return await db.Query<FileChunk, Recipient, (FileChunk, Recipient)>(_selectStatementGetFailedFileChunkTransmission, null
 				, (fc, re) => (fc, re));
 			}
 		}
 
 		public async Task<Result> DeleteFailedFileTransmission(Guid fileId, Guid recipientId)
 		{
-			using (_database)
-				return await _database.Execute(_deleteStatementDeleteFailedFileTransmission, new { FileId = fileId, RecipientId = recipientId });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_deleteStatementDeleteFailedFileTransmission, new { FileId = fileId, RecipientId = recipientId });
 		}
 
 		public async Task<Result> DeleteFailedEofMessageTransmission(Guid eofMessageId, Guid recipientId)
 		{
-			using (_database)
-				return await _database.Execute(_deleteStatementDeleteFailedEofMessageTransmission, new { EofMessageId = eofMessageId, RecipientId = recipientId });
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_deleteStatementDeleteFailedEofMessageTransmission, new { EofMessageId = eofMessageId, RecipientId = recipientId });
 		}
 
 		public async Task<Result> DeleteFailedFileChunkTransmission(Guid fileChunkId, Guid recipientId)
 		{
-			using (_database)
+			var db = _database.Get();
+			using (db)
 			{
-				var resultFt = await _database.Execute(_deleteStatementDeleteFailedFileChunkTransmission, new { FileChunkId = fileChunkId, RecipientId = recipientId });
-				var resultFc = await _database.Execute(_deleteFileChunkStatement, new { FileChunkId = fileChunkId });
+				var resultFt = await db.Execute(_deleteStatementDeleteFailedFileChunkTransmission, new { FileChunkId = fileChunkId, RecipientId = recipientId });
+				var resultFc = await db.Execute(_deleteFileChunkStatement, new { FileChunkId = fileChunkId });
 
 				return resultFc.WasSuccessful && resultFt.WasSuccessful ? Result.Success() : Result.Failure();
 			}
