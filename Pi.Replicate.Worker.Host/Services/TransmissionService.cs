@@ -4,6 +4,7 @@ using Pi.Replicate.Worker.Host.Repositories;
 using Serilog;
 using System;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
@@ -80,13 +81,12 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
 				var httpClient = _httpClientFactory.CreateClient("default");
-				var chunkModel = new FileChunkTransmissionModel
-				{
-					Host = Environment.MachineName,
-					Value = fileChunkValue
-				};
-				chunkModel.Host = Environment.MachineName;
-				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk/{fileChunk.SequenceNo}", chunkModel, throwErrorOnResponseNok: true);
+
+				var address = $"{recipient.Address}/api/file/{fileChunk.FileId}/chunk/{fileChunk.SequenceNo}/{Environment.MachineName}";
+				var content = new ByteArrayContent(fileChunkValue);
+				content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+				var response = await httpClient.PostAsync(address, content);
+				response.EnsureSuccessStatusCode();
 				await _transmissionRepository.AddTransmissionResult(fileChunk.FileId, recipient.Id, fileChunk.SequenceNo, FileSource.Local);
 			}
 			catch (Exception ex)
