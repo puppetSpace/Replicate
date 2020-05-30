@@ -18,12 +18,12 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			_fileChunkService = fileChunkService;
 		}
 
-		[HttpPost("api/file/{fileId}/chunk")]
-		public async Task<IActionResult> Post(Guid fileId, [FromBody] FileChunkTransmissionModel model)
+		[HttpPost("api/file/{fileId}/chunk/{sequenceNo}")]
+		public async Task<IActionResult> Post(Guid fileId, int sequenceNo, [FromBody] FileChunkTransmissionModel model)
 		{
 			//todo create function to form address
 			var address = $"https://{Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{Request.HttpContext.Connection.RemotePort}";
-			var result = await _fileChunkService.AddReceivedFileChunk(fileId, model.SequenceNo, model.Value, model.Host,address);
+			var result = await _fileChunkService.AddReceivedFileChunk(fileId, sequenceNo, model.Value, model.Host,address);
 			return result.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 		}
 	}

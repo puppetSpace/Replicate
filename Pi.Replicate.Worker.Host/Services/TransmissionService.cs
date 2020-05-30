@@ -83,11 +83,10 @@ namespace Pi.Replicate.Worker.Host.Services
 				var chunkModel = new FileChunkTransmissionModel
 				{
 					Host = Environment.MachineName,
-					SequenceNo = fileChunk.SequenceNo,
 					Value = fileChunkValue
 				};
 				chunkModel.Host = Environment.MachineName;
-				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk", chunkModel, throwErrorOnResponseNok: true);
+				await httpClient.PostAsync($"{recipient.Address}/api/file/{fileChunk.FileId}/chunk/{fileChunk.SequenceNo}", chunkModel, throwErrorOnResponseNok: true);
 				await _transmissionRepository.AddTransmissionResult(fileChunk.FileId, recipient.Id, fileChunk.SequenceNo, FileSource.Local);
 			}
 			catch (Exception ex)
