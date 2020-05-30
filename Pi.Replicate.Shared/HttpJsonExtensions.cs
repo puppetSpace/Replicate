@@ -15,9 +15,13 @@ namespace Pi.Replicate.Shared
             var stringContent = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync(url, stringContent);
-            if (!response.IsSuccessStatusCode && throwErrorOnResponseNok)
-                throw new InvalidOperationException($"Failed to post data. Reason: {response.StatusCode}: {response.ReasonPhrase}");
-
+			if (!response.IsSuccessStatusCode && throwErrorOnResponseNok)
+			{
+				var httpStatusCode = response.StatusCode;
+				var reasonPhrase = response.ReasonPhrase;
+				response.Dispose();
+				throw new InvalidOperationException($"Failed to post data. Reason: {httpStatusCode}: {reasonPhrase}");
+			}
             return response;
         }
 
@@ -28,10 +32,15 @@ namespace Pi.Replicate.Shared
 
             var response = await client.PostAsync(url, stringContent);
 
-            if (response.IsSuccessStatusCode)
-                return System.Text.Json.JsonSerializer.Deserialize<TOut>(await response.Content.ReadAsStringAsync());
-            else
-                throw new InvalidOperationException($"Failed to post data. Reason: {response.StatusCode}: {response.ReasonPhrase}");
+			if (response.IsSuccessStatusCode)
+				return System.Text.Json.JsonSerializer.Deserialize<TOut>(await response.Content.ReadAsStringAsync());
+			else
+			{
+				var httpStatusCode = response.StatusCode;
+				var reasonPhrase = response.ReasonPhrase;
+				response.Dispose();
+				throw new InvalidOperationException($"Failed to post data. Reason: {httpStatusCode}: {reasonPhrase}");
+			}
         }
     }
 }

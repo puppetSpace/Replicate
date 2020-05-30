@@ -39,7 +39,7 @@ namespace Pi.Replicate.Worker.Host.Services
 					FolderName = folder.Name,
 					Host = Environment.MachineName
 				};
-				await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
+				var response = await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 			}
 			catch (System.Exception ex)
 			{
