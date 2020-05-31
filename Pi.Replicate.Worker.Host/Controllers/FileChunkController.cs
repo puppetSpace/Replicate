@@ -27,7 +27,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			using (var ms = new MemoryStream())
 			{
 				await Request.Body.CopyToAsync(ms);
-				var address = $"https://{Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:{Request.HttpContext.Connection.RemotePort}";
+				var address = $"https://{Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4()}:44309";
 				var result = await _fileChunkService.AddReceivedFileChunk(fileId, sequenceNo, ms.ToArray(), host, address);
 				return result.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 			}
