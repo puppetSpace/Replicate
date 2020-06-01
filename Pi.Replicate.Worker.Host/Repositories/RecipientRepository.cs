@@ -29,7 +29,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 				IF(@recipientId is null)
 				BEGIN
 					SET @recipientId = NEWID();
-					INSERT INTO dbo.Recipient(Id,[Name],[Address], Verified) VALUES(@recipientId,@Name,@Address,1);
+					INSERT INTO dbo.Recipient(Id,[Name],[Address], Verified) VALUES(@recipientId,@Name,@Address,0);
 				END
 
 				IF NOT EXISTS (SELECT 1 FROM dbo.FolderRecipient WHERE FolderId = @FolderId and RecipientId = @recipientId)
