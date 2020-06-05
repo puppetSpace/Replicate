@@ -6,7 +6,7 @@
         <div class="site-overview-tile">
             <span class="site-overview-tile-title">Files processed for upload</span>
             <span class="oi oi-arrow-thick-top site-overview-tile-symbol" />
-            <span class="site-overview-tile-value">@OverviewModel.AmountOfFilesProcessedForDownload</span>
+            <span class="site-overview-tile-value">@OverviewModel.AmountOfFilesProcessedForSending</span>
         </div>
 
         <div class="site-overview-tile">
@@ -24,7 +24,7 @@
                 </tr>
                 <tr>
                     <td>Processor:</td>
-                    <td>@Math.Ceiling(SystemOverview.CpuUsagePercentage)</td>
+                    <td>@Math.Ceiling(SystemOverview.CpuUsagePercentage) %</td>
                 </tr>
             </table>
         </div>

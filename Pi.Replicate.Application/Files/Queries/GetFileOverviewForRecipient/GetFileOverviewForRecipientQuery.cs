@@ -20,6 +20,7 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 
 	public class GetFileOverviewForRecipientQueryHandler : IRequestHandler<GetFileOverviewForRecipientQuery, Result<ICollection<FileOverviewModel>>>
 	{
+		//todo add if eofmessage and fileinfo is sent
 		private readonly IDatabase _database;
 		private const string _selectQuery = @"
 			with file_cte(Id,[Name],[Version],Size,LastModifiedDate,[Path],rnk) as
@@ -33,8 +34,8 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 			from dbo.TransmissionResult
 			where RecipientId = @RecipientId
 			group by FileId)
-			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, (tr.chunkCount / em.AmountOfChunks) * 100 PercentageSent
-			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent, (trs.chunkCount / ems.AmountOfChunks) * 100 PercentageSent
+			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, (convert(decimal,tr.chunkCount) / em.AmountOfChunks) * 100 PercentageSent
+			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent, (convert(decimal,trs.chunkCount) / ems.AmountOfChunks) * 100 PercentageSent
 			from file_cte fi
 			left join dbo.[File] fis on fis.[Path] = fi.[Path] and fis.[Version] <> fi.[Version]
 			left join dbo.EofMessage em on em.FileId = fi.Id

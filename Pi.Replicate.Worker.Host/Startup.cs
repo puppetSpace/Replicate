@@ -49,9 +49,10 @@ namespace Pi.Replicate.Worker.Host
 
 			services.AddHttpClient("default", client =>
 			{
+				client.Timeout = TimeSpan.FromSeconds(5);
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3), TimeSpan.FromSeconds(5) }));
+			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1)}));
 
 			services.AddHttpClient("webhook", client =>
 			{
