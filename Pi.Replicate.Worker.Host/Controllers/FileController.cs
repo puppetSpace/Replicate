@@ -2,6 +2,7 @@
 using Observr;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
+using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
 using Serilog;
@@ -37,13 +38,12 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
-			var ipAddress = Request.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-			Log.Information($"File data received from {ipAddress}");
+			Log.Information($"File data received from {model.Host}");
 			var folderCreation = await AddFolder(model.FolderName);
 			if (folderCreation.WasSuccessful)
 			{
 				var fileResult = await _fileRespository.AddNewFile(new File { Id = model.Id, FolderId = folderCreation.Data, Name = model.Name, Size = model.Size, Version = model.Version, LastModifiedDate = model.LastModifiedDate, Path = model.Path, Source = FileSource.Remote });
-				var recipientResult = await _recipientRepository.AddRecipientToFolder(model.Host, $"https://{ipAddress}:{Request.HttpContext.Connection.RemotePort}", folderCreation.Data);
+				var recipientResult = await _recipientRepository.AddRecipientToFolder(model.Host, DummyAdress.Create(model.Host), folderCreation.Data);
 				return fileResult.WasSuccessful && recipientResult.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);
 			}
 			else
