@@ -51,7 +51,7 @@ create table dbo.EofMessage(
 	AmountOfChunks int NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_EofMessage PRIMARY KEY(Id),
-	CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
+	--CONSTRAINT FK_EofMessage_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE, --no foreign key. Could be that eofmessage comes in without fileinfo
 );
 GO
 
