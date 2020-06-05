@@ -146,7 +146,8 @@ namespace Pi.Replicate.Worker.Host.Services
 			Log.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
 			var filePath = _pathBuilder.BuildPath(file.Path);
 			var signature = _deltaService.CreateSignature(filePath);
-			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature WHERE Id = @FileId", new { FileId = file.Id, Signature = signature.ToArray() });
+			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
+			await _database.Execute("UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature, LastModifiedDate = @LastModifiedDate WHERE Id = @FileId", new { FileId = file.Id, Signature = signature.ToArray(), LastModifiedDate = newCreationDate });
 			await _database.Execute("DELETE FROM dbo.FileChunk WHERE FileId = @FileId", new { FileId = file.Id });
 			_webhookService.NotifyFileAssembled(file);
 		}
