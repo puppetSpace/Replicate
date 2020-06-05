@@ -87,7 +87,7 @@ create table dbo.TransmissionResult(
 	[Source] int NOT NULL,
 	CreationTime datetime NOT NULL DEFAULT GETUTCDATE()
 	CONSTRAINT PK_TransmissionResult PRIMARY KEY(Id),
-	CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE,
+	-- CONSTRAINT FK_TransmissionResult_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id) ON DELETE CASCADE, --Filechunk can come in without file details. these will be added later when retry happens
 	CONSTRAINT FK_TransmissionResult_Recipient FOREIGN KEY(RecipientId) REFERENCES dbo.Recipient(Id) ON DELETE CASCADE
 );
 GO
