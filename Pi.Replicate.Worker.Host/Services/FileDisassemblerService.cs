@@ -129,7 +129,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
-					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks));
+					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks).ToArray());
 					await chunkCreatedDelegate(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;

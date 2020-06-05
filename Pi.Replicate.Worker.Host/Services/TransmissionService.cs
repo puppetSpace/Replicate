@@ -76,7 +76,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		public async Task<bool> SendFileChunk(FileChunk fileChunk, Recipient recipient)
 		{
 			var canContinue = true;
-			var fileChunkValue = fileChunk.Value.ToArray();
+			var fileChunkValue = fileChunk.Value;
 			try
 			{
 				Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");

@@ -44,7 +44,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		private const string _deleteStatementDeleteFailedFileTransmission = "DELETE FROM dbo.FailedTransmission WHERE FileId = @FileId and RecipientId = @RecipientId";
 		private const string _deleteStatementDeleteFailedEofMessageTransmission = "DELETE FROM dbo.FailedTransmission WHERE EofMessageId = @EofMessageId and RecipientId = @RecipientId";
 		private const string _deleteStatementDeleteFailedFileChunkTransmission = "DELETE FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId";
-		private const string _deleteFileChunkStatement = "DELETE FROM dbo.FileChunk WHERE FileChunkId = @FileChunkId";
+		private const string _deleteFileChunkStatement = "DELETE FROM dbo.FileChunk WHERE Id = @FileChunkId";
 
 		private const string _insertStatementFileChunk = @"IF NOT EXISTS(SELECT 1 FROM dbo.FileChunk WHERE Id = @Id)
 															BEGIN

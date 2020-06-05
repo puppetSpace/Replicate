@@ -10,10 +10,10 @@ namespace Pi.Replicate.Worker.Host.Models
 
         public int SequenceNo { get; private set; }
 
-        public ReadOnlyMemory<byte> Value { get; private set; }
+        public byte[] Value { get; private set; }
 
 
-        public static FileChunk Build(Guid fileId, int sequenceNo, ReadOnlyMemory<byte> value)
+        public static FileChunk Build(Guid fileId, int sequenceNo, byte[] value)
         {
             return new FileChunk
             {
