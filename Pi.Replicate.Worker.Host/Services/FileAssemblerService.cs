@@ -60,6 +60,10 @@ namespace Pi.Replicate.Worker.Host.Services
 				}
 				else
 				{
+					var fileFolder = System.IO.Path.GetDirectoryName(filePath);
+					if (!System.IO.Directory.Exists(fileFolder))
+						System.IO.Directory.CreateDirectory(fileFolder);
+
 					Log.Information($"Decompressing file '{tempPath}'");
 					await _compressionService.Decompress(tempPath, filePath);
 					Log.Information($"File decompressed to '{filePath}'");
