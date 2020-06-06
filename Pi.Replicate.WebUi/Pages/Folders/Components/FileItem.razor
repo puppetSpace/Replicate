@@ -4,7 +4,7 @@
     <div class="file-item-header">
         <div class="file-item-name" title="@File.Name">@File.Name</div>
         <div title="version" class="file-item-version"><span class="oi oi-file" /> @File.Version</div>
-        <div title="% sent" class="file-item-sent"><span class="oi oi-arrow-thick-top" /> @(File.PercentageSent + "%")</div>
+        <div title="% @(File.Source == Domain.FileSource.Local ? "sent" : "received")" class="file-item-sent"><span class="@(File.Source == Domain.FileSource.Local ? "oi oi-arrow-thick-top" : "oi oi-arrow-thick-bottom")"/> @(File.PercentageSentReceived + "%")</div>
     </div>
     <div class="file-item-body">
         <table>
@@ -20,13 +20,21 @@
                 <td>Last Sent</td>
                 <td class="file-item-metadata">@File.LastSent</td>
             </tr>
+            <tr>
+                <td>Metadata @(File.Source == Domain.FileSource.Local ? "sent" : "received")</td>
+                <td class="file-item-metadata"><span class="@(File.MetadataPresent ? "oi oi-check" : "oi oi-x")" /></td>
+            </tr>
+            <tr>
+                <td>Eof @(File.Source == Domain.FileSource.Local ? "sent" : "received")</td>
+                <td class="file-item-metadata"><span class="@(File.EofMessagePresent ? "oi oi-check" : "oi oi-x")" /></td>
+            </tr>
         </table>
         @if (File.Versions.Any())
         {
             <details class="file-item-previousversions">
                 <summary>Previous versions</summary>
                 <div>
-                    @foreach(var pv in File.Versions.OrderBy(x=>x.Version))
+                    @foreach (var pv in File.Versions.OrderBy(x => x.Version))
                     {
                         <FileItem File="pv" />
                     }

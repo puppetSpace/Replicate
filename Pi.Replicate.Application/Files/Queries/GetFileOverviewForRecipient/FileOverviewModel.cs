@@ -1,4 +1,5 @@
 ﻿using Pi.Replicate.Application.Common;
+using Pi.Replicate.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,15 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 
 		public string Path { get; set; }
 
-		public double PercentageSent { get; set; }
+		public double PercentageSentReceived { get; set; }
 
 		public DateTime? LastSent { get; set; }
+
+		public FileSource Source { get; set; }
+
+		public bool MetadataPresent { get; set; }
+
+		public bool EofMessagePresent { get; set; }
 
 		public ICollection<FileOverviewModel> Versions { get; set; }
 

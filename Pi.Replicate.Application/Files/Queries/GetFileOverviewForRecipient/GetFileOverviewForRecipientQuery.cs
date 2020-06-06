@@ -20,22 +20,25 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 
 	public class GetFileOverviewForRecipientQueryHandler : IRequestHandler<GetFileOverviewForRecipientQuery, Result<ICollection<FileOverviewModel>>>
 	{
-		//todo add if eofmessage and fileinfo is sent
 		private readonly IDatabase _database;
 		private const string _selectQuery = @"
-			with file_cte(Id,[Name],[Version],Size,LastModifiedDate,[Path],rnk) as
-			(select  Id,[Name], [Version], Size,LastModifiedDate, [Path]
+			with file_cte(Id,[Name],[Version],Size,LastModifiedDate,[Path],Source,rnk) as
+			(select  Id,[Name], [Version], Size,LastModifiedDate, [Path], Source
 			, ROW_NUMBER() over(partition by [Name] order by [Version] DESC)  rnk
 			from dbo.[File]
-			where [Status] = 0 and FolderId = @FolderId
+			where [Status] in (0,2) and FolderId = @FolderId
 			),
 			transmission_cte(fileId,chunkCount, LastSent) as
 			(select FileId,count(FileChunkSequenceNo), max(CreationTime)
 			from dbo.TransmissionResult
 			where RecipientId = @RecipientId
 			group by FileId)
-			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, (convert(decimal,tr.chunkCount) / em.AmountOfChunks) * 100 PercentageSent
-			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent, (convert(decimal,trs.chunkCount) / ems.AmountOfChunks) * 100 PercentageSent
+			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, fi.Source, (convert(decimal,tr.chunkCount) / em.AmountOfChunks) * 100 PercentageSentReceived
+			, iif(em.Id is null,0,1) EofMessagePresent
+			, iif(em.Id is not null and fi.Id not in (select fileid from dbo.failedTransmission),1,0) MetadataPresent
+			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent,fis.Source, (convert(decimal,trs.chunkCount) / ems.AmountOfChunks) * 100 PercentageSentReceived
+			, iif(ems.Id is null,0,1) EofMessagePresent
+			, iif(ems.Id is not null and fi.Id not in (select fileid from dbo.failedTransmission),1,0) MetadataPresent
 			from file_cte fi
 			left join dbo.[File] fis on fis.[Path] = fi.[Path] and fis.[Version] <> fi.[Version]
 			left join dbo.EofMessage em on em.FileId = fi.Id
