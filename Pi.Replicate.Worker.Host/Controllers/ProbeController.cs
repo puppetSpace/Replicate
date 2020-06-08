@@ -13,6 +13,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
     {
         public IActionResult Get()
 		{
+			WorkerLog.Instance.Information($"Someone is trying to verify this point");
 			return Ok(System.Text.Json.JsonSerializer.Serialize(Environment.MachineName));
 		}
     }
