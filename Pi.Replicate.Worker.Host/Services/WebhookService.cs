@@ -57,12 +57,12 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (found is object)
 			{
 				found.CallbackUrl = value.CallbackUrl;
-				Log.Debug($"Webhook of type '{value.WebhookType}' for folderId '{value.FolderId}' updated callbackUrl to '{value.CallbackUrl}' ");
+				WorkerLog.Instance.Debug($"Webhook of type '{value.WebhookType}' for folderId '{value.FolderId}' updated callbackUrl to '{value.CallbackUrl}' ");
 			}
 			else
 			{
 				_webhookCache.Add(new Webhook { FolderId = value.FolderId, Type = value.WebhookType, CallbackUrl = value.CallbackUrl });
-				Log.Debug($"Webhook of type '{value.WebhookType}' for folderId '{value.FolderId}' added with callbackUrl '{value.CallbackUrl}' ");
+				WorkerLog.Instance.Debug($"Webhook of type '{value.WebhookType}' for folderId '{value.FolderId}' added with callbackUrl '{value.CallbackUrl}' ");
 			}
 
 			return Task.CompletedTask;
@@ -92,7 +92,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				var postObject = new { name = file.Name, path = _pathBuilder.BuildPath(file.Path), version = file.Version, folder = folderName };
 
-				Log.Debug($"Webhook of type '{type}' for folder '{folderName}' calling '{foundWebhook.CallbackUrl}'");
+				WorkerLog.Instance.Debug($"Webhook of type '{type}' for folder '{folderName}' calling '{foundWebhook.CallbackUrl}'");
 				var httpClient = _httpClientFactory.CreateClient("webhook");
 				try
 				{
@@ -100,12 +100,12 @@ namespace Pi.Replicate.Worker.Host.Services
 				}
 				catch (Exception ex)
 				{
-					Log.Error(ex.InnerException, $"Failed to call webhook of type '{type}' for folder '{folderName}'");
+					WorkerLog.Instance.Error(ex.InnerException, $"Failed to call webhook of type '{type}' for folder '{folderName}'");
 				}
 			}
 			else
 			{
-				Log.Warning($"No webhook found of type '{type}' for folder '{folderName}'");
+				WorkerLog.Instance.Warning($"No webhook found of type '{type}' for folder '{folderName}'");
 			}
 
 		}

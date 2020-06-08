@@ -25,7 +25,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var canContinue = true;
 			try
 			{
-				Log.Information($"Sending '{file.Path}' metadata to {recipient.Name}");
+				WorkerLog.Instance.Information($"Sending '{file.Path}' metadata to {recipient.Name}");
 
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var endpoint = $"{recipient.Address}/api/file";
@@ -44,7 +44,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 			catch (System.Exception ex)
 			{
-				Log.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				WorkerLog.Instance.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
 				var result = await _transmissionRepository.AddFailedFileTransmission(file.Id, recipient.Id);
 				canContinue = result.WasSuccessful;
 			}
@@ -57,7 +57,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var canContinue = true;
 			try
 			{
-				Log.Information($"Sending Eot message to {recipient.Name}");
+				WorkerLog.Instance.Information($"Sending Eot message to {recipient.Name}");
 
 				var httpClient = _httpClientFactory.CreateClient("default");
 				var endpoint = $"{recipient.Address}/api/file/{message.FileId}/eot";
@@ -66,7 +66,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 			catch (System.Exception ex)
 			{
-				Log.Error(ex, $"Failed to send Eof message to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				WorkerLog.Instance.Error(ex, $"Failed to send Eof message to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
 				var result = await _transmissionRepository.AddFailedEofMessageTransmission(message.Id, recipient.Id);
 				canContinue = result.WasSuccessful;
 			}
@@ -79,7 +79,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var fileChunkValue = fileChunk.Value;
 			try
 			{
-				Log.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
+				WorkerLog.Instance.Information($"Sending chunk '{fileChunk.SequenceNo}' to '{recipient.Name}'");
 				var httpClient = _httpClientFactory.CreateClient("default");
 
 				var address = $"{recipient.Address}/api/file/{fileChunk.FileId}/chunk/{fileChunk.SequenceNo}/{Environment.MachineName}";
@@ -91,7 +91,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				WorkerLog.Instance.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
 				var result = await _transmissionRepository.AddFailedFileChunkTransmission(fileChunk.Id, fileChunk.FileId, recipient.Id, fileChunk.SequenceNo, fileChunkValue);
 				canContinue = result.WasSuccessful;
 			}

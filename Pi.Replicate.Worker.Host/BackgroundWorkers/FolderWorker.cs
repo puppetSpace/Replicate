@@ -38,7 +38,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new System.Threading.Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FolderWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FolderWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var queryResult = await _folderRespository.GetFoldersToCrawl();
@@ -48,7 +48,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 						{
 							try
 							{
-								Log.Information($"Crawling through folder '{folder.Name}'");
+								WorkerLog.Instance.Information($"Crawling through folder '{folder.Name}'");
 								var collector = _fileCollectorFactory.Get(folder);
 								await collector.CollectFiles();
 								await ProcessNewFiles(folder, collector.NewFiles);
@@ -56,11 +56,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 							}
 							catch (Exception ex)
 							{
-								Log.Error(ex, $"Unexpected error occured during processing of folder {folder.Name}");
+								WorkerLog.Instance.Error(ex, $"Unexpected error occured during processing of folder {folder.Name}");
 							}
 						}
 					}
-					Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
+					WorkerLog.Instance.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min for next cycle of foldercrawling");
 					await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 				}
 			});
@@ -77,7 +77,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				var createdFile = await _fileService.CreateNewFile(folder.Id, newFile);
 				if (createdFile is object)
 				{
-					Log.Debug($"Adding '{createdFile.Path}' to queue");
+					WorkerLog.Instance.Debug($"Adding '{createdFile.Path}' to queue");
 					if (await queue.WaitToWriteAsync())
 						await queue.WriteAsync(createdFile);
 				}

@@ -40,7 +40,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, $"Unexpected error occured while assembling the file '{file.Name}'");
+				WorkerLog.Instance.Error(ex, $"Unexpected error occured while assembling the file '{file.Name}'");
 			}
 		}
 
@@ -56,7 +56,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 				if (System.IO.File.Exists(filePath) && FileLock.IsLocked(filePath, checkWriteAccess: true))
 				{
-					Log.Warning($"File '{filePath}' is locked for writing. unable overwrite file");
+					WorkerLog.Instance.Warning($"File '{filePath}' is locked for writing. unable overwrite file");
 				}
 				else
 				{
@@ -64,9 +64,9 @@ namespace Pi.Replicate.Worker.Host.Services
 					if (!System.IO.Directory.Exists(fileFolder))
 						System.IO.Directory.CreateDirectory(fileFolder);
 
-					Log.Information($"Decompressing file '{tempPath}'");
+					WorkerLog.Instance.Information($"Decompressing file '{tempPath}'");
 					await _compressionService.Decompress(tempPath, filePath);
-					Log.Information($"File decompressed to '{filePath}'");
+					WorkerLog.Instance.Information($"File decompressed to '{filePath}'");
 					await MarkFileAsCompleted(file);
 				}
 
@@ -85,14 +85,14 @@ namespace Pi.Replicate.Worker.Host.Services
 				var filePath = _pathBuilder.BuildPath(file.Path);
 				if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
 				{
-					Log.Information($"Applying delta to {filePath}");
+					WorkerLog.Instance.Information($"Applying delta to {filePath}");
 					_deltaService.ApplyDelta(filePath, System.IO.File.ReadAllBytes(filePath));
 					await MarkFileAsCompleted(file);
 
 				}
 				else
 				{
-					Log.Warning($"File '{filePath}' does not exist or is locked for writing. unable to apply delta");
+					WorkerLog.Instance.Warning($"File '{filePath}' does not exist or is locked for writing. unable to apply delta");
 				}
 				DeleteTempPath(tempPath);
 			}
@@ -102,7 +102,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			try
 			{
-				Log.Information($"Building {(file.IsNew() ? "" : "delta")} file '{file.Name}'");
+				WorkerLog.Instance.Information($"Building {(file.IsNew() ? "" : "delta")} file '{file.Name}'");
 				var temppath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 				using var db = _database;
 				using var sw = System.IO.File.OpenWrite(temppath);
@@ -118,12 +118,12 @@ namespace Pi.Replicate.Worker.Host.Services
 					toSkip = toTake + 1;
 					toTake += 10;
 				}
-				Log.Information($"File built to '{temppath}'");
+				WorkerLog.Instance.Information($"File built to '{temppath}'");
 				return temppath;
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, $"Error occured while assembling {(file.IsNew() ? "" : "delta")} file '{file.Name}' to tempfile");
+				WorkerLog.Instance.Error(ex, $"Error occured while assembling {(file.IsNew() ? "" : "delta")} file '{file.Name}' to tempfile");
 				return null;
 			}
 		}
@@ -132,18 +132,18 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			try
 			{
-				Log.Information($"Deleting temp file '{tempPath}'");
+				WorkerLog.Instance.Information($"Deleting temp file '{tempPath}'");
 				System.IO.File.Delete(tempPath);
 			}
 			catch (Exception ex)
 			{
-				Log.Warning(ex, "Error occured while deleting temp file of assembled file");
+				WorkerLog.Instance.Warning(ex, "Error occured while deleting temp file of assembled file");
 			}
 		}
 
 		private async Task MarkFileAsCompleted(File file)
 		{
-			Log.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
+			WorkerLog.Instance.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
 			var filePath = _pathBuilder.BuildPath(file.Path);
 			var signature = _deltaService.CreateSignature(filePath);
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);

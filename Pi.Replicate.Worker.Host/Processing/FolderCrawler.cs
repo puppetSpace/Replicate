@@ -11,11 +11,11 @@ namespace Pi.Replicate.Worker.Host.Processing
             var files = new List<System.IO.FileInfo>();
             if (string.IsNullOrWhiteSpace(path) || !System.IO.Directory.Exists(path))
             {
-                Log.Warning($"Given path, '{path}' is not a directory. Returning empty list");
+                WorkerLog.Instance.Warning($"Given path, '{path}' is not a directory. Returning empty list");
                 return files;
             }
 
-            Log.Debug($"Traversing '{path}'");
+            WorkerLog.Instance.Debug($"Traversing '{path}'");
 
             foreach (var file in System.IO.Directory.GetFiles(path))
                 files.Add(new System.IO.FileInfo(file));

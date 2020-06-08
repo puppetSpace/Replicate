@@ -38,7 +38,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Post([FromBody] FileTransmissionModel model)
 		{
-			Log.Information($"File data received from {model.Host}");
+			WorkerLog.Instance.Information($"File data received from {model.Host}");
 			var folderCreation = await AddFolder(model.FolderName);
 			if (folderCreation.WasSuccessful)
 			{

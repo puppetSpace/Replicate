@@ -53,7 +53,8 @@ namespace Pi.Replicate.Worker.Host
 				.WriteTo.Sink((ILogEventSink)Log.Logger)
 				.WriteTo.Observers(events => events.Do(async evt =>
 				 {
-					 await telemetryProxy.SendLog(evt);
+					 if(evt.Properties.ContainsKey("Context"))
+						await telemetryProxy.SendLog(evt);
 				 }).Subscribe())
 				.CreateLogger();
 			return host;
@@ -73,11 +74,11 @@ namespace Pi.Replicate.Worker.Host
 			}
 			public async Task Initialize()
 			{
-				Log.Information("Initializing webhook service");
+				WorkerLog.Instance.Information("Initializing webhook service");
 				await _webhookService.Initialize();
 				using (_database)
 				{
-					Log.Information("Deleting unprocessed files from database");
+					WorkerLog.Instance.Information("Deleting unprocessed files from database");
 					await _database.Execute("DELETE FROM dbo.FailedTransmission where FileId not in (select fileId from dbo.TransmissionResult)", null);
 					await _database.Execute("DELETE FROM dbo.[File] where Source = 0 and Id not in (select fileId from dbo.TransmissionResult)", null);
 					await _database.Execute("DELETE FROM dbo.[File] where Source = 0 and Id not in (select fileId from dbo.EofMessage)", null);

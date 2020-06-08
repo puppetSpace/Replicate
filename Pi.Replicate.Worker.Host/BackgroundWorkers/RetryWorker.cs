@@ -37,13 +37,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(RetryWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(RetryWorker)}");
 				await RetryFailedFiles();
 				await RetryFailedTransmisionFiles();
 				await RetryFailedTransmissionEofMessages();
 				await RetryFailedTransmissionFileChunks();
 
-				Log.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
+				WorkerLog.Instance.Information($"Waiting {TimeSpan.FromMinutes(_triggerInterval)}min to trigger retry logic again");
 				await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 			});
 			th.Start();
@@ -52,7 +52,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task RetryFailedFiles()
 		{
-			Log.Information($"Adding failed file back on queue");
+			WorkerLog.Instance.Information($"Adding failed file back on queue");
 			var failedFilesResult = await _fileRepository.GetFailedFiles();
 			if (failedFilesResult.WasSuccessful)
 			{
@@ -67,7 +67,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task RetryFailedTransmisionFiles()
 		{
-			Log.Information($"Retrying to send files that have failed");
+			WorkerLog.Instance.Information($"Retrying to send files that have failed");
 			var failedFilesResult = await _transmissionRepository.GetFailedFileTransmission();
 			if (failedFilesResult.WasSuccessful)
 			{
@@ -82,7 +82,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task RetryFailedTransmissionEofMessages()
 		{
-			Log.Information($"Retrying to send eof messages that have failed");
+			WorkerLog.Instance.Information($"Retrying to send eof messages that have failed");
 			var failedEofMessagesResult = await _transmissionRepository.GetFailedEofMessageTransmission();
 			if (failedEofMessagesResult.WasSuccessful)
 			{
@@ -97,7 +97,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task RetryFailedTransmissionFileChunks()
 		{
-			Log.Information($"Retrying to send filechunks that have failed");
+			WorkerLog.Instance.Information($"Retrying to send filechunks that have failed");
 			var failedChunksResult = await _transmissionRepository.GetFailedFileChunkTransmission();
 			if (failedChunksResult.WasSuccessful)
 			{

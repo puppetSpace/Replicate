@@ -72,7 +72,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			public void ReportProgress(string operation, long currentPosition, long total)
 			{
-				Log.Verbose($"operation: {operation}, currentPosition: {currentPosition}, total: {total}");
+				WorkerLog.Instance.Verbose($"operation: {operation}, currentPosition: {currentPosition}, total: {total}");
 			}
 
 			public static IProgressReporter Get() => new LogProgressReporter();

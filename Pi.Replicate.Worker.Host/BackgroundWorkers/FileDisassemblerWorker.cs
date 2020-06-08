@@ -42,7 +42,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FileDisassemblerWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
 				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
@@ -53,7 +53,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					{
 						taskRunner.Add((async () =>
 						{
-							Log.Information($"'{file.Path}' is being processed");
+							WorkerLog.Instance.Information($"'{file.Path}' is being processed");
 							var recipients = await GetRecipients(file);
 
 							if (recipients.Any())
@@ -62,13 +62,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 								if (eofMessage is object)
 									await FinializeFileProcess(eofMessage, recipients);
 
-								Log.Information($"'{file.Path}' is processed");
+								WorkerLog.Instance.Information($"'{file.Path}' is processed");
 							}
 						}));
 					}
 					else
 					{
-						Log.Information($"File '{file.Path}' does not exist");
+						WorkerLog.Instance.Information($"File '{file.Path}' does not exist");
 					}
 				}
 			});

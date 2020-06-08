@@ -22,7 +22,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FileChunkExportWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FileChunkExportWorker)}");
 				var queue = _workerQueueContainer.ToSendChunks.Reader;
 				while (await queue.WaitToReadAsync() || !stoppingToken.IsCancellationRequested)
 				{

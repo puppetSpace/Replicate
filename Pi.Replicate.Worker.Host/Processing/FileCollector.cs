@@ -31,17 +31,17 @@ namespace Pi.Replicate.Worker.Host.Processing
 			if (result.WasSuccessful)
 			{
 				var filesInDb = result.Data;
-				Log.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
+				WorkerLog.Instance.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
 
 				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
-				Log.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
+				WorkerLog.Instance.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
 				ChangedFiles = filesFromSystem
 						.Where(x => filesInDb
 							.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
 						.ToList();
 
-				Log.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
+				WorkerLog.Instance.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
 			}
 		}
 

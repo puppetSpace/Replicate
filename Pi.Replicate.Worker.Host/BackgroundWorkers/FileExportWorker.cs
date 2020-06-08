@@ -37,8 +37,8 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		public async Task Handle(RecipientsAddedToFolderNotification value, CancellationToken cancellationToken)
 		{
-			Log.Information("Handling notification that recipients are added");
-			Log.Debug($"Getting files of folder '{value.FolderId}' for following recipients: '{string.Join(", ", value.Recipients)}'");
+			WorkerLog.Instance.Information("Handling notification that recipients are added");
+			WorkerLog.Instance.Debug($"Getting files of folder '{value.FolderId}' for following recipients: '{string.Join(", ", value.Recipients)}'");
 			var filesResult = await _fileRepository.GetFilesForFolder(value.FolderId);
 			var folderResult = await _folderRepository.GetFolder(value.FolderId);
 			if (filesResult.WasSuccessful && folderResult.WasSuccessful)
@@ -68,7 +68,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FileExportWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FileExportWorker)}");
 				var incomingQueue = _workerQueueContainer.ToSendFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToProcessFiles.Writer;
 				while (await incomingQueue.WaitToReadAsync() || !stoppingToken.IsCancellationRequested)

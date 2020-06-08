@@ -57,13 +57,13 @@ namespace Pi.Replicate.Worker.Host.Services
 				}
 				catch (Exception ex)
 				{
-					Log.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
+					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
 					await HandleFailed(file);
 				}
 			}
 			else
 			{
-				Log.Warning($"File '{path}' does not exist or is locked. File will not be processed");
+				WorkerLog.Instance.Warning($"File '{path}' does not exist or is locked. File will not be processed");
 				await HandleFailed(file);
 
 			}
@@ -74,11 +74,11 @@ namespace Pi.Replicate.Worker.Host.Services
 		private async Task<EofMessage> ProcessNewFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
 		{
 			var sequenceNo = 0;
-			Log.Information($"Compressing file '{path}'");
+			WorkerLog.Instance.Information($"Compressing file '{path}'");
 			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 			await _compressionService.Compress(path, pathOfCompressed);
 
-			Log.Information($"Splitting up '{path}'");
+			WorkerLog.Instance.Information($"Splitting up '{path}'");
 
 			var sharedmemory = MemoryPool<byte>.Shared.Rent(_sizeofChunkInBytes);
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
@@ -97,14 +97,14 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private static void DeleteTempFile(string path, string pathOfCompressed)
 		{
-			Log.Information($"'compressed file of {path}' is being deleted");
+			WorkerLog.Instance.Information($"'compressed file of {path}' is being deleted");
 			try
 			{
 				System.IO.File.Delete(pathOfCompressed);
 			}
 			catch (Exception ex)
 			{
-				Log.Warning(ex, "Failed to delete temp file");
+				WorkerLog.Instance.Warning(ex, "Failed to delete temp file");
 			}
 		}
 
@@ -115,16 +115,16 @@ namespace Pi.Replicate.Worker.Host.Services
 			var result = await _fileRepository.GetSignatureOfPreviousFile(file.Id);
 			if (!result.WasSuccessful || result.Data.Length == 0)
 			{
-				Log.Information($"Unable to process changed file '{file.Path}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
+				WorkerLog.Instance.Information($"Unable to process changed file '{file.Path}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
 				return null;
 			}
 			else
 			{
-				Log.Information($"Creating delta of changed file '{file.Path}'");
+				WorkerLog.Instance.Information($"Creating delta of changed file '{file.Path}'");
 				var delta = _deltaService.CreateDelta(path, result.Data);
 				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
 
-				Log.Information($"Splitting up delta of changed file '{file.Path}'");
+				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.Path}'");
 				var indexOfSlice = 0;
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
@@ -141,7 +141,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private async Task<EofMessage> CreateEofMessage(File file, int amountOfChunks)
 		{
-			Log.Information($"Creating eof message for '{file.Path}'");
+			WorkerLog.Instance.Information($"Creating eof message for '{file.Path}'");
 			var eofMessage = EofMessage.Build(file.Id, amountOfChunks);
 			var eofResult = await _eofMessageRepository.AddEofMessage(eofMessage);
 			if (eofResult.WasSuccessful)

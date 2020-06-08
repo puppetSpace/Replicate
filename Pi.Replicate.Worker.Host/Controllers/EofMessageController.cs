@@ -21,7 +21,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		[HttpPost("api/file/{fileId}/eot")]
 		public async Task<IActionResult> Post(Guid fileId, [FromBody] EofMessageTransmissionModel model)
 		{
-			Log.Information($"Eof message received from {Request.HttpContext.Connection.RemoteIpAddress}");
+			WorkerLog.Instance.Information($"Eof message received from {Request.HttpContext.Connection.RemoteIpAddress}");
 			var eofMessage = EofMessage.Build(fileId, model.AmountOfChunks);
 			var result = await _eofMessageRepository.AddReceivedEofMessage(eofMessage);
 			return result.WasSuccessful ? NoContent() : StatusCode((int)HttpStatusCode.InternalServerError);

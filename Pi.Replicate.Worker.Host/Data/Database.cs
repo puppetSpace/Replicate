@@ -33,7 +33,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result.Failure();
 			}
 		}
@@ -47,7 +47,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result<TE>.Failure();
 			}
 		}
@@ -61,7 +61,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result<ICollection<TE>>.Failure();
 			}
 		}
@@ -75,7 +75,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result<ICollection<TResult>>.Failure();
 			}
 		}
@@ -89,7 +89,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result<ICollection<TResult>>.Failure();
 			}
 		}
@@ -103,7 +103,7 @@ namespace Pi.Replicate.Worker.Host.Data
 			}
 			catch (Exception ex)
 			{
-				Log.Error(ex, _exceptionString);
+				WorkerLog.Instance.Error(ex, _exceptionString);
 				return Result<TE>.Failure();
 			}
 		}

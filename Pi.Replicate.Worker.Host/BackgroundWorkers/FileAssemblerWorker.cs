@@ -35,7 +35,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new Thread(async () =>
 			{
-				Log.Information($"Starting {nameof(FileAssemblerWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FileAssemblerWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var completedFilesResult = await _fileRepository.GetCompletedFiles();
