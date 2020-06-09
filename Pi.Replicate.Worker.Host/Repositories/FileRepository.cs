@@ -20,6 +20,8 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		Task<Result<File>> GetLastVersionOfFile(Guid folderId, string relativePath);
 		Task<Result<byte[]>> GetSignatureOfPreviousFile(Guid fileId);
 		Task<Result> UpdateFileAsFailed(Guid fileId);
+		Task<Result> UpdateFileAsAssembled(Guid fileId, DateTime lastModifiedDate, byte[] signature, IDatabase database = null);
+		Task<Result<ICollection<File>>> GetAllVersionsOfFile(File file, IDatabase database = null);
 	}
 
 	public class FileRepository : IFileRepository
@@ -45,6 +47,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			FROM dbo.[File] fi
 			INENR JOIN file_cte fic ON fic.[path] = fi.[Path] AND fi.[Version] = fic.[version] - 1 ";
 		private const string _updateStatementUpdateFileAsFailed = @"UPDATE dbo.[File] SET [Status] = 1 WHERE Id = @Id";
+		private const string _updateStatementUpdateFileAssAssembled = "UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature, LastModifiedDate = @LastModifiedDate WHERE Id = @FileId";
 		private const string _selectStatementGetCompletedFiles = @"
 			select fi.Id, fi.FolderId,fi.[Name],fi.[Version], fi.Size,fi.LastModifiedDate, fi.[Path], fi.Source
 			, eme.Id,eme.FileId,eme.AmountOfChunks,eme.CreationTime
@@ -52,10 +55,12 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			inner join dbo.EofMessage eme on eme.FileId = fi.Id
 			left join dbo.FileChunk fc on fc.FileId = fi.Id
 			where fi.Source = 1
+			and fi.Id not in (select fileId from dbo.FileConflict)
 			group by fi.Id, fi.FolderId,fi.[Name],fi.[Version], fi.Size,fi.LastModifiedDate, fi.[Path], fi.Source
 			, eme.Id,eme.FileId,eme.AmountOfChunks,eme.CreationTime
 			having sum(fc.SequenceNo) = (eme.AmountOfChunks*(eme.AmountOfChunks+1)) / 2";
 		private const string _selectStatementGetFailedFiles = "SELECT Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source FROM dbo.[File] WHERE [Status] = 1";
+		private const string _selectStatementGetOtherVersionsOfFile = "SELECT Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source FROM dbo.[File] WHERE [Path] = @Path";
 
 		public FileRepository(IDatabaseFactory database)
 		{
@@ -119,6 +124,34 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			var db = _database.Get();
 			using (db)
 				return await db.Execute(_updateStatementUpdateFileAsFailed, new { Id = fileId });
+		}
+
+		public async Task<Result<ICollection<File>>> GetAllVersionsOfFile(File file, IDatabase database = null)
+		{
+			if (database is null)
+			{
+				var db = _database.Get();
+				using (db)
+					return await db.Query<File>(_selectStatementGetOtherVersionsOfFile, new { file.Path, file.Version });
+			}
+			else
+			{
+				return await database.Query<File>(_selectStatementGetOtherVersionsOfFile, new { file.Path, file.Version });
+			}
+		}
+
+		public async Task<Result> UpdateFileAsAssembled(Guid fileId, DateTime lastModifiedDate, byte[] signature, IDatabase database = null)
+		{
+			if(_database is null)
+			{
+				var db = _database.Get();
+				using(db)
+					return await db.Execute(_updateStatementUpdateFileAssAssembled, new { FileId = fileId, Signature = signature, LastModifiedDate = lastModifiedDate });
+			}
+			else
+			{
+				return await database.Execute(_updateStatementUpdateFileAssAssembled, new { FileId = fileId, Signature = signature, LastModifiedDate = lastModifiedDate });
+			}
 		}
 	}
 }

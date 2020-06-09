@@ -17,6 +17,8 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			services.AddTransient<RecipientRepository>();
 			services.AddTransient<IEofMessageRepository,EofMessageRepository>();
 			services.AddTransient<WebhookRepository>();
+			services.AddTransient<IFileChunkRepository,FileChunkRepository>();
+			services.AddTransient<ConflictRepository>();
 		}
     }
 }

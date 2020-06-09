@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Pi.Replicate.Application\Pi.Replicate.Application.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Data\Pi.Replicate.Data.csproj" />
     <ProjectReference Include="..\Pi.Replicate.Shared\Pi.Replicate.Shared.csproj" />
   </ItemGroup>

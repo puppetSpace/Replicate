@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	//todo check for conflicts here
 	public class FileAssemblerWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
@@ -49,7 +48,6 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 						await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 					}
-
 				}
 			});
 
@@ -61,11 +59,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task AssembleNewFiles(IEnumerable<(File file, EofMessage eofMesssage)> newFiles)
 		{
 			var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
-			foreach (var completedFile in newFiles)
+			foreach (var (file, eofMesssage) in newFiles)
 			{
 				taskRunner.Add(async () =>
 				{
-					await _fileAssemblerServiceFactory.Get().ProcessFile(completedFile.file, completedFile.eofMesssage);
+					await _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage);
 				});
 			}
 			await taskRunner.WaitTillComplete();
@@ -73,9 +71,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task ApplyChangedToExistingFiles(IEnumerable<(File file, EofMessage eofMesssage)> changedFiles)
 		{
-			foreach (var changedFile in changedFiles)
+			foreach (var (file, eofMesssage) in changedFiles)
 			{
-				await _fileAssemblerServiceFactory.Get().ProcessFile(changedFile.file, changedFile.eofMesssage);
+				await _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage);
 			}
 		}
 	}

@@ -128,12 +128,10 @@ GO
 
 create table dbo.FileConflict(
 	Id uniqueidentifier NOT NULL,
-	SourceFileId uniqueidentifier NOT NULL,
-	DestinationFileId uniqueidentifier NOT NULL,
-	[Type] smallint NOT NULL,
+	FileId uniqueidentifier NOT NULL,
+	[Message] varchar(max) NOT NULL,
 	CONSTRAINT PK_FileConflict PRIMARY KEY(Id),
-	CONSTRAINT FK_FileConflict_File_Source FOREIGN KEY(SourceFileId) REFERENCES dbo.[File](Id),
-	CONSTRAINT FK_FileConflict_File_Destination FOREIGN KEY(DestinationFileId) REFERENCES dbo.[File](Id)
+	CONSTRAINT FK_FileConflict_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id)
 )
 GO
 

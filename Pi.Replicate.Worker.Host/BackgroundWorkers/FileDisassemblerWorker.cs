@@ -51,7 +51,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					var file = await incomingQueue.ReadAsync(stoppingToken);
 					if (System.IO.File.Exists(_pathBuilder.BuildPath(file.Path)))
 					{
-						taskRunner.Add((async () =>
+						taskRunner.Add(async () =>
 						{
 							WorkerLog.Instance.Information($"'{file.Path}' is being processed");
 							var recipients = await GetRecipients(file);
@@ -64,7 +64,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 								WorkerLog.Instance.Information($"'{file.Path}' is processed");
 							}
-						}));
+						});
 					}
 					else
 					{
