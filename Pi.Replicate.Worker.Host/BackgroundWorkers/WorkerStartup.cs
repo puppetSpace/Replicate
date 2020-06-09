@@ -6,6 +6,7 @@ using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Services;
 using Serilog;
 using Serilog.Core;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 using System;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
@@ -49,8 +50,10 @@ namespace Pi.Replicate.Worker.Host
 		public static IHost AttachLogSinks(this IHost host)
 		{
 			var telemetryProxy = host.Services.GetService<TelemetryProxy>();
+			var configuration = host.Services.GetService<IConfiguration>();
 			Log.Logger = new LoggerConfiguration()
 				.WriteTo.Sink((ILogEventSink)Log.Logger)
+				.WriteTo.MSSqlServer(configuration.GetConnectionString("ReplicateDatabase"), new SinkOptions { AutoCreateSqlTable = true, TableName = "log" })
 				.WriteTo.Observers(events => events.Do(async evt =>
 				 {
 					 if(evt.Properties.ContainsKey("Context"))
