@@ -126,6 +126,17 @@ create table dbo.FolderWebhook(
 )
 GO
 
+create table dbo.FileConflict(
+	Id uniqueidentifier NOT NULL,
+	SourceFileId uniqueidentifier NOT NULL,
+	DestinationFileId uniqueidentifier NOT NULL,
+	[Type] smallint NOT NULL,
+	CONSTRAINT PK_FileConflict PRIMARY KEY(Id),
+	CONSTRAINT FK_FileConflict_File_Source FOREIGN KEY(SourceFileId) REFERENCES dbo.[File](Id),
+	CONSTRAINT FK_FileConflict_File_Destination FOREIGN KEY(DestinationFileId) REFERENCES dbo.[File](Id)
+)
+GO
+
 insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
 insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFolderCrawl','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
 insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFileAssembly','10','number','The amount of time to wait to between each moment the application checks if all chunks have arrived for a file and assembly of files');

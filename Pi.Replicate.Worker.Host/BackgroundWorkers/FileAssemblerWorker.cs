@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
+	//todo check for conflicts here
 	public class FileAssemblerWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
