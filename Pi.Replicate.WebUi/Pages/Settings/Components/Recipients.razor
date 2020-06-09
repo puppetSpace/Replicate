@@ -29,7 +29,7 @@
                             }
                             else
                             {
-                                <a @onclick=@(()=>VerifyRecipient(recipient)) class="selectable"><span title="Contact the recipient to verify its existince. This will also fill in the recipient's name" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
+                                <a @onclick=@(()=>VerifyRecipient(recipient)) class="selectable"><span title="Contact the recipient to verify its existence. This will also fill in the recipient's name" class="oi oi-reload" style="@(recipient.IsVerifying ? "animation: rotationAnimation 1.5s linear infinite" : "")"></span></a>
                                 @if (!string.IsNullOrWhiteSpace(recipient.VerifyResult))
                                 {
                                     <span title="@recipient.VerifyResult" class="oi oi-warning"></span>

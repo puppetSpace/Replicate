@@ -16,7 +16,11 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
     public class GetFolderListQueryHandler : IRequestHandler<GetFolderListQuery, Result<ICollection<FolderListItem>>>
     {
         private readonly IDatabase _database;
-        private readonly string _selectStatement = "SELECT Id,Name from dbo.Folder";
+        private readonly string _selectStatement = @"SELECT fo.Id,fo.Name, iif(count(fc.Id) > 0,1,0) HasConflicts
+			from dbo.Folder fo
+			left join dbo.[File] fi on fi.FolderId = fo.Id
+			left join dbo.FileConflict fc on fc.FileId = fi.Id
+			group by fo.Id,fo.Name ";
 
         public GetFolderListQueryHandler(IDatabase database)
         {

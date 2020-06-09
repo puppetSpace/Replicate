@@ -11,9 +11,16 @@
             </li>
             @foreach (var folder in Folders)
             {
-                <li class="nav-item">
+                <li class="nav-item" title="@(folder.HasConflicts ? "Folder has conflicts" : folder.Name)">
                     <NavLink class="nav-link" href='@("folder/"+ folder.Id)'>
-                        <span class="oi oi-folder" aria-hidden="true"></span> @folder.Name
+                        @if (folder.HasConflicts)
+                        {
+                            <span class="oi oi-warning"></span> @folder.Name
+                        }
+                        else
+                        {
+                            <span class="oi oi-folder" aria-hidden="true"></span> @folder.Name
+                        }
                     </NavLink>
                 </li>
             }

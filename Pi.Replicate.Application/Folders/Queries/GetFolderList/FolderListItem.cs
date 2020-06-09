@@ -11,5 +11,7 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderList
         public Guid Id { get; set; }
 
         public string Name { get; set; }
-    }
+
+		public bool HasConflicts { get; set; }
+	}
 }
