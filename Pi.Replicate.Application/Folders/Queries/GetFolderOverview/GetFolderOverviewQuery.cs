@@ -18,12 +18,17 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatement = @"				
-			select fo.[Name] FolderName, count(eme.FileId) AmountOfFilesProcessedForSending, count(fir.Id) AmountOfFilesProcessedForDownload, count(fif.Id) AmountOfFilesFailedToProcess
+			select fo.[Name] FolderName
+			, count(eme.FileId) AmountOfFilesProcessedForSending
+			, count(fir.Id) AmountOfFilesProcessedForDownload
+			, count(fif.Id) AmountOfFilesFailedToProcess
+			, count(fc.Id) AmountOfConflicts
 			from dbo.Folder fo
 			left join dbo.[File] fil on fil.FolderId = fo.Id and fil.Source = 0
 			left join dbo.EofMessage eme on eme.FileId = fil.Id
 			left join dbo.[File] fir on fir.FolderId = fo.Id and fir.Source = 1 and fir.[Status] = 2
 			left join dbo.[File] fif on fif.FolderId = fo.Id and fif.Source = 0 and fir.[Status] = 1
+			left join dbo.FileConflict fc on fc.FileId = fil.Id
 			where fo.Id = @FolderId
 			group by fo.[Name]";
 

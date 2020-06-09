@@ -71,10 +71,9 @@
 }
 .folder-overview .folder-metadata {
   display: flex;
-  flex-direction: column;
   font-size: smaller;
   margin-top: 0.5rem;
-  justify-content: center;
+  align-items: center;
 }
 .folder-overview .folder-setting-link {
   font-size: x-large;

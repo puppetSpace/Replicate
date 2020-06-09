@@ -12,6 +12,8 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 
 		public int AmountOfFilesFailedToProcess { get; set; }
 
+		public int AmountOfConflicts { get; set; }
+
 		public ICollection<RecipientOverviewModel> Recipients { get; set; } = new List<RecipientOverviewModel>();
 	}
 

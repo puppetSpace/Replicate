@@ -10,6 +10,10 @@
                 <span title="Amount of files received" class="oi oi-arrow-thick-bottom space-before-10"> </span> @FolderOverviewModel.AmountOfFilesProcessedForDownload
                 <span title="Amount of files failed to process" class="oi oi-bug space-before-10"></span> @FolderOverviewModel.AmountOfFilesFailedToProcess
             </span>
+            @if (FolderOverviewModel.AmountOfConflicts > 0)
+            {
+                <span title="Folder has file conflicts" class="oi oi-warning space-before-10"></span> <a href='@("folder/" + FolderId + "/conflicts")'>Resolve @FolderOverviewModel.AmountOfConflicts conflict(s)</a>
+            }
         </div>
         <NavLink class="nav-link folder-setting-link" href='@("folder/"+ FolderId + "/settings")'>
             <span class="oi oi-cog" aria-hidden="true"></span>
