@@ -129,7 +129,7 @@ GO
 create table dbo.FileConflict(
 	Id uniqueidentifier NOT NULL,
 	FileId uniqueidentifier NOT NULL,
-	[Message] varchar(max) NOT NULL,
+	[Type] smallint NOT NULL,
 	CONSTRAINT PK_FileConflict PRIMARY KEY(Id),
 	CONSTRAINT FK_FileConflict_File FOREIGN KEY(FileId) REFERENCES dbo.[File](Id)
 )
@@ -200,11 +200,4 @@ where a.FileTransmisionChunkSequenceNoSum = a.ChunksChecksum
 group by a.RecipientId,a.FolderId;
 
 GO
-create view dbo.V_FoldersWithFileConflicts
-as
-select FolderId
-from dbo.[File] fi
-where fi.Source = 1
-group by  FolderId, [Path], [Version]
-having count(1) > 1;
 

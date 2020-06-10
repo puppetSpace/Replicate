@@ -18,19 +18,28 @@ namespace Pi.Replicate.Application.Folders.Queries.GetFolderOverview
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatement = @"				
+			with fileconflicts(FolderId,AmountOfConflicts)
+			as(
+				select fo.Id,count(fc.Id)
+				from dbo.Folder fo
+				left join dbo.[File] fic on fic.FolderId = fo.Id
+				left join dbo.FileConflict fc on fc.FileId = fic.Id
+				where fo.Id = @FolderId
+				group by fo.Id
+			)
 			select fo.[Name] FolderName
 			, count(eme.FileId) AmountOfFilesProcessedForSending
 			, count(fir.Id) AmountOfFilesProcessedForDownload
 			, count(fif.Id) AmountOfFilesFailedToProcess
-			, count(fc.Id) AmountOfConflicts
+			, fc.AmountOfConflicts
 			from dbo.Folder fo
 			left join dbo.[File] fil on fil.FolderId = fo.Id and fil.Source = 0
 			left join dbo.EofMessage eme on eme.FileId = fil.Id
 			left join dbo.[File] fir on fir.FolderId = fo.Id and fir.Source = 1 and fir.[Status] = 2
 			left join dbo.[File] fif on fif.FolderId = fo.Id and fif.Source = 0 and fir.[Status] = 1
-			left join dbo.FileConflict fc on fc.FileId = fil.Id
+			left join fileconflicts fc on fc.FolderId = fo.Id
 			where fo.Id = @FolderId
-			group by fo.[Name]";
+			group by fo.[Name],fc.AmountOfConflicts";
 
 		private const string _recipientSelectStatement = @"
 			select re.Id RecipientId, re.[Name] RecipientName, re.[Address] RecipientAddress, ref.AmountofFilesSent, rer.AmountOfFilesReceived

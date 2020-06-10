@@ -2,4 +2,29 @@
 @inherits FileConflictOverviewBase
 <div class="fileconflict-overview">
     <h3>File Conflicts</h3>
+    @foreach (var conflict in Conflicts)
+    {
+        <div class="fileconflict-overview-conflict">
+            <div class="fileconflict-overview-conflict-header">
+                <div class="fileconflict-overview-conflict-header-title">
+                    <h4>@conflict.File.Name</h4>
+                    <small>Conflict: @conflict.Type.GetDescription()</small>
+                </div>
+                <span class="oi oi-warning" />
+            </div>
+            <div class="fileconflict-overview-conflict-detail">
+                <div class="fileconflict-overview-conflict-detail-left">
+                    <h5>Conflicting file</h5>
+                    <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail File="conflict.File" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
+                </div>
+                <div class="fileconflict-overview-conflict-detail-right">
+                    <h5>Present file(s)</h5>
+                    @foreach (var file in conflict.ConflictingFiles)
+                    {
+                        <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail File="file" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
 </div>

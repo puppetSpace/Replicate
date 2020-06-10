@@ -35,12 +35,18 @@ namespace Pi.Replicate.WebUi.Pages
 
 		protected override async Task OnInitializedAsync()
 		{
+			OverviewModel = await OverviewService.GetOverview();
+			await ConnectToWorkerSignalrHub();
+		}
+
+		private async Task ConnectToWorkerSignalrHub()
+		{
 			try
 			{
 				var workerApiUrl = Configuration[Constants.WorkerApiBaseAddressSetting];
 				_hubConnection = new HubConnectionBuilder()
 					.WithUrl($"{workerApiUrl}/systemHub")
-					.WithAutomaticReconnect()
+					.WithAutomaticReconnect(new[] { TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(30) })
 					.Build();
 
 				_hubConnection.On<SystemOverview>("ReceiveSystemOverview", (so) =>
@@ -56,7 +62,7 @@ namespace Pi.Replicate.WebUi.Pages
 				});
 
 				await _hubConnection.StartAsync();
-				OverviewModel = await OverviewService.GetOverview();
+
 			}
 			catch (Exception ex)
 			{

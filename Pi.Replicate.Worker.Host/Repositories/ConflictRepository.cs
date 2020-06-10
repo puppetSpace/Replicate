@@ -12,7 +12,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
     public class ConflictRepository
     {
 		private readonly IDatabaseFactory _databaseFactory;
-		private const string _insertStatementAddConflict = "INSERT INTO dbo.FileConflict(Id,FileId,Message) VALUES(NEWID(),@FileId,@Message)";
+		private const string _insertStatementAddConflict = "INSERT INTO dbo.FileConflict(Id,FileId,Type) VALUES(NEWID(),@FileId,@Type)";
 
 		public ConflictRepository(IDatabaseFactory databaseFactory)
 		{
@@ -24,7 +24,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		{
 			var db = _databaseFactory.Get();
 			using (db)
-				return await db.Execute(_insertStatementAddConflict, new {fileConflict.FileId, fileConflict.Message });
+				return await db.Execute(_insertStatementAddConflict, new {fileConflict.FileId, fileConflict.Type });
 		}
     }
 }

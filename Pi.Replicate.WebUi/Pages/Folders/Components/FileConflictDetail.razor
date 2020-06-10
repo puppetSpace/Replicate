@@ -1,0 +1,18 @@
+﻿@inherits FileConflictDetailBase
+    <div class="fileconflictdetail">
+        <table>
+            <tr>
+                <td>Source</td>
+                <td class="padding-before-10">@File.RecipientName</td>
+            </tr>
+            <tr>
+                <td>LastModified</td>
+                <td class="padding-before-10">@File.LastModifiedDate</td>
+            </tr>
+            <tr>
+                <td>Version</td>
+                <td class="padding-before-10">@File.Version</td>
+            </tr>
+        </table>
+        <input type="button" class="btn btn-primary" value="Delete" @onclick="@(()=>OnDelete.InvokeAsync(new Models.FileConflictDeleteArgument { FileConflictId = FileConflictId, FileId = File.Id }))" />
+    </div>

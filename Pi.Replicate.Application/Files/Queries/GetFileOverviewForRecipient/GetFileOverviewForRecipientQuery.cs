@@ -22,8 +22,8 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 	{
 		private readonly IDatabase _database;
 		private const string _selectQuery = @"
-			with file_cte(Id,[Name],[Version],Size,LastModifiedDate,[Path],Source,rnk) as
-			(select  Id,[Name], [Version], Size,LastModifiedDate, [Path], Source
+			with file_cte(Id,[Name],[Version],Size,LastModifiedDate,[Path],Source,Status,rnk) as
+			(select  Id,[Name], [Version], Size,LastModifiedDate, [Path], Source,Status
 			, ROW_NUMBER() over(partition by [Name] order by [Version] DESC)  rnk
 			from dbo.[File]
 			where [Status] in (0,2) and FolderId = @FolderId
@@ -33,10 +33,10 @@ namespace Pi.Replicate.Application.Files.Queries.GetFileOverviewForRecipient
 			from dbo.TransmissionResult
 			where RecipientId = @RecipientId
 			group by FileId)
-			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, fi.Source, (convert(decimal,tr.chunkCount) / em.AmountOfChunks) * 100 PercentageSentReceived
+			select fi.[Name],fi.[Version],fi.Size,fi.LastModifiedDate,fi.[Path],tr.LastSent, fi.Source,fi.Status, (convert(decimal,tr.chunkCount) / em.AmountOfChunks) * 100 PercentageSentReceived
 			, iif(em.Id is null,0,1) EofMessagePresent
 			, iif(em.Id is not null and fi.Id not in (select fileid from dbo.failedTransmission),1,0) MetadataPresent
-			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent,fis.Source, (convert(decimal,trs.chunkCount) / ems.AmountOfChunks) * 100 PercentageSentReceived
+			, fis.[Name],fis.[Version],fis.Size,fis.LastModifiedDate,fis.[Path], trs.LastSent,fis.Source,fis.Status, (convert(decimal,trs.chunkCount) / ems.AmountOfChunks) * 100 PercentageSentReceived
 			, iif(ems.Id is null,0,1) EofMessagePresent
 			, iif(ems.Id is not null and fi.Id not in (select fileid from dbo.failedTransmission),1,0) MetadataPresent
 			from file_cte fi

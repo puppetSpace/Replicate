@@ -245,6 +245,63 @@
   color: #ffc107;
   font-weight: 600;
 }
+.fileconflict-overview {
+  display: flex;
+  flex-direction: column;
+}
+.fileconflict-overview h3 {
+  border-bottom: 2px solid #ffffff;
+}
+.fileconflict-overview .fileconflict-overview-conflict {
+  width: 50%;
+  margin-bottom: 20px;
+  align-self: center;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-header {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+  padding-left: 10px;
+  background-color: #1c1c1c;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-header .fileconflict-overview-conflict-header-title {
+  display: flex;
+  flex-direction: column;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-header span {
+  margin-left: auto;
+  align-self: center;
+  font-size: x-large;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-header h4 {
+  font-weight: normal;
+  margin: 0;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail {
+  display: flex;
+  flex-direction: row;
+  padding-left: 30px;
+  background-color: rgba(255, 255, 255, 0.1);
+  padding-bottom: 5px;
+  justify-content: space-between;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail h5 {
+  margin: 0;
+  font-size: 1.2rem;
+  padding-top: 5px;
+  margin-bottom: 10px;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflictdetail {
+  padding-left: 15px;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflict-overview-conflict-detail-right {
+  margin-right: 40px;
+}
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflict-overview-conflict-detail-right .fileconflictdetail {
+  margin-top: 15px;
+}
 .checkboxlistview {
   overflow-y: auto;
   max-height: 300px;
@@ -431,6 +488,15 @@
 .file-item .file-item-body .file-item-previousversions {
   margin-top: 10px;
 }
+.fileconflictdetail {
+  display: flex;
+  flex-direction: column;
+  font-size: smaller;
+  padding-bottom: 5px;
+}
+.fileconflictdetail input[type=button] {
+  margin-left: auto;
+}
 .selectable:hover {
   cursor: pointer;
 }
@@ -531,4 +597,7 @@ app {
 }
 .space-before-10 {
   margin-left: 10px;
+}
+.padding-before-10 {
+  padding-left: 10px;
 }
