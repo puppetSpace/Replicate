@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Pages
 {
-	public class IndexBase : ComponentBase
+	public class IndexBase : ComponentBase,IDisposable
 	{
 		private HubConnection _hubConnection;
 
@@ -26,6 +26,9 @@ namespace Pi.Replicate.WebUi.Pages
 
 		[Inject]
 		public OverviewService OverviewService { get; set; }
+
+		[Inject]
+		public HubProxy HubProxy { get; set; }
 
 		protected SystemOverview SystemOverview { get; set; } = new SystemOverview();
 
@@ -43,11 +46,7 @@ namespace Pi.Replicate.WebUi.Pages
 		{
 			try
 			{
-				var workerApiUrl = Configuration[Constants.WorkerApiBaseAddressSetting];
-				_hubConnection = new HubConnectionBuilder()
-					.WithUrl($"{workerApiUrl}/systemHub")
-					.WithAutomaticReconnect(new[] { TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(20), TimeSpan.FromSeconds(30) })
-					.Build();
+				_hubConnection = HubProxy.BuildConnection("systemHub");
 
 				_hubConnection.On<SystemOverview>("ReceiveSystemOverview", (so) =>
 				{
@@ -80,5 +79,10 @@ namespace Pi.Replicate.WebUi.Pages
 			LogEventLevel.Warning => $"site-overview-log-warning",
 			_ => "site-overview-log-information"
 		};
+
+		public void Dispose()
+		{
+			_hubConnection?.DisposeAsync();
+		}
 	}
 }

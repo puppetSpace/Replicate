@@ -1,9 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using Observr;
 using Pi.Replicate.Application.Folders.Queries.GetFolderList;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared.Models;
 using Pi.Replicate.WebUi.Models;
+using Pi.Replicate.WebUi.Services;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -14,39 +17,40 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.WebUi.Shared
 {
-    public class NavMenuBase : ComponentBase, Observr.IObserver<Folder>, Observr.IObserver<FileConflictsResolvedMessage>, IDisposable
+    public class NavMenuBase : ComponentBase, Observr.IObserver<FileConflictsResolvedMessage>, IDisposable
     {
-        private IDisposable _subscriptionFolderChanged;
         private IDisposable _subscriptionFileConflictResolved;
+		private HubConnection _hubConnection;
 
 		[Inject]
-        public IBroker Broker { get; set; }
+        protected IBroker Broker { get; set; }
 
         [Inject]
         protected IMediator Mediator { get; set; }
 
-        protected List<FolderListItem> Folders { get; set; } = new List<FolderListItem>();
+		[Inject]
+		protected HubProxy HubProxy { get; set; }
+
+		protected List<FolderListItem> Folders { get; set; } = new List<FolderListItem>();
 
         protected override async Task OnInitializedAsync()
         {
-            _subscriptionFolderChanged?.Dispose();
 			_subscriptionFileConflictResolved?.Dispose();
-			_subscriptionFolderChanged = Broker.Subscribe<Folder>(this);
-			_subscriptionFileConflictResolved = Broker.Subscribe<FileConflictsResolvedMessage>(this);
+			_subscriptionFileConflictResolved = Broker.Subscribe(this);
 			var folderResult = await Mediator.Send(new GetFolderListQuery());
-			if(folderResult.WasSuccessful)
-				Folders = folderResult.Data.OrderBy(x=>x.Name).ToList();
-        }
+			if (folderResult.WasSuccessful)
+			{
+				Folders = folderResult.Data.OrderBy(x => x.Name).ToList();
 
-        public async Task Handle(Folder value, CancellationToken cancellationToken)
-        {
-            await InvokeAsync(()=>
-            {
-				Log.Information("Notified of new folder");
-                Folders.Add(new FolderListItem { Id = value.Id, Name = value.Name });
-                Folders = Folders.OrderBy(x=>x).ToList();
-                StateHasChanged();
-            });
+				_hubConnection = HubProxy.BuildConnection("communicationHub");
+				_hubConnection.On<FolderAddedNotification>("FolderAdded", x =>
+				{
+					Log.Information("Notified of new folder");
+					Folders.Add(new FolderListItem { Id = x.Id, Name = x.Name });
+					Folders = Folders.OrderBy(x => x).ToList();
+					StateHasChanged();
+				});
+			}
         }
 
 		public Task Handle(FileConflictsResolvedMessage value, CancellationToken cancellationToken)
@@ -59,7 +63,6 @@ namespace Pi.Replicate.WebUi.Shared
 
 		public void Dispose()
         {
-            _subscriptionFolderChanged?.Dispose();
 			_subscriptionFileConflictResolved?.Dispose();
 
 		}

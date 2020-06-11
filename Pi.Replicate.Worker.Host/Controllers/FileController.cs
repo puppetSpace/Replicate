@@ -20,19 +20,19 @@ namespace Pi.Replicate.Worker.Host.Controllers
 		private readonly RecipientRepository _recipientRepository;
 		private readonly IFileRepository _fileRespository;
 		private readonly PathBuilder _pathBuilder;
-		private readonly IBroker _broker;
+		private readonly CommunicationProxy _communicationProxy;
 
 		public FileController(FolderRepository folderRepository
 			, RecipientRepository recipientRepository
 			, IFileRepository fileRespository
 			, PathBuilder pathBuilder
-			, IBroker broker)
+			, CommunicationProxy communicationProxy)
 		{
 			_folderRepository = folderRepository;
 			_recipientRepository = recipientRepository;
 			_fileRespository = fileRespository;
 			_pathBuilder = pathBuilder;
-			_broker = broker;
+			_communicationProxy = communicationProxy;
 		}
 
 		[HttpPost]
@@ -61,7 +61,7 @@ namespace Pi.Replicate.Worker.Host.Controllers
 				var folderPath = _pathBuilder.BuildPath(folderName);
 				if (!System.IO.Directory.Exists(folderPath))
 					System.IO.Directory.CreateDirectory(folderPath);
-				_broker.Publish(new Folder { Id = folderAddResult.Data, Name = folderName }).Forget();
+				_communicationProxy.SendNewFolderAddedNotification(new FolderAddedNotification { Id = folderAddResult.Data, Name = folderName }).Forget();
 
 				return folderAddResult;
 			}

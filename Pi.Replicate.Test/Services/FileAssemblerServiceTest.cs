@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Pi.Replicate.Application.Common.Interfaces;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Services;
 using System;
@@ -9,6 +8,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Repositories;
+using Pi.Replicate.Worker.Host.Data;
+using Pi.Replicate.Shared.Models;
 
 namespace Pi.Replicate.Test.Processors
 {
@@ -31,15 +33,32 @@ namespace Pi.Replicate.Test.Processors
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var amountofTimesQueryCalled = 0;
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, object y) =>
+			var deltaServiceMock = new Mock<IDeltaService>();
+			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
+
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns((Guid x, int y, int z, IDatabase d) =>
 				{
 					amountofTimesQueryCalled++;
-					return new List<byte[]>();
+					return Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>()));
 				});
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object);
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
+			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(2, amountofTimesQueryCalled);
@@ -55,16 +74,34 @@ namespace Pi.Replicate.Test.Processors
 			var databaseMock = new Mock<IDatabase>();
 			var toSkipSum = 0;
 			var toTakeSum = 0;
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) =>
+
+			var deltaServiceMock = new Mock<IDeltaService>();
+			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
+
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns((Guid x, int y, int z, IDatabase d) =>
 				{
-					toSkipSum += (int)y.ToSkip;
-					toTakeSum += (int)y.ToTake;
-					return new List<byte[]>();
+					toSkipSum += y;
+					toTakeSum += z;
+					return Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>()));
 				});
 
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(11, toSkipSum);
@@ -79,8 +116,6 @@ namespace Pi.Replicate.Test.Processors
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var pathToDecompressTo = "";
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) => new List<byte[]>());
 
 			var compressionServiceMock = new Mock<ICompressionService>();
 			compressionServiceMock.Setup(x => x.Decompress(It.IsAny<string>(), It.IsAny<string>()))
@@ -88,8 +123,26 @@ namespace Pi.Replicate.Test.Processors
 				{
 					pathToDecompressTo = d;
 				});
+
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
+
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(compressionServiceMock.Object, pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt"), pathToDecompressTo);
@@ -104,15 +157,34 @@ namespace Pi.Replicate.Test.Processors
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var executedStatements = new List<string>();
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) => new List<byte[]>());
 
-			databaseMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<object>()))
-				.Callback((string x, dynamic y) => executedStatements.Add(x));
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
+
+			var fileChunkDeleteCalled = false;
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Callback(() => fileChunkDeleteCalled = true)
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			var updateFileCalled = false;
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Callback(() => updateFileCalled = true)
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, new DeltaService(), databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
+
+			Assert.IsTrue(updateFileCalled);
+			Assert.IsTrue(fileChunkDeleteCalled);
 
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));
 			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FileChunk", StringComparison.OrdinalIgnoreCase)));
@@ -128,18 +200,33 @@ namespace Pi.Replicate.Test.Processors
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var amountofTimesQueryCalled = 0;
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, object y) =>
-				{
-					amountofTimesQueryCalled++;
-					return new List<byte[]>();
-				});
 
 			var deltaServiceMock = new Mock<IDeltaService>();
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns((Guid x, int y, int z, IDatabase d) =>
+				{
+					amountofTimesQueryCalled++;
+					return Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>()));
+				});
+
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(2, amountofTimesQueryCalled);
@@ -157,19 +244,34 @@ namespace Pi.Replicate.Test.Processors
 			var toSkipSum = 0;
 			var toTakeSum = 0;
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) =>
-				{
-					toSkipSum += (int)y.ToSkip;
-					toTakeSum += (int)y.ToTake;
-					return new List<byte[]>();
-				});
 
 			var deltaServiceMock = new Mock<IDeltaService>();
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns((Guid x, int y, int z, IDatabase d) =>
+				{
+					toSkipSum += y;
+					toTakeSum += z;
+					return Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>()));
+				});
+
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(11, toSkipSum);
@@ -186,18 +288,31 @@ namespace Pi.Replicate.Test.Processors
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, object y) =>
-				{
-					return new List<byte[]>();
-				});
+
 			var isApplyDeltaCalled = false;
 			var deltaServiceMock = new Mock<IDeltaService>();
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()))
 				.Callback(() => isApplyDeltaCalled = true);
 
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
+
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(isApplyDeltaCalled);
@@ -214,20 +329,37 @@ namespace Pi.Replicate.Test.Processors
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var executedStatements = new List<string>();
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) => new List<byte[]>());
-			databaseMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<object>()))
-				.Callback((string x, dynamic y) => executedStatements.Add(x));
 
 			var deltaServiceMock = new Mock<IDeltaService>();
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
+
+			var fileChunkDeleteCalled = false;
+			fileChunkRepositoryMock.Setup(x => x.DeleteChunksForFile(It.IsAny<Guid>(), It.IsAny<IDatabase>()))
+				.Callback(() => fileChunkDeleteCalled = true)
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			var updateFileCalled = false;
+			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
+				.Callback(() => updateFileCalled = true)
+				.Returns(() => Task.FromResult(Result.Success()));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FIleChunk", StringComparison.OrdinalIgnoreCase)));
+			Assert.IsTrue(updateFileCalled);
+			Assert.IsTrue(fileChunkDeleteCalled);
 			Assert.IsFalse(domainFile.IsNew());
 		}
 
@@ -240,16 +372,24 @@ namespace Pi.Replicate.Test.Processors
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
 			var eofMessage = EofMessage.Build(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
-			databaseMock.Setup(x => x.Query<byte[]>(It.IsAny<string>(), It.IsAny<object>()))
-				.ReturnsAsync((string x, dynamic y) => new List<byte[]>());
-			databaseMock.Setup(x => x.Execute(It.IsAny<string>(), It.IsAny<object>()));
 
 			var deltaServiceMock = new Mock<IDeltaService>();
 			deltaServiceMock.Setup(x => x.ApplyDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>()));
 
+			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
+			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
+
+			var fileRepositoryMock = new Mock<IFileRepository>();
+			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
+				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
+
+			var fileConflictServiceMock = new Mock<IFileConflictService>();
+			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
+
 			var webhookIsCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { webhookIsCalled = true; }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object);
+			var fileAssemblerService = new FileAssemblerService(new CompressionService(), pathBuilder, deltaServiceMock.Object, databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(webhookIsCalled);

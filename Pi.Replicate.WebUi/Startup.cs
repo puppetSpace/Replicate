@@ -43,6 +43,7 @@ namespace Pi.Replicate.WebUi
 			});
 			services.AddTransient<ProbeService>();
 			services.AddTransient<OverviewService>();
+			services.AddTransient<HubProxy>();
 			services.AddBlazoredToast();
 
 		}

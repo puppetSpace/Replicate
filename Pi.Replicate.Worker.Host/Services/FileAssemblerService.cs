@@ -20,7 +20,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
-		private readonly FileConflictService _fileConflictService;
+		private readonly IFileConflictService _fileConflictService;
 
 		public FileAssemblerService(ICompressionService compressionService
 			, PathBuilder pathBuilder
@@ -29,7 +29,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IFileChunkRepository fileChunkRepository
-			, FileConflictService fileConflictService)
+			, IFileConflictService fileConflictService)
 		{
 			_pathBuilder = pathBuilder;
 			_compressionService = compressionService;
@@ -47,8 +47,8 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				using (_database)
 				{
-					bool canContinue = await CheckForConflicts(file);
-					if (canContinue)
+					bool hasConflicts = await HasForConflicts(file);
+					if (!hasConflicts)
 					{
 						if (file.IsNew())
 							await ProcessNew(file, eofMessage);
@@ -63,7 +63,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 		}
 
-		private async Task<bool> CheckForConflicts(File file)
+		private async Task<bool> HasForConflicts(File file)
 		{
 			var previousVersions = await _fileRepository.GetAllVersionsOfFile(file, _database);
 			if(previousVersions.WasSuccessful && previousVersions.Data.Any())
@@ -71,7 +71,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				var hasConflicts = await _fileConflictService.Check(file, previousVersions.Data);
 				return hasConflicts;
 			}
-			return true;
+			return false;
 		}
 
 		private async Task ProcessNew(File file, EofMessage eofMessage)
@@ -171,7 +171,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var signature = _deltaService.CreateSignature(filePath);
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
 			await _fileRepository.UpdateFileAsAssembled(file.Id,newCreationDate, signature.ToArray(), _database);
-			await _fileChunkRepository.DeleteChunksForFile(file.Id );
+			await _fileChunkRepository.DeleteChunksForFile(file.Id,_database);
 			_webhookService.NotifyFileAssembled(file);
 		}
 	}
@@ -185,7 +185,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
-		private readonly FileConflictService _fileConflictService;
+		private readonly IFileConflictService _fileConflictService;
 
 		public FileAssemblerServiceFactory(ICompressionService compressionService
 			, PathBuilder pathBuilder
@@ -194,7 +194,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IFileChunkRepository fileChunkRepository
-			, FileConflictService fileConflictService)
+			, IFileConflictService fileConflictService)
 		{
 			_compressionService = compressionService;
 			_pathBuilder = pathBuilder;
