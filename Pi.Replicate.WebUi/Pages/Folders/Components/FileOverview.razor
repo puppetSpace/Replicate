@@ -1,8 +1,11 @@
 ﻿@inherits FileOverviewBase
 <div class="file-overview">
     <div class="file-overview-header">
-        <h3>File overview</h3>
-        <span title="close" class="oi oi-x" @onclick="OnCloseClicked" />
+        <h3>Files</h3>
+        <div class="file-overview-header-end">
+            <SearchBox Class="file-overview-header-search" Placeholder="search for file" OnSearch="SearchFile" />
+            <span title="close" class="oi oi-x" @onclick="OnCloseClicked" />
+        </div>
     </div>
     @foreach (var file in Files)
     {
