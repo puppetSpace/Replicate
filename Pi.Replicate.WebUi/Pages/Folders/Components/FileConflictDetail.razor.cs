@@ -19,6 +19,9 @@ namespace Pi.Replicate.WebUi.Pages.Folders.Components
 		public Guid FileConflictId { get; set; }
 
 		[Parameter]
+		public string Class { get; set; }
+
+		[Parameter]
 		public EventCallback<FileConflictDeleteArgument> OnDelete { get; set; }
 	}
 }

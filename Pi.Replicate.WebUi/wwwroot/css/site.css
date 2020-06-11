@@ -118,10 +118,17 @@
   margin-top: 0.5rem;
   align-items: center;
 }
+.folder-overview .folder-metadata-side {
+  margin-left: auto;
+  display: flex;
+  align-items: flex-start;
+}
+.folder-overview .folder-metadata-side-search {
+  align-self: center;
+}
 .folder-overview .folder-setting-link {
   font-size: x-large;
   align-self: center;
-  margin-left: auto;
 }
 .folder-overview .blade-rack {
   flex: 1;
@@ -293,7 +300,7 @@
   padding-top: 5px;
   margin-bottom: 10px;
 }
-.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflictdetail {
+.fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflict-overview-conflict-detail-left-component {
   padding-left: 15px;
 }
 .fileconflict-overview .fileconflict-overview-conflict .fileconflict-overview-conflict-detail .fileconflict-overview-conflict-detail-right {

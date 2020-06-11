@@ -15,13 +15,13 @@
             <div class="fileconflict-overview-conflict-detail">
                 <div class="fileconflict-overview-conflict-detail-left">
                     <h5>Conflicting file</h5>
-                    <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail File="conflict.File" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
+                    <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail Class="fileconflict-overview-conflict-detail-left-component" File="conflict.File" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
                 </div>
                 <div class="fileconflict-overview-conflict-detail-right">
                     <h5>Present file(s)</h5>
                     @foreach (var file in conflict.ConflictingFiles)
                     {
-                        <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail File="file" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
+                        <Pi.Replicate.WebUi.Pages.Folders.Components.FileConflictDetail Class="fileconflict-overview-conflict-detail-left-component" File="file" FileConflictId="conflict.Id" OnDelete="DeleteFile" />
                     }
                 </div>
             </div>

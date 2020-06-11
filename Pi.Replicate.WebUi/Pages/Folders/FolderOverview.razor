@@ -15,13 +15,16 @@
                 <span title="Folder has file conflicts" class="oi oi-warning space-before-10"></span> <a href='@("folder/" + FolderId + "/conflicts")'>Resolve @FolderOverviewModel.AmountOfConflicts conflict(s)</a>
             }
         </div>
-        <NavLink class="nav-link folder-setting-link" href='@("folder/"+ FolderId + "/settings")'>
-            <span class="oi oi-cog" aria-hidden="true"></span>
-        </NavLink>
+        <div class="folder-metadata-side">
+            <SearchBox Class="folder-metadata-side-search" OnSearch="SearchRecipient" />
+            <NavLink class="nav-link folder-setting-link" href='@("folder/"+ FolderId + "/settings")'>
+                <span class="oi oi-cog" aria-hidden="true"></span>
+            </NavLink>
+        </div>
     </div>
     <div class="blade-rack">
         <div class="blade-recipients @(FileOverviewModels.Any() ? "blade-side" : "")">
-            @foreach (var recipient in FolderOverviewModel.Recipients.OrderBy(x => x.RecipientName))
+            @foreach (var recipient in Recipients.OrderBy(x => x.RecipientName))
             {
                 <Pi.Replicate.WebUi.Pages.Folders.Components.RecipientTile Recipient="recipient" Clicked="RecipientClicked" />
             }

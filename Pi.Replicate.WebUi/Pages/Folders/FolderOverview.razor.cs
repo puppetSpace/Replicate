@@ -21,6 +21,8 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 
 		public List<FileOverviewModel> FileOverviewModels { get; set; } = new List<FileOverviewModel>();
 
+		public List<RecipientOverviewModel> Recipients { get; set; } = new List<RecipientOverviewModel>();
+
 		[Inject]
 		protected IMediator Mediator { get; set; }
 
@@ -33,15 +35,26 @@ namespace Pi.Replicate.WebUi.Pages.Folders
 			{
 				var folderOverviewResult = await Mediator.Send(new GetFolderOverviewQuery { FolderId = result });
 				if (folderOverviewResult.WasSuccessful)
+				{
 					FolderOverviewModel = folderOverviewResult.Data;
+					Recipients = folderOverviewResult.Data.Recipients.ToList();
+				}
 			}
 		}
 
-			protected async Task RecipientClicked(Guid recipientId)
-			{
-				var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = recipientId });
-				if (queryResult.WasSuccessful)
-					FileOverviewModels = queryResult.Data.ToList();
-			}
+		protected async Task RecipientClicked(Guid recipientId)
+		{
+			var queryResult = await Mediator.Send(new GetFileOverviewForRecipientQuery { FolderId = Guid.Parse(FolderId), RecipientId = recipientId });
+			if (queryResult.WasSuccessful)
+				FileOverviewModels = queryResult.Data.ToList();
+		}
+
+		protected void SearchRecipient(string searchTerm)
+		{
+			if (string.IsNullOrWhiteSpace(searchTerm))
+				Recipients = FolderOverviewModel.Recipients.ToList();
+			else
+				Recipients = FolderOverviewModel.Recipients.Where(x => x.RecipientName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
 		}
 	}
+}

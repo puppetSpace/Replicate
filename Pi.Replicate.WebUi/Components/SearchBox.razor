@@ -1,0 +1,26 @@
+﻿<div class="input-group @(Class)">
+    <input type="text" class="form-control" placeholder="search for recipient" @bind="SearchText" @onkeyup="KeyHandler" />
+    <div class="input-group-append">
+        <button class="btn btn-secondary" type="button" @onclick="@(()=>OnSearch.InvokeAsync(SearchText))">
+            <i class="oi oi-magnifying-glass" />
+        </button>
+    </div>
+</div>
+
+@code{
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    public string SearchText { get; set; }
+
+    protected async Task KeyHandler(KeyboardEventArgs args)
+    {
+        if (args.Code == "Enter")
+            await OnSearch.InvokeAsync(SearchText);
+    }
+
+}
