@@ -59,7 +59,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 				System.IO.Directory.CreateDirectory(path);
 
 
-			_broker.Publish(folder).Forget();
+			_broker.Publish(new FolderAddedNotification { Id = folder.Id, Name = folder.Name }).Forget();
 			return Result.Success();
 		}
 	}
