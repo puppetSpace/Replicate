@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Shared.Models
+namespace Pi.Replicate.Application.Common.Models
 {
 	public class RecipientsAddedToFolderNotification
 	{

@@ -1,20 +1,17 @@
-﻿using Pi.Replicate.Application.Common;
+﻿using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {
-    public class SystemService
-    {
-        public async Task<SystemOverview> GetSystemOverview()
+	public class SystemService
+	{
+		public async Task<SystemOverview> GetSystemOverview()
 		{
 			var overview = new SystemOverview();
-			using(var process = Process.GetCurrentProcess())
+			using (var process = Process.GetCurrentProcess())
 			{
 				overview.MemoryUsage = ByteDisplayConverter.Convert(process.PrivateMemorySize64);
 				var gcMemoryInfo = GC.GetGCMemoryInfo();
@@ -40,5 +37,5 @@ namespace Pi.Replicate.Worker.Host.Services
 
 			return cpuUsageTotal * 100;
 		}
-    }
+	}
 }

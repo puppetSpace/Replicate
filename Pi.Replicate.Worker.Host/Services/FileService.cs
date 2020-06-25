@@ -1,7 +1,4 @@
-﻿using MediatR;
-using Observr;
-using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Models;
+﻿using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
 using System;
@@ -27,7 +24,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		public async Task<File> CreateNewFile(Guid folderId, System.IO.FileInfo newFile)
 		{
 			var signature = _deltaService.CreateSignature(newFile.FullName);
-			var file = File.Build(newFile,folderId, _pathBuilder.BasePath);
+			var file = File.Build(newFile, folderId, _pathBuilder.BasePath);
 
 			var result = await _fileRespository.AddNewFile(file, signature.ToArray());
 			return result.WasSuccessful ? file : null;

@@ -3,14 +3,12 @@ using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-    public class RecipientRepository
-    {
+	public class RecipientRepository
+	{
 		private readonly IDatabaseFactory _database;
 
 		private const string _selectStatementGetRecipientsForFolder = @"
@@ -49,11 +47,11 @@ namespace Pi.Replicate.Worker.Host.Repositories
 				return await db.Query<Recipient>(_selectStatementGetRecipientsForFolder, new { FolderId = folderId });
 		}
 
-		public async Task<Result> AddRecipientToFolder(string recipientName, string recipientAddress,Guid folderId)
+		public async Task<Result> AddRecipientToFolder(string recipientName, string recipientAddress, Guid folderId)
 		{
 			var db = _database.Get();
 			using (db)
 				return await db.Execute(_insertStatementAddRecipientToFolder, new { Address = recipientAddress, Name = recipientName, FolderId = folderId });
 		}
-    }
+	}
 }

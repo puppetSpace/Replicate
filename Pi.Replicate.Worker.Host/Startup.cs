@@ -45,6 +45,7 @@ namespace Pi.Replicate.Worker.Host
 
 			services.AddObservr();
 			services.AddSignalR();
+			services.AddGrpc();
 			services.AddControllers();
 
 			services.AddHttpClient("default", client =>
@@ -52,7 +53,7 @@ namespace Pi.Replicate.Worker.Host
 				client.Timeout = TimeSpan.FromSeconds(5);
 				client.DefaultRequestHeaders.Accept.Clear();
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1)}));
+			}).AddTransientHttpErrorPolicy(b => b.WaitAndRetryAsync(new[] { TimeSpan.FromSeconds(1) }));
 
 			services.AddHttpClient("webhook", client =>
 			{
@@ -60,7 +61,7 @@ namespace Pi.Replicate.Worker.Host
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
 
-			
+
 			services.AddResponseCompression(opt =>
 			{
 				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
@@ -86,6 +87,7 @@ namespace Pi.Replicate.Worker.Host
 				endpoints.MapControllers();
 				endpoints.MapHub<SystemHub>("/systemHub");
 				endpoints.MapHub<CommunicationHub>("/communicationHub");
+				endpoints.MapGrpcService<NotificationService>();
 			});
 		}
 	}

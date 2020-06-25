@@ -1,14 +1,7 @@
 ﻿using Octodiff.Core;
 using Octodiff.Diagnostics;
-using Pi.Replicate.Application.Common.Interfaces;
-using Serilog;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {

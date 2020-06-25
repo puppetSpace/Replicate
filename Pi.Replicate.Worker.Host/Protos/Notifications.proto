@@ -1,0 +1,25 @@
+﻿syntax = "proto3";
+
+service NotificationHub{
+	rpc FolderWebhookChanged (FolderWebhookRequest) returns (FolderWebhookResponse);
+	rpc RecipientAddedToFolder (RecipientAddedRequest) returns (RecipientAddedResponse);
+}
+
+message FolderWebhookRequest{
+	string folderId = 1;
+	string webHookType = 2;
+	string callBackUrl = 3;
+}
+
+message FolderWebhookResponse{
+
+}
+
+message RecipientAddedRequest{
+	string folderId = 1;
+	repeated string recipients = 2;
+}
+
+message RecipientAddedResponse{
+
+}

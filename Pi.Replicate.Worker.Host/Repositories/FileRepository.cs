@@ -1,11 +1,8 @@
-﻿using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Models;
+﻿using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
@@ -116,7 +113,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			var db = _database.Get();
 			using (db)
 				return await db.Query<File>(_selectStatementGetFailedFiles, null);
-			
+
 		}
 
 		public async Task<Result> UpdateFileAsFailed(Guid fileId)
@@ -142,10 +139,10 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result> UpdateFileAsAssembled(Guid fileId, DateTime lastModifiedDate, byte[] signature, IDatabase database = null)
 		{
-			if(_database is null)
+			if (_database is null)
 			{
 				var db = _database.Get();
-				using(db)
+				using (db)
 					return await db.Execute(_updateStatementUpdateFileAssAssembled, new { FileId = fileId, Signature = signature, LastModifiedDate = lastModifiedDate });
 			}
 			else

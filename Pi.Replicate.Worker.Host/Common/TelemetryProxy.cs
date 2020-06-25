@@ -2,16 +2,13 @@
 using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Hubs;
 using Serilog.Events;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Common
 {
-    public class TelemetryProxy
-    {
+	public class TelemetryProxy
+	{
 		private readonly IHubContext<SystemHub> _hubContext;
 
 		public TelemetryProxy(IHubContext<SystemHub> hubContext)
@@ -25,7 +22,7 @@ namespace Pi.Replicate.Worker.Host.Common
 
 		}
 
-		private static Dictionary<LogEventLevel, string> _shortLogNames = new Dictionary<LogEventLevel, string> { 
+		private static readonly Dictionary<LogEventLevel, string> _shortLogNames = new Dictionary<LogEventLevel, string> {
 			  { LogEventLevel.Debug, "DBG"}
 			, { LogEventLevel.Error, "ERR"}
 			, { LogEventLevel.Fatal, "FTL"}
@@ -35,7 +32,7 @@ namespace Pi.Replicate.Worker.Host.Common
 		internal async Task SendLog(LogEvent evt)
 		{
 			var logMessage = new LogMessage($"[{evt.Timestamp:HH:mm:ss} {_shortLogNames[evt.Level]}] {evt.RenderMessage()}", evt.Level);
-			await _hubContext.Clients.All.SendAsync("ReceiveLog",logMessage);
+			await _hubContext.Clients.All.SendAsync("ReceiveLog", logMessage);
 		}
 
 		//count not available on Channel yet

@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Observr;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
-using Serilog;
 using System;
 using System.Net;
 using System.Threading.Tasks;

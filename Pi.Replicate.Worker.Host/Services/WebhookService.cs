@@ -1,9 +1,7 @@
 ﻿using Observr;
 using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;

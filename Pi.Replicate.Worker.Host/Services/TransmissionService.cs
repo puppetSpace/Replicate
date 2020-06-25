@@ -1,7 +1,6 @@
 ﻿using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
-using Serilog;
 using System;
 using System.Net.Http;
 using System.Net.Http.Headers;

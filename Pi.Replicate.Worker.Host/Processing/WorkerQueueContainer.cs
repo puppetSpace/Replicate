@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Pi.Replicate.Worker.Host.Models;
 using System.Threading.Channels;
-using System.Threading.Tasks;
-using Pi.Replicate.Worker.Host.Models;
 
 namespace Pi.Replicate.Worker.Host.Processing
 {
-    public class WorkerQueueContainer
-    {
+	public class WorkerQueueContainer
+	{
 		public WorkerQueueContainer()
 		{
 			ToProcessFiles = Channel.CreateBounded<File>(new BoundedChannelOptions(50) { FullMode = BoundedChannelFullMode.Wait });

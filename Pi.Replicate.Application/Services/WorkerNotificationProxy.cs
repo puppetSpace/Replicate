@@ -1,8 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Grpc.Net.Client;
+using Microsoft.Extensions.Configuration;
+using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Models;
 using Serilog;
 using System;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -10,38 +12,37 @@ namespace Pi.Replicate.Application.Services
 {
 	public class WorkerNotificationProxy
 	{
-		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly string _workerHostAddress;
 
-		public WorkerNotificationProxy(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+		public WorkerNotificationProxy(IConfiguration configuration)
 		{
-			_httpClientFactory = httpClientFactory;
 			_workerHostAddress = configuration[Constants.WorkerApiBaseAddressSetting];
 		}
 
-		public void PostFolderWebhookChanged(FolderWebhookChangedNotification folderWebhookChangeNotification)
+		public async Task PostFolderWebhookChanged(FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
-			PostChangeToWorker("folderwebhookchange",folderWebhookChangeNotification).Forget();
-		}
-
-		public void PostRecipientsAdded(RecipientsAddedToFolderNotification recipientsAddedToFolderNotification)
-		{
-			PostChangeToWorker("recipientsaddedtofolder", recipientsAddedToFolderNotification).Forget();
-		}
-
-		private async Task PostChangeToWorker(string action,object data)
-		{
-			try
+			using(var channel = GrpcChannel.ForAddress(_workerHostAddress))
 			{
-				Log.Information($"Executing action '{action}' on Workerhost");
-				var client = _httpClientFactory.CreateClient("hostproxy");
-				var response = await client.PostAsync($"{_workerHostAddress}/api/notification/{action}", data);
-				if (!response.IsSuccessStatusCode)
-					Log.Error($"Failed execute action '{action}'on Workerhost");
+				var client = new NotificationHub.NotificationHubClient(channel);
+				await client.FolderWebhookChangedAsync(new FolderWebhookRequest
+				{
+					FolderId = folderWebhookChangeNotification.FolderId.ToString(),
+					WebHookType = folderWebhookChangeNotification.WebhookType,
+					CallBackUrl = folderWebhookChangeNotification.CallbackUrl
+				});
 			}
-			catch (Exception ex)
+		}
+
+		public async Task PostRecipientsAdded(RecipientsAddedToFolderNotification recipientsAddedToFolderNotification)
+		{
+			using (var channel = GrpcChannel.ForAddress(_workerHostAddress))
 			{
-				Log.Error(ex, $"Error happend while executing action '{action}' on Workerhost");
+				var client = new NotificationHub.NotificationHubClient(channel);
+				await client.RecipientAddedToFolderAsync(new RecipientAddedRequest
+				{
+					FolderId = recipientsAddedToFolderNotification.FolderId.ToString(),
+					Recipients = { recipientsAddedToFolderNotification.Recipients.Select(x => x.ToString()) }
+				});
 			}
 		}
 	}

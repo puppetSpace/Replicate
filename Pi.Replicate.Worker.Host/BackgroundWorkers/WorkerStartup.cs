@@ -56,8 +56,8 @@ namespace Pi.Replicate.Worker.Host
 				.WriteTo.MSSqlServer(configuration.GetConnectionString("ReplicateDatabase"), new SinkOptions { AutoCreateSqlTable = true, TableName = "log" })
 				.WriteTo.Observers(events => events.Do(async evt =>
 				 {
-					 if(evt.Properties.ContainsKey("Context"))
-						await telemetryProxy.SendLog(evt);
+					 if (evt.Properties.ContainsKey("Context"))
+						 await telemetryProxy.SendLog(evt);
 				 }).Subscribe())
 				.CreateLogger();
 			return host;

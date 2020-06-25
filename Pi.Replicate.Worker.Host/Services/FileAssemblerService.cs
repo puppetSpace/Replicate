@@ -2,9 +2,7 @@ using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
-using Serilog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -66,7 +64,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		private async Task<bool> HasForConflicts(File file)
 		{
 			var previousVersions = await _fileRepository.GetAllVersionsOfFile(file, _database);
-			if(previousVersions.WasSuccessful && previousVersions.Data.Any())
+			if (previousVersions.WasSuccessful && previousVersions.Data.Any())
 			{
 				var hasConflicts = await _fileConflictService.Check(file, previousVersions.Data);
 				return hasConflicts;
@@ -135,7 +133,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				while (toSkip < eofMessage.AmountOfChunks)
 				{
 					//best way is to get the chunks in chunks. If a file exists out of 1000 * 1Mb files and load that into memory, you are gonna have a bad time
-					var chunks = await _fileChunkRepository.GetFileChunkData(eofMessage.FileId,toSkip, toTake, _database);
+					var chunks = await _fileChunkRepository.GetFileChunkData(eofMessage.FileId, toSkip, toTake, _database);
 					foreach (var chunk in chunks.Data)
 						await sw.WriteAsync(chunk, 0, chunk.Length);
 					toSkip = toTake + 1;
@@ -170,8 +168,8 @@ namespace Pi.Replicate.Worker.Host.Services
 			var filePath = _pathBuilder.BuildPath(file.Path);
 			var signature = _deltaService.CreateSignature(filePath);
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
-			await _fileRepository.UpdateFileAsAssembled(file.Id,newCreationDate, signature.ToArray(), _database);
-			await _fileChunkRepository.DeleteChunksForFile(file.Id,_database);
+			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature.ToArray(), _database);
+			await _fileChunkRepository.DeleteChunksForFile(file.Id, _database);
 			_webhookService.NotifyFileAssembled(file);
 		}
 	}

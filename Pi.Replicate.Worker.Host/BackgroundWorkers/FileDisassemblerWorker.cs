@@ -6,7 +6,6 @@ using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Repositories;
 using Pi.Replicate.Worker.Host.Services;
-using Serilog;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;

@@ -1,16 +1,13 @@
 ﻿using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-    public class WebhookRepository
-    {
+	public class WebhookRepository
+	{
 		private readonly IDatabase _database;
 		private const string _selectStatementGetWebhooks = @"
 			SELECT fwh.FolderId, fwh.CallBackUrl, wht.Id, wht.[Name] Type
@@ -24,8 +21,8 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<ICollection<Webhook>>> GetWebhooks()
 		{
-			using(_database)
+			using (_database)
 				return await _database.Query<Webhook>(_selectStatementGetWebhooks, null);
 		}
-    }
+	}
 }

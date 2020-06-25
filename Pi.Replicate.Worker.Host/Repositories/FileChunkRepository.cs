@@ -2,8 +2,6 @@
 using Pi.Replicate.Worker.Host.Data;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
@@ -28,10 +26,10 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result<ICollection<byte[]>>> GetFileChunkData(Guid fileId, int toSkip, int toTake, IDatabase database = null)
 		{
-			if(database is null)
+			if (database is null)
 			{
 				var db = _databaseFactory.Get();
-				using(db)
+				using (db)
 					return await db.Query<byte[]>(_selectStatementGetFileChunkData, new { FileId = fileId, ToSkip = toSkip, ToTake = toTake });
 			}
 			else
@@ -42,15 +40,15 @@ namespace Pi.Replicate.Worker.Host.Repositories
 
 		public async Task<Result> DeleteChunksForFile(Guid fileId, IDatabase database = null)
 		{
-			if(database is null)
+			if (database is null)
 			{
 				var db = _databaseFactory.Get();
-				using(db)
+				using (db)
 					return await database.Execute(_deleteStatementDeleteFileChunksForFile, new { FileId = fileId });
 			}
 			else
 			{
-				return await database.Execute(_deleteStatementDeleteFileChunksForFile, new { FileId = fileId }); 
+				return await database.Execute(_deleteStatementDeleteFileChunksForFile, new { FileId = fileId });
 			}
 		}
 	}

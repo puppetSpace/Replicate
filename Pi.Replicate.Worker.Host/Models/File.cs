@@ -1,12 +1,11 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Pi.Replicate.Worker.Host.Models
 {
-    public class File
-    {
-        public Guid Id { get; set; }
+	public class File
+	{
+		public Guid Id { get; set; }
 
 		public Guid FolderId { get; set; }
 
@@ -18,25 +17,25 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public FileSource Source { get; set; }
 
-        public DateTime LastModifiedDate { get; set; }
+		public DateTime LastModifiedDate { get; set; }
 
-        public string Path { get; set; }
+		public string Path { get; set; }
 
 		public bool IsNew() => Version == 1;
 
-        public void Update(System.IO.FileInfo file)
-        {
+		public void Update(System.IO.FileInfo file)
+		{
 			Id = Guid.NewGuid();
-            LastModifiedDate = file.LastWriteTimeUtc;
-            Size = file.Length;
+			LastModifiedDate = file.LastWriteTimeUtc;
+			Size = file.Length;
 			Version++;
 
-        }
+		}
 
-        public static File Build(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
-        {
-            if (file is null || !file.Exists)
-                throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
+		public static File Build(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
+		{
+			if (file is null || !file.Exists)
+				throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
 
 			return new File
 			{
@@ -48,9 +47,9 @@ namespace Pi.Replicate.Worker.Host.Models
 				Size = file.Length,
 				Source = FileSource.Local,
 				Version = 1
-				
-            };
-        }
+
+			};
+		}
 	}
 
 	public class RequestFile : File

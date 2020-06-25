@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Repositories;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Pi.Replicate.Worker.Host.Models;
-using Pi.Replicate.Worker.Host.Repositories;
 
 namespace Pi.Replicate.Worker.Host.Services
 {

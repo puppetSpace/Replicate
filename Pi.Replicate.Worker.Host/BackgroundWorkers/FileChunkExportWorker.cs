@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Services;
-using Serilog;
 using System.Threading;
 using System.Threading.Tasks;
 

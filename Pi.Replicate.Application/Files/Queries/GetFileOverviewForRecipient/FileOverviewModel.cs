@@ -1,5 +1,6 @@
 ﻿using Pi.Replicate.Application.Common;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;

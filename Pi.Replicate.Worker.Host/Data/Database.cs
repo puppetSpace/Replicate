@@ -1,13 +1,11 @@
 ﻿using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Shared.Models;
-using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Data
@@ -42,7 +40,7 @@ namespace Pi.Replicate.Worker.Host.Data
 		{
 			try
 			{
-				var result = await Connection.ExecuteScalarAsync<TE>(query, parameters).ConfigureAwait(false); 
+				var result = await Connection.ExecuteScalarAsync<TE>(query, parameters).ConfigureAwait(false);
 				return Result<TE>.Success(result);
 			}
 			catch (Exception ex)

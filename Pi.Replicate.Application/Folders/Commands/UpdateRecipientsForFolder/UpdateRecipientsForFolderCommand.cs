@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.Application.Common.Models;
 using Pi.Replicate.Application.Services;
 using Pi.Replicate.Domain;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -44,7 +46,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddRecipientToFolder
 				foreach (var toDeleteRecipient in request.ToDeleteRecipients)
 					await _database.Execute(_deleteStatement, new { request.FolderId, RecipientId = toDeleteRecipient.Id });
 
-				_workerNotificationProxy.PostRecipientsAdded(new RecipientsAddedToFolderNotification { FolderId = request.FolderId, Recipients = request.ToAddRecipients.Select(x => x.Id).ToList() });
+				_workerNotificationProxy.PostRecipientsAdded(new RecipientsAddedToFolderNotification { FolderId = request.FolderId, Recipients = request.ToAddRecipients.Select(x => x.Id).ToList() }).Forget();
 				return Result.Success();
 			}
 		}

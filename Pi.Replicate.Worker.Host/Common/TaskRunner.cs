@@ -1,25 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Common
 {
-    public class TaskRunner
-    {
+	public class TaskRunner
+	{
 		private readonly List<Task> _runningTasks = new List<Task>();
 		private readonly SemaphoreSlim _semaphoreSlim;
-		private Timer _cleanupJob;
+		private readonly Timer _cleanupJob;
 
 		public TaskRunner(int maxAmountOfRunningTasks)
 		{
 			_semaphoreSlim = new SemaphoreSlim(maxAmountOfRunningTasks);
-			_cleanupJob = new Timer(x => { _runningTasks.RemoveAll(x => x.IsCompleted); },null,TimeSpan.FromSeconds(0),TimeSpan.FromMinutes(1));
+			_cleanupJob = new Timer(x => { _runningTasks.RemoveAll(x => x.IsCompleted); }, null, TimeSpan.FromSeconds(0), TimeSpan.FromMinutes(1));
 		}
 
-        public void Add(Func<Task> action)
+		public void Add(Func<Task> action)
 		{
 			_runningTasks.Add(Task.Run(async () =>
 			{
@@ -33,5 +31,5 @@ namespace Pi.Replicate.Worker.Host.Common
 		{
 			await Task.WhenAll(_runningTasks);
 		}
-    }
+	}
 }

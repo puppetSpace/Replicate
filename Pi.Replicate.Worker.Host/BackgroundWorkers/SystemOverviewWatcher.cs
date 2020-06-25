@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Worker.Host.Common;
-using Pi.Replicate.Worker.Host.Hubs;
 using Pi.Replicate.Worker.Host.Services;
 using System.Threading;
 using System.Threading.Tasks;

@@ -4,7 +4,6 @@ using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Repositories;
 using Pi.Replicate.Worker.Host.Services;
-using Serilog;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
