@@ -21,7 +21,9 @@ namespace Pi.Replicate.Application.Services
 
 		public async Task PostFolderWebhookChanged(FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
-			using(var channel = GrpcChannel.ForAddress(_workerHostAddress))
+			using var channel = GrpcChannel.ForAddress(_workerHostAddress);
+
+			try
 			{
 				var client = new NotificationHub.NotificationHubClient(channel);
 				await client.FolderWebhookChangedAsync(new FolderWebhookRequest
@@ -31,11 +33,18 @@ namespace Pi.Replicate.Application.Services
 					CallBackUrl = folderWebhookChangeNotification.CallbackUrl
 				});
 			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Failed to notify worker");
+			}
+
 		}
 
 		public async Task PostRecipientsAdded(RecipientsAddedToFolderNotification recipientsAddedToFolderNotification)
 		{
-			using (var channel = GrpcChannel.ForAddress(_workerHostAddress))
+			using var channel = GrpcChannel.ForAddress(_workerHostAddress);
+
+			try
 			{
 				var client = new NotificationHub.NotificationHubClient(channel);
 				await client.RecipientAddedToFolderAsync(new RecipientAddedRequest
@@ -43,6 +52,10 @@ namespace Pi.Replicate.Application.Services
 					FolderId = recipientsAddedToFolderNotification.FolderId.ToString(),
 					Recipients = { recipientsAddedToFolderNotification.Recipients.Select(x => x.ToString()) }
 				});
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Failed to notify worker");
 			}
 		}
 	}
