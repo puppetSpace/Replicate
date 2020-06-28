@@ -1,11 +1,12 @@
-﻿using Pi.Replicate.Shared;
+﻿using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Net.Client;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
@@ -41,7 +42,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				FolderName = folder.Name,
 				Host = Environment.MachineName
 			};
-			var response =  await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
+			var response = await httpClient.PostAsync(endpoint, fileTransmissionModel, throwErrorOnResponseNok: true);
 			response.EnsureSuccessStatusCode();
 		}
 
@@ -69,18 +70,64 @@ namespace Pi.Replicate.Worker.Host.Services
 
 	public class GrpcTransmissionLink : ITransmissionLink
 	{
+		private static ChannelStore _channelStore = new ChannelStore();
+
 		public async Task SendFile(Recipient recipient, Folder folder, File file)
 		{
-
+			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
+			await client.SendFileAsync(new FileTransmissionRequest
+			{
+				Id = file.Id.ToString(),
+				Name = file.Name,
+				LastModifiedDate = Timestamp.FromDateTime(file.LastModifiedDate),
+				Path = file.Path,
+				Size = file.Size,
+				Version = file.Version,
+				FolderName = folder.Name,
+				Host = Environment.MachineName,
+			});
 		}
 
 		public async Task SendEofMessage(Recipient recipient, EofMessage message)
 		{
-
+			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
+			await client.SendEofMessageAsync(new EofMessageTransmissionRequest
+			{ 
+				FileId = message.FileId.ToString(), 
+				AmountOfChunks = message.AmountOfChunks 
+			});
 		}
 
 		public async Task SendFileChunk(Recipient recipient, FileChunk fileChunk)
 		{
+			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
+			await client.SendFileChunkAsync(new FileChunkTransmissionRequest
+			{
+				FileId = fileChunk.FileId.ToString(),
+				SequenceNo = fileChunk.SequenceNo,
+				Host = Environment.MachineName,
+				Value = ByteString.CopyFrom(fileChunk.Value)
+			});
+		}
+
+		private class ChannelStore
+		{
+			private Dictionary<string, GrpcChannel> _channels = new Dictionary<string, GrpcChannel>();
+
+
+			public GrpcChannel Get(string url)
+			{
+				if (_channels.ContainsKey(url))
+				{
+					return _channels[url];
+				}
+				else
+				{
+					var channel = GrpcChannel.ForAddress(url);
+					_channels.Add(url, channel);
+					return channel;
+				}
+			}
 
 		}
 
