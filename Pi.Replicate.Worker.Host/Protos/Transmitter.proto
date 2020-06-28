@@ -1,0 +1,45 @@
+﻿syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+service Transmitter{
+	rpc SendFile (FileTransmissionRequest) returns (FileTransmissionResponse);
+	rpc SendEofMessage (EofMessageTransmissionRequest) returns (EofMessageTransmissionResponse);
+	rpc SendFileChunk (FileChunkTransmissionRequest) returns (FileChunkTransmissionResponse);
+
+}
+
+message FileTransmissionRequest{
+	string id = 1;
+	google.protobuf.Timestamp lastModifiedDate = 2;
+	string name = 3;
+	string path = 4;
+	int64 size = 5;
+	int32 version = 6;
+	string folderName = 7;
+	string host = 8;
+
+}
+message FileTransmissionResponse{
+
+}
+
+message EofMessageTransmissionRequest{
+	string fileId = 1;
+	int32 amountOfChunks = 2;
+}
+
+message EofMessageTransmissionResponse{
+
+}
+
+message FileChunkTransmissionRequest{
+	string fileId = 1;
+	int32 sequenceNo = 2;
+	string host = 3;
+	bytes value = 4;
+}
+
+message FileChunkTransmissionResponse{
+
+}
