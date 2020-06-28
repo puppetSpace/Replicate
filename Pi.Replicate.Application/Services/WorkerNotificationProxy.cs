@@ -25,7 +25,7 @@ namespace Pi.Replicate.Application.Services
 
 			try
 			{
-				var client = new NotificationHub.NotificationHubClient(channel);
+				var client = new Notifier.NotifierClient(channel);
 				await client.FolderWebhookChangedAsync(new FolderWebhookRequest
 				{
 					FolderId = folderWebhookChangeNotification.FolderId.ToString(),
@@ -46,7 +46,7 @@ namespace Pi.Replicate.Application.Services
 
 			try
 			{
-				var client = new NotificationHub.NotificationHubClient(channel);
+				var client = new Notifier.NotifierClient(channel);
 				await client.RecipientAddedToFolderAsync(new RecipientAddedRequest
 				{
 					FolderId = recipientsAddedToFolderNotification.FolderId.ToString(),

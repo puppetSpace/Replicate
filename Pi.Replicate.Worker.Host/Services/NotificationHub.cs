@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {
-	public class NotificationService : NotificationHub.NotificationHubBase
+	public class NotificationHub : Notifier.NotifierBase
 	{
 		private readonly IBroker _broker;
 
-		public NotificationService(IBroker broker)
+		public NotificationHub(IBroker broker)
 		{
 			_broker = broker;
 		}

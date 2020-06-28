@@ -1,6 +1,7 @@
 ﻿syntax = "proto3";
 
-service NotificationHub{
+
+service Notifier{
 	rpc FolderWebhookChanged (FolderWebhookRequest) returns (FolderWebhookResponse);
 	rpc RecipientAddedToFolder (RecipientAddedRequest) returns (RecipientAddedResponse);
 }
