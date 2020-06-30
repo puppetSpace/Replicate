@@ -21,16 +21,17 @@ message FileTransmissionRequest{
 
 }
 message FileTransmissionResponse{
-
+	bool isSuccessful = 1;
 }
 
 message EofMessageTransmissionRequest{
 	string fileId = 1;
 	int32 amountOfChunks = 2;
+	string host = 3;
 }
 
 message EofMessageTransmissionResponse{
-
+	bool isSuccessful = 1;
 }
 
 message FileChunkTransmissionRequest{
@@ -41,5 +42,5 @@ message FileChunkTransmissionRequest{
 }
 
 message FileChunkTransmissionResponse{
-
+	bool isSuccessful = 1;
 }
