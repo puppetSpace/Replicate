@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
 using Observr;
 using Pi.Replicate.Application.Folders.Queries.GetFolderList;
-using Pi.Replicate.Domain;
 using Pi.Replicate.Shared.Models;
 using Pi.Replicate.WebUi.Models;
 using Pi.Replicate.WebUi.Services;
@@ -21,7 +20,6 @@ namespace Pi.Replicate.WebUi.Shared
 	{
 		private IDisposable _subscriptionFileConflictResolved;
 		private IDisposable _sybscriptionFolderAdded;
-		private HubConnection _hubConnection;
 
 		[Inject]
 		protected IBroker Broker { get; set; }
@@ -44,12 +42,6 @@ namespace Pi.Replicate.WebUi.Shared
 			if (folderResult.WasSuccessful)
 			{
 				Folders = folderResult.Data.OrderBy(x => x.Name).ToList();
-
-				_hubConnection = HubProxy.BuildConnection("communicationHub");
-				_hubConnection.On<FolderAddedNotification>("FolderAdded", async x =>
-				{
-					await Handle(x, CancellationToken.None);
-				});
 			}
 		}
 
