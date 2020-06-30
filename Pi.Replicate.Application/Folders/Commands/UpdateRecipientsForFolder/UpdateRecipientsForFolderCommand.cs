@@ -25,12 +25,12 @@ namespace Pi.Replicate.Application.Folders.Commands.AddRecipientToFolder
 	public class UpdateRecipientsForFolderCommandHandler : IRequestHandler<UpdateRecipientsForFolderCommand, Result>
 	{
 		private readonly IDatabase _database;
-		private readonly WorkerNotificationProxy _workerNotificationProxy;
+		private readonly WorkerCommunicationProxy _workerNotificationProxy;
 		private const string _insertStatement = "INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,@RecipientId)";
 		private const string _deleteStatement = "DELETE FROM dbo.FolderRecipient WHERE FolderId = @FolderId AND RecipientId = @RecipientId";
 
 
-		public UpdateRecipientsForFolderCommandHandler(IDatabase database, WorkerNotificationProxy workerNotificationProxy)
+		public UpdateRecipientsForFolderCommandHandler(IDatabase database, WorkerCommunicationProxy workerNotificationProxy)
 		{
 			_database = database;
 			_workerNotificationProxy = workerNotificationProxy;

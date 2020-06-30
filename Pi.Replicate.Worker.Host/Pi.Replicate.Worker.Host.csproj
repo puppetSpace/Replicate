@@ -38,7 +38,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Protobuf Include="Protos\Notifier.proto" GrpcServices="Server" />
+    <Protobuf Include="Protos\Communicator.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\Transmitter.proto" GrpcServices="Both" />
   </ItemGroup>
 

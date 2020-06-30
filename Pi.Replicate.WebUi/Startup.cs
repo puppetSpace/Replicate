@@ -41,7 +41,7 @@ namespace Pi.Replicate.WebUi
 				config.DefaultRequestHeaders.Accept.Clear();
 				config.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
-			services.AddTransient<ProbeService>();
+			services.AddTransient<WebhookTester>();
 			services.AddTransient<OverviewService>();
 			services.AddTransient<HubProxy>();
 			services.AddBlazoredToast();

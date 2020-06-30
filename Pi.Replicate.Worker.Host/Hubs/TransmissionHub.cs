@@ -1,17 +1,9 @@
 ﻿using Grpc.Core;
-using Pi.Replicate.Shared;
-using Pi.Replicate.Shared.Models;
-using Pi.Replicate.Worker.Host.Common;
-using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Processing.Transmission;
-using Pi.Replicate.Worker.Host.Repositories;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Pi.Replicate.Worker.Host.Services
+namespace Pi.Replicate.Worker.Host.Hubs
 {
 	public class TransmissionHub : Transmitter.TransmitterBase
 	{

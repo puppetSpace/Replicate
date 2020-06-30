@@ -5,27 +5,24 @@ using Pi.Replicate.Shared;
 using Serilog;
 using System;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Application.Services
 {
-	public class WorkerNotificationProxy
+	public class WorkerCommunicationProxy
 	{
-		private readonly string _workerHostAddress;
+		private static GrpcChannel _channel;
 
-		public WorkerNotificationProxy(IConfiguration configuration)
+		public WorkerCommunicationProxy(IConfiguration configuration)
 		{
-			_workerHostAddress = configuration[Constants.WorkerApiBaseAddressSetting];
+			_channel = GrpcChannel.ForAddress(configuration[Constants.WorkerApiBaseAddressSetting]);
 		}
 
 		public async Task PostFolderWebhookChanged(FolderWebhookChangedNotification folderWebhookChangeNotification)
 		{
-			using var channel = GrpcChannel.ForAddress(_workerHostAddress);
-
 			try
 			{
-				var client = new Notifier.NotifierClient(channel);
+				var client = new Communicator.CommunicatorClient(_channel);
 				await client.FolderWebhookChangedAsync(new FolderWebhookRequest
 				{
 					FolderId = folderWebhookChangeNotification.FolderId.ToString(),
@@ -42,11 +39,9 @@ namespace Pi.Replicate.Application.Services
 
 		public async Task PostRecipientsAdded(RecipientsAddedToFolderNotification recipientsAddedToFolderNotification)
 		{
-			using var channel = GrpcChannel.ForAddress(_workerHostAddress);
-
 			try
 			{
-				var client = new Notifier.NotifierClient(channel);
+				var client = new Communicator.CommunicatorClient(_channel);
 				await client.RecipientAddedToFolderAsync(new RecipientAddedRequest
 				{
 					FolderId = recipientsAddedToFolderNotification.FolderId.ToString(),
@@ -56,6 +51,22 @@ namespace Pi.Replicate.Application.Services
 			catch (Exception ex)
 			{
 				Log.Error(ex, "Failed to notify worker");
+			}
+		}
+
+		public async Task<(string hostname, string exception)> ProbeRecipient(string address)
+		{
+			using var channel =  GrpcChannel.ForAddress(address);
+			try
+			{
+				var client = new Communicator.CommunicatorClient(channel);
+				var result = await client.ProbeRecipientAsync(new ProbeRequest());
+				return (result.MachineName,null);
+			}
+			catch(Exception ex)
+			{
+				Log.Error(ex, $"Failed to probe {address}");
+				return (null,ex.Message);
 			}
 		}
 	}

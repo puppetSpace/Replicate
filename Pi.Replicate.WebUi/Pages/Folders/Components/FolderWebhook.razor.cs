@@ -13,18 +13,18 @@ namespace Pi.Replicate.WebUi.Pages.Folders.Components
     {
 
 		[Inject]
-		public ProbeService ProbeService { get; set; }
+		public WebhookTester WebhookTester { get; set; }
 
 
 		[Parameter]
 		public FolderWebhookViewModel FolderWebhook { get; set; }
 
-		protected ProbeResult ProbeResult { get; set; }
+		protected WebhookResult WebhookResult { get; set; }
 
 		
 		protected async Task TestWebhook()
 		{
-			ProbeResult = await ProbeService.ProbePost(FolderWebhook.CallbackUrl, System.Text.Json.JsonSerializer.Deserialize<object>(FolderWebhook.WebHookTypeMessageStructure));
+			WebhookResult = await WebhookTester.Test(FolderWebhook.CallbackUrl, System.Text.Json.JsonSerializer.Deserialize<object>(FolderWebhook.WebHookTypeMessageStructure));
 		}
 
 	}

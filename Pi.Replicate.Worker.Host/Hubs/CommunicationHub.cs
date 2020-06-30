@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {
-	public class NotificationHub : Notifier.NotifierBase
+	public class CommunicationHub : Communicator.CommunicatorBase
 	{
 		private readonly IBroker _broker;
 
-		public NotificationHub(IBroker broker)
+		public CommunicationHub(IBroker broker)
 		{
 			_broker = broker;
 		}
@@ -27,5 +27,10 @@ namespace Pi.Replicate.Worker.Host.Services
 			return new RecipientAddedResponse();
 		}
 
+		public override Task<ProbeResponse> ProbeRecipient(ProbeRequest request, ServerCallContext context)
+		{
+			WorkerLog.Instance.Information($"Someone is trying to verify this point");
+			return Task.FromResult(new ProbeResponse { MachineName = Environment.MachineName });
+		}
 	}
 }

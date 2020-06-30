@@ -50,6 +50,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Common\Protos\Notifier.proto" GrpcServices="Client" />
+    <Protobuf Include="Common\Protos\Communicator.proto" GrpcServices="Client" />
   </ItemGroup>
 </Project>

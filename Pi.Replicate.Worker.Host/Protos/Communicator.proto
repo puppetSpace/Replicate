@@ -1,9 +1,10 @@
 ﻿syntax = "proto3";
 
 
-service Notifier{
+service Communicator{
 	rpc FolderWebhookChanged (FolderWebhookRequest) returns (FolderWebhookResponse);
 	rpc RecipientAddedToFolder (RecipientAddedRequest) returns (RecipientAddedResponse);
+	rpc ProbeRecipient (ProbeRequest) returns (ProbeResponse);
 }
 
 message FolderWebhookRequest{
@@ -23,4 +24,12 @@ message RecipientAddedRequest{
 
 message RecipientAddedResponse{
 
+}
+
+message ProbeRequest{
+
+}
+
+message ProbeResponse{
+	string machineName = 1;
 }

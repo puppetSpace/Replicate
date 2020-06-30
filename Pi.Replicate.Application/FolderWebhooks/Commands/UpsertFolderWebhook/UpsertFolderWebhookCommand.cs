@@ -24,14 +24,14 @@ namespace Pi.Replicate.Application.FolderWebhooks.Commands.UpsertFolderWebhook
 	public class UpsertFolderWebhookCommandHandler : IRequestHandler<UpsertFolderWebhookCommand, Result>
 	{
 		private readonly IDatabase _database;
-		private readonly WorkerNotificationProxy _workerProxy;
+		private readonly WorkerCommunicationProxy _workerProxy;
 		private const string _upsertStatement = @"
 			IF NOT EXISTS (SELECT 1 FROM dbo.FolderWebhook WHERE FolderId = @FolderId AND WebhookTypeId = @WebhookTypeId)
 				INSERT INTO dbo.FolderWebhook(Id,FolderId,WebhookTypeId,CallbackUrl) VALUES(NEWID(),@FolderId,@WebhookTypeId,@CallbackUrl)
 			ELSE
 				UPDATE dbo.FolderWebhook SET CallbackUrl = @CallbackUrl WHERE FolderId = @FolderId AND WebhookTypeId = @WebhookTypeId";
 
-		public UpsertFolderWebhookCommandHandler(IDatabase database, WorkerNotificationProxy workerProxy)
+		public UpsertFolderWebhookCommandHandler(IDatabase database, WorkerCommunicationProxy workerProxy)
 		{
 			_database = database;
 			_workerProxy = workerProxy;

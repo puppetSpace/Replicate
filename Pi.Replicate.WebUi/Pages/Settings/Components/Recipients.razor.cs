@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using Pi.Replicate.Application.Recipients.Commands.DeleteRecipient;
 using Pi.Replicate.Application.Recipients.Commands.UpsertRecipient;
 using Pi.Replicate.Application.Recipients.Queries.GetRecipientsForSettings;
+using Pi.Replicate.Application.Services;
 using Pi.Replicate.Shared;
 using Pi.Replicate.WebUi.Components;
 using System.Collections.Generic;
@@ -17,8 +18,9 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 	{
 		private readonly List<RecipientViewModel> _toDeleteRecipients = new List<RecipientViewModel>();
 
+
 		[Inject]
-		public ProbeService ProbeService { get; set; }
+		public WorkerCommunicationProxy WorkerCommunicationProxy { get; set; }
 
 		[Inject]
 		public IMediator Mediator { get; set; }
@@ -74,10 +76,10 @@ namespace Pi.Replicate.WebUi.Pages.Settings.Components
 		protected async Task VerifyRecipient(RecipientViewModel recipientModel)
 		{
 			recipientModel.IsVerifying = true;
-			var result = await ProbeService.ProbeGet<string>($"{recipientModel.Address}/api/probe");
-			recipientModel.Verified = result.IsSuccessful;
-			recipientModel.VerifyResult = result.IsSuccessful ? string.Empty : result.Message;
-			recipientModel.Name = result.ResponseData;
+			var result = await WorkerCommunicationProxy.ProbeRecipient(recipientModel.Address);
+			recipientModel.Verified = !string.IsNullOrEmpty(result.hostname);
+			recipientModel.VerifyResult = result.exception;
+			recipientModel.Name = result.hostname;
 			recipientModel.IsVerifying = false;
 			StateHasChanged();
 		}

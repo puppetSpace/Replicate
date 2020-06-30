@@ -88,7 +88,7 @@ namespace Pi.Replicate.Worker.Host
 			{
 				endpoints.MapControllers();
 				endpoints.MapHub<SystemHub>("/systemHub");
-				endpoints.MapGrpcService<NotificationHub>();
+				endpoints.MapGrpcService<CommunicationHub>();
 			});
 		}
 	}

@@ -75,7 +75,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		public async Task SendFile(Recipient recipient, Folder folder, File file)
 		{
 			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
-			await client.SendFileAsync(new FileTransmissionRequest
+			var result = await client.SendFileAsync(new FileTransmissionRequest
 			{
 				Id = file.Id.ToString(),
 				Name = file.Name,
@@ -86,28 +86,37 @@ namespace Pi.Replicate.Worker.Host.Services
 				FolderName = folder.Name,
 				Host = Environment.MachineName,
 			});
+
+			if (!result.IsSuccessful)
+				throw new InvalidOperationException($"'{nameof(SendFile)}' received a negative 'IsSuccessful' from '{recipient.Name}'");
 		}
 
 		public async Task SendEofMessage(Recipient recipient, EofMessage message)
 		{
 			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
-			await client.SendEofMessageAsync(new EofMessageTransmissionRequest
+			var result = await client.SendEofMessageAsync(new EofMessageTransmissionRequest
 			{ 
 				FileId = message.FileId.ToString(), 
 				AmountOfChunks = message.AmountOfChunks 
 			});
+
+			if (!result.IsSuccessful)
+				throw new InvalidOperationException($"'{nameof(SendEofMessage)}' received a negative 'IsSuccessful' from '{recipient.Name}'");
 		}
 
 		public async Task SendFileChunk(Recipient recipient, FileChunk fileChunk)
 		{
 			var client = new Transmitter.TransmitterClient(_channelStore.Get(recipient.Address));
-			await client.SendFileChunkAsync(new FileChunkTransmissionRequest
+			var result = await client.SendFileChunkAsync(new FileChunkTransmissionRequest
 			{
 				FileId = fileChunk.FileId.ToString(),
 				SequenceNo = fileChunk.SequenceNo,
 				Host = Environment.MachineName,
 				Value = ByteString.CopyFrom(fileChunk.Value)
 			});
+
+			if (!result.IsSuccessful)
+				throw new InvalidOperationException($"'{nameof(SendFileChunk)}' received a negative 'IsSuccessful' from '{recipient.Name}'");
 		}
 
 		private class ChannelStore
