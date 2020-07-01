@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pi.Replicate.Worker.Host.Models;
-using Pi.Replicate.Worker.Host.Processing.Transmission;
 using Pi.Replicate.Worker.Host.Repositories;
 using System;
 using System.Net;
@@ -11,21 +10,19 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class EofMessageController : ControllerBase
 	{
-		private readonly TransmissionActionFactory _transmissionActionFactory;
+		private readonly IEofMessageRepository _eofMessageRepository;
 
-		public EofMessageController(TransmissionActionFactory transmissionActionFactory)
+		public EofMessageController(IEofMessageRepository eofMessageRepository)
 		{
-			_transmissionActionFactory = transmissionActionFactory;
+			_eofMessageRepository = eofMessageRepository;
 		}
 
 		[HttpPost("api/file/{fileId}/eot")]
 		public async Task<IActionResult> Post(Guid fileId, [FromBody] EofMessageTransmissionModel model)
 		{
 			WorkerLog.Instance.Information($"Eof message received from {Request.HttpContext.Connection.RemoteIpAddress}");
-			var isSuccessfull = await _transmissionActionFactory
-				.GetForEofMessageReceived()
-				.Execute(fileId, model.AmountOfChunks);
-			return isSuccessfull 
+			var result = await _eofMessageRepository.AddReceivedEofMessage(EofMessage.Build(fileId, model.AmountOfChunks));
+			return result.WasSuccessful
 				? NoContent() 
 				: StatusCode((int)HttpStatusCode.InternalServerError);
 		}

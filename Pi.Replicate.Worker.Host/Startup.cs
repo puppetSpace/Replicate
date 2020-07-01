@@ -11,7 +11,6 @@ using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Hubs;
 using Pi.Replicate.Worker.Host.Processing;
-using Pi.Replicate.Worker.Host.Processing.Transmission;
 using Pi.Replicate.Worker.Host.Repositories;
 using Pi.Replicate.Worker.Host.Services;
 using Polly;
@@ -39,11 +38,9 @@ namespace Pi.Replicate.Worker.Host
 			services.AddTransient<FileCollectorFactory>();
 			services.AddSingleton<WorkerQueueContainer>();
 			services.AddTransient<TelemetryProxy>();
-			services.AddTransient<CommunicationProxy>();
 			services.AddRepositories();
 			services.AddWorkerServices();
 			services.AddBackgroundServices();
-			services.AddTransmissionActions();
 
 			services.AddObservr();
 			services.AddSignalR();

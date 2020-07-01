@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pi.Replicate.Worker.Host.Common;
-using Pi.Replicate.Worker.Host.Processing.Transmission;
 using Pi.Replicate.Worker.Host.Services;
 using System;
 using System.IO;
@@ -12,11 +11,11 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class FileChunkController : ControllerBase
 	{
-		private readonly TransmissionActionFactory _transmissionActionFactory;
+		private readonly FileChunkService _fileChunkService;
 
-		public FileChunkController(TransmissionActionFactory transmissionActionFactory)
+		public FileChunkController(FileChunkService fileChunkService)
 		{
-			_transmissionActionFactory = transmissionActionFactory;
+			_fileChunkService = fileChunkService;
 		}
 
 		[HttpPost("api/file/{fileId}/chunk/{sequenceNo}/{host}")]
@@ -26,10 +25,8 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			using (var ms = new MemoryStream())
 			{
 				await Request.Body.CopyToAsync(ms);
-				var isSuccessful = await _transmissionActionFactory
-					.GetForFileChunkReceived()
-					.Execute(fileId, sequenceNo, ms.ToArray(), host);
-				return isSuccessful 
+				var result = await _fileChunkService.AddReceivedFileChunk(fileId, sequenceNo, ms.ToArray(), host, DummyAdress.Create(host));
+				return result.WasSuccessful
 					? NoContent() 
 					: StatusCode((int)HttpStatusCode.InternalServerError);
 			}
