@@ -38,6 +38,7 @@ namespace Pi.Replicate.Worker.Host
 			services.AddTransient<FileCollectorFactory>();
 			services.AddSingleton<WorkerQueueContainer>();
 			services.AddTransient<TelemetryProxy>();
+			services.AddSingleton<TransmissionHub.TransmissionActions>();
 			services.AddRepositories();
 			services.AddWorkerServices();
 			services.AddBackgroundServices();
@@ -84,9 +85,9 @@ namespace Pi.Replicate.Worker.Host
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapHub<SystemHub>("/systemHub");
+				endpoints.MapControllers();
 				endpoints.MapGrpcService<CommunicationHub>();
 				endpoints.MapGrpcService<TransmissionHub>();
-				endpoints.MapControllers();
 			});
 		}
 	}
