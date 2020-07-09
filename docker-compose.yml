@@ -1,0 +1,45 @@
+version: '3.4'
+
+services:
+  workerhost:
+    image: ${DOCKER_REGISTRY-}pireplicateworkerhost
+    build:
+      context: .
+      dockerfile: Pi.Replicate.Worker.Host/Dockerfile
+    volumes: 
+      - d:\temp:/home
+    depends_on: 
+      - db
+    ports: 
+      - "44309:44309"
+    environment: 
+      - ASPNETCORE_ENVIRONMENT=Docker
+
+  web:
+    image: ${DOCKER_REGISTRY-}pireplicatewebui
+    build:
+      context: .
+      dockerfile: Pi.Replicate.WebUi/Dockerfile
+    depends_on: 
+      - workerhost
+      - db
+    ports: 
+      - "44309:44309"
+      - "443:443"
+    environment: 
+        - AppSettings__WorkerApiBaseAddress=https://worker:44309
+        - ASPNETCORE_ENVIRONMENT=Docker
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2019-CU5-ubuntu-16.04
+    ports:
+      - "1433:1433"
+    volumes: 
+      - data:/var/opt/mssql/data
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=password123
+
+volumes: 
+  data:
+

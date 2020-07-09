@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Data
 {
+	public interface IDatabaseInitializer
+	{
+		void Initialize();
+	}
+
 	public interface IDatabase : IDisposable
 	{
 		IDbConnection Connection { get; }

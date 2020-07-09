@@ -1,5 +1,7 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.SqlServer.Management.Common;
+using Microsoft.SqlServer.Management.Smo;
 using Pi.Replicate.Shared.Models;
 using System;
 using System.Collections.Generic;
@@ -10,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Data
 {
-	public class Database : IDatabase
+	public class Database : IDatabase, IDatabaseInitializer
 	{
 		private const string _exceptionString = "Error occured during execution of query";
 
@@ -109,6 +111,22 @@ namespace Pi.Replicate.Worker.Host.Data
 		public void Dispose()
 		{
 			Connection?.Close();
+		}
+
+		void IDatabaseInitializer.Initialize()
+		{
+			using (Connection)
+			{
+				var doesDatabaseExist = Connection.ExecuteScalar<bool>("select 1 from sys.databases where name = 'ReplicateDb';");
+				if (!doesDatabaseExist)
+				{
+					//todo get password from environment variable
+					Connection.Execute("CREATE DATABASE ReplicateDb");
+					Connection.Execute("USE ReplicateDB; CREATE LOGIN Replicator WITH PASSWORD = 'Y9w@*bdnPhM*6AQXbjdzD^33Z^j8B'; CREATE USER Replicator FOR LOGIN Replicator;");
+					var server = new Server(new ServerConnection(new Microsoft.Data.SqlClient.SqlConnection(Connection.ConnectionString)));
+					server.ConnectionContext.ExecuteNonQuery(System.IO.File.ReadAllText("Created_Db_Structure.sql"));
+				}
+			}
 		}
 	}
 

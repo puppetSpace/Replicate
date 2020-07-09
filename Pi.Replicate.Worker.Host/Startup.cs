@@ -61,7 +61,6 @@ namespace Pi.Replicate.Worker.Host
 				client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 			});
 
-
 			services.AddResponseCompression(opt =>
 			{
 				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });

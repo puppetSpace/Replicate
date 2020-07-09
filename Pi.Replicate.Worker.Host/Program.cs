@@ -26,6 +26,7 @@ namespace Pi.Replicate.Worker.Host
 
 			CreateHostBuilder(args)
 				.Build()
+				.InitializeDatabase()
 				.AddSystemSettingsFromDatabase()
 				.AttachLogSinks()
 				.InitializeWorker()

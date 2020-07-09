@@ -1,3 +1,5 @@
+use ReplicateDb;
+GO
 create table dbo.Folder(
 	Id uniqueidentifier NOT NULL,
 	[Name] varchar(30) NOT NULL,
@@ -135,7 +137,7 @@ create table dbo.FileConflict(
 )
 GO
 
-insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
+--insert into dbo.SystemSetting VALUES(NEWID(),'BaseFolder','D:\Temp','text','This is the folder that will contain all the folders you create within the application + the files that need to be synced');
 insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFolderCrawl','10','number','The amount of time to wait between each moment the application crawls to the folders to search for new and changed files');
 insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalFileAssembly','10','number','The amount of time to wait to between each moment the application checks if all chunks have arrived for a file and assembly of files');
 insert into dbo.SystemSetting VALUES(NEWID(),'TriggerIntervalRetry','10','number','The amount of time to wait between each moment the application retries sending failed data to the recipients');

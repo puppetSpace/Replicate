@@ -63,6 +63,16 @@ namespace Pi.Replicate.Worker.Host
 			return host;
 		}
 
+		public static IHost InitializeDatabase(this IHost host)
+		{
+			//todo for docker add username/password for ReplicatedDb
+			//todo for docker use sa user for connecting
+			var database = host.Services.GetService<IDatabase>();
+			((IDatabaseInitializer)database).Initialize();
+
+			return host;
+		}
+
 
 
 		private class WorkerStartup
