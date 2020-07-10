@@ -25,15 +25,13 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 	public class AddNewFolderCommandHandler : IRequestHandler<AddFolderCommand, Result>
 	{
 		private readonly IDatabase _database;
-		private readonly PathBuilder _pathBuilder;
 		private const string _insertStatementFolder = "INSERT INTO dbo.Folder(Id,Name) VALUES(@Id,@Name)";
 		private const string _insertStatementFolderRecipient = "INSERT INTO dbo.FolderRecipient(FolderId,RecipientId) VALUES(@FolderId,@RecipientId)";
 		private readonly IBroker _broker;
 
-		public AddNewFolderCommandHandler(IDatabase database, PathBuilder pathBuilder, IBroker broker)
+		public AddNewFolderCommandHandler(IDatabase database, IBroker broker)
 		{
 			_database = database;
-			_pathBuilder = pathBuilder;
 			_broker = broker;
 		}
 
@@ -54,7 +52,7 @@ namespace Pi.Replicate.Application.Folders.Commands.AddFolder
 					await _database.Execute(_insertStatementFolderRecipient, new { FolderId = folder.Id, RecipientId = recipient.Id });
 			}
 
-			var path = _pathBuilder.BuildPath(folder.Name);
+			var path = PathBuilder.BuildPath(folder.Name);
 			if (request.CreateOnDisk && !System.IO.Directory.Exists(path))
 				System.IO.Directory.CreateDirectory(path);
 

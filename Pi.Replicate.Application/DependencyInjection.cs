@@ -17,7 +17,6 @@ namespace Pi.Replicate.Application
 			services.AddAutoMapper(typeof(MappingProfile).Assembly);
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 			services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ErrorHandlingBehavior<,>));
-			services.AddSingleton<PathBuilder>();
 			services.AddTransient<WorkerCommunicationProxy>();
 		}
 	}

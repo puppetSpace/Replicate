@@ -11,27 +11,18 @@ namespace Pi.Replicate.Worker.Host.Services
 {
 	public class FileAssemblerService
 	{
-		private readonly ICompressionService _compressionService;
-		private readonly PathBuilder _pathBuilder;
-		private readonly IDeltaService _deltaService;
 		private readonly IDatabase _database;
 		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
 		private readonly IFileConflictService _fileConflictService;
 
-		public FileAssemblerService(ICompressionService compressionService
-			, PathBuilder pathBuilder
-			, IDeltaService deltaService
-			, IDatabase database
+		public FileAssemblerService(IDatabase database
 			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IFileChunkRepository fileChunkRepository
 			, IFileConflictService fileConflictService)
 		{
-			_pathBuilder = pathBuilder;
-			_compressionService = compressionService;
-			_deltaService = deltaService;
 			_database = database;
 			_webhookService = webhookService;
 			_fileRepository = fileRepository;
@@ -78,7 +69,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (tempPath is null)
 				return;
 
-			var filePath = _pathBuilder.BuildPath(file.Path);
+			var filePath = PathBuilder.BuildPath(file.Path);
 
 			if (System.IO.File.Exists(filePath) && FileLock.IsLocked(filePath, checkWriteAccess: true))
 			{
@@ -91,7 +82,7 @@ namespace Pi.Replicate.Worker.Host.Services
 					System.IO.Directory.CreateDirectory(fileFolder);
 
 				WorkerLog.Instance.Information($"Decompressing file '{tempPath}'");
-				await _compressionService.Decompress(tempPath, filePath);
+				await file.DecompressFrom(tempPath);
 				WorkerLog.Instance.Information($"File decompressed to '{filePath}'");
 				await MarkFileAsCompleted(file);
 			}
@@ -105,11 +96,11 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (tempPath is null)
 				return;
 
-			var filePath = _pathBuilder.BuildPath(file.Path);
+			var filePath = PathBuilder.BuildPath(file.Path);
 			if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
 			{
 				WorkerLog.Instance.Information($"Applying delta to {filePath}");
-				_deltaService.ApplyDelta(filePath, System.IO.File.ReadAllBytes(filePath));
+				file.ApplyDelta(System.IO.File.ReadAllBytes(filePath));
 				await MarkFileAsCompleted(file);
 
 			}
@@ -165,8 +156,8 @@ namespace Pi.Replicate.Worker.Host.Services
 		private async Task MarkFileAsCompleted(File file)
 		{
 			WorkerLog.Instance.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
-			var filePath = _pathBuilder.BuildPath(file.Path);
-			var signature = _deltaService.CreateSignature(filePath);
+			var filePath = PathBuilder.BuildPath(file.Path);
+			var signature = file.CreateSignature();
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
 			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature.ToArray(), _database);
 			await _fileChunkRepository.DeleteChunksForFile(file.Id, _database);
@@ -176,27 +167,18 @@ namespace Pi.Replicate.Worker.Host.Services
 
 	public class FileAssemblerServiceFactory
 	{
-		private readonly ICompressionService _compressionService;
-		private readonly PathBuilder _pathBuilder;
-		private readonly IDeltaService _deltaService;
 		private readonly IDatabaseFactory _databaseFactory;
 		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
 		private readonly IFileConflictService _fileConflictService;
 
-		public FileAssemblerServiceFactory(ICompressionService compressionService
-			, PathBuilder pathBuilder
-			, IDeltaService deltaService
-			, IDatabaseFactory databaseFactory
+		public FileAssemblerServiceFactory(IDatabaseFactory databaseFactory
 			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IFileChunkRepository fileChunkRepository
 			, IFileConflictService fileConflictService)
 		{
-			_compressionService = compressionService;
-			_pathBuilder = pathBuilder;
-			_deltaService = deltaService;
 			_databaseFactory = databaseFactory;
 			_webhookService = webhookService;
 			_fileRepository = fileRepository;
@@ -207,7 +189,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		//to make sure that every thread get's its own instance of IDatabase
 		public FileAssemblerService Get()
 		{
-			return new FileAssemblerService(_compressionService, _pathBuilder, _deltaService, _databaseFactory.Get(), _webhookService, _fileRepository, _fileChunkRepository, _fileConflictService);
+			return new FileAssemblerService(_databaseFactory.Get(), _webhookService, _fileRepository, _fileChunkRepository, _fileConflictService);
 		}
 	}
 }

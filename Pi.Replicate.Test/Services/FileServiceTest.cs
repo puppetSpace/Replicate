@@ -16,6 +16,12 @@ namespace Pi.Replicate.Test.Services
 	[TestClass]
 	public class FileServiceTest
 	{
+		[TestInitialize]
+		public void Initialize()
+		{
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
+		}
+
 		[TestMethod]
 		public async Task CreateNewFile_FileExists_CreatesNewFile()
 		{
@@ -23,18 +29,12 @@ namespace Pi.Replicate.Test.Services
 			var domainFile = Domain.File.Build(file, Guid.Empty, System.IO.Directory.GetCurrentDirectory());
 			var fileAddedToDb = false;
 
-			var configMock = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configMock.Object);
-
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateSignature(It.IsAny<string>())).Returns(ReadOnlyMemory<byte>.Empty);
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>(), It.IsAny<byte[]>()))
 				.ReturnsAsync(() => Result.Success())
 				.Callback<File,byte[]>((x,y)=> fileAddedToDb = true);
 
-			var fileService = new FileService(deltaServiceMock.Object, fileRepositoryMock.Object, pathBuilder);
+			var fileService = new FileService(fileRepositoryMock.Object);
 			var createdFile = await fileService.CreateNewFile(Guid.Empty , file);
 
 			Assert.IsTrue(createdFile is object);
@@ -53,17 +53,11 @@ namespace Pi.Replicate.Test.Services
 			var file = new System.IO.FileInfo("FileFolder/text1.txt");
 			var domainFile = Domain.File.Build(file, Guid.Empty, System.IO.Directory.GetCurrentDirectory());
 
-			var configMock = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configMock.Object);
-
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateSignature(It.IsAny<string>())).Returns(ReadOnlyMemory<byte>.Empty);
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>(), It.IsAny<byte[]>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var fileService = new FileService(deltaServiceMock.Object, fileRepositoryMock.Object, pathBuilder);
+			var fileService = new FileService(fileRepositoryMock.Object);
 			var createdFile = await fileService.CreateNewFile(Guid.Empty, file);
 
 			Assert.IsTrue(createdFile is object);
@@ -80,17 +74,11 @@ namespace Pi.Replicate.Test.Services
 			var file = new System.IO.FileInfo("FileFolder/test1.txt");
 			var domainFile = Domain.File.Build(file, Guid.Empty, System.IO.Directory.GetCurrentDirectory());
 
-			var configMock = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configMock.Object);
-
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateSignature(It.IsAny<string>())).Returns(ReadOnlyMemory<byte>.Empty);
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>(), It.IsAny<byte[]>()))
 				.ReturnsAsync(() => Result.Failure());
 
-			var fileService = new FileService(deltaServiceMock.Object, fileRepositoryMock.Object, pathBuilder);
+			var fileService = new FileService(fileRepositoryMock.Object);
 			var createdFile = await fileService.CreateNewFile(Guid.Empty, file);
 
 			Assert.IsTrue(createdFile is null);
@@ -102,13 +90,6 @@ namespace Pi.Replicate.Test.Services
 			var file = new System.IO.FileInfo("FileFolder/test1.txt");
 			var domainFile = File.Build(file, Guid.Empty, System.IO.Directory.GetCurrentDirectory());
 
-
-			var configMock = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configMock.Object);
-
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateSignature(It.IsAny<string>())).Returns(ReadOnlyMemory<byte>.Empty);
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>(), It.IsAny<byte[]>()))
 				.ReturnsAsync(() => Result.Success());
@@ -116,7 +97,7 @@ namespace Pi.Replicate.Test.Services
 			fileRepositoryMock.Setup(x => x.GetLastVersionOfFile(It.IsAny<Guid>(),It.IsAny<string>()))
 				.ReturnsAsync(() => Result<File>.Success(domainFile));
 
-			var fileService = new FileService(deltaServiceMock.Object, fileRepositoryMock.Object, pathBuilder);
+			var fileService = new FileService(fileRepositoryMock.Object);
 			var createdFile = await fileService.CreateUpdateFile(Guid.Empty, file);
 
 			Assert.IsTrue(createdFile is object);
@@ -133,33 +114,14 @@ namespace Pi.Replicate.Test.Services
 			var file = new System.IO.FileInfo("FileFolder/test1.txt");
 			var domainFile = Domain.File.Build(file, Guid.Empty, System.IO.Directory.GetCurrentDirectory());
 
-			var configMock = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configMock.Object);
-
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateSignature(It.IsAny<string>())).Returns(ReadOnlyMemory<byte>.Empty);
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.GetLastVersionOfFile(It.IsAny<Guid>(), It.IsAny<string>()))
 				.ReturnsAsync(() => Result<File>.Failure());
 
-			var fileService = new FileService(deltaServiceMock.Object, fileRepositoryMock.Object, pathBuilder);
+			var fileService = new FileService(fileRepositoryMock.Object);
 			var createdFile = await fileService.CreateUpdateFile(Guid.Empty, file);
 
 			Assert.IsTrue(createdFile is null);
-		}
-
-		private Mock<IConfiguration> CreateConfigurationMock()
-		{
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[It.IsAny<string>()]).Returns<string>(x =>
-				x switch
-				{
-					Constants.ReplicateBasePath => System.IO.Directory.GetCurrentDirectory(),
-					_ => ""
-				});
-
-			return configurationMock;
 		}
 	}
 }

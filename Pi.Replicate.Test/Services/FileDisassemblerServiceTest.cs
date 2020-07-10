@@ -16,13 +16,17 @@ namespace Pi.Replicate.Test.Services
 	[TestClass]
 	public class FileDisassemblerServiceTest
 	{
+		[TestInitialize]
+		public void Initialize()
+		{
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
+		}
 
 		[TestMethod]
 		public async Task ProcessFile_CorrectAmountOfChunksShouldBeCreated()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var calculatedAmountOfChunks = Math.Ceiling((double)compressedFile.Length / int.Parse(configuration.Object[Constants.FileSplitSizeOfChunksInBytes]));
 			var amountOfCalls = 0;
@@ -35,8 +39,8 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(),webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object,webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
 
@@ -46,8 +50,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_EofMessageShouldBeCreated()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var eofMessageAmountOfChunks = 0;
@@ -61,8 +64,8 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 			Assert.AreEqual(eofMessageAmountOfChunks, amountOfCalls);
 
@@ -72,8 +75,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_Changed_CallToGetPreviousSignatureShouldBeMade()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var getPreviousSignatureOfFileQueryCalled = false;
@@ -88,11 +90,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
 
@@ -102,8 +103,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_Changed_EofMessageShouldbeMade()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
@@ -116,11 +116,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
 
@@ -131,8 +130,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_Changed_1ChunkShouldBeMade()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
@@ -145,11 +143,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var deltaServiceMock = CreateDeltaServiceMock();
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, deltaServiceMock.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
 
@@ -161,8 +158,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_FileIsLocked_ShouldReturnEmptyResultSet()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 
 			using var fs = fileInfo.OpenWrite();
 
@@ -177,8 +173,8 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 
 			Assert.AreEqual(0, amountOfCalls);
@@ -189,8 +185,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_WebhookFileDissambledShouldBeCalled()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
@@ -204,8 +199,8 @@ namespace Pi.Replicate.Test.Services
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { webhookCalled = true; }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 			Assert.IsTrue(webhookCalled);
 		}
@@ -214,8 +209,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_FileIsLocked_WebhookFailedFileShouldBeCalled()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 
 			using var fs = fileInfo.OpenWrite();
 
@@ -230,8 +224,8 @@ namespace Pi.Replicate.Test.Services
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { webhookCalled = true; });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 
 			Assert.IsTrue(webhookCalled);
@@ -242,8 +236,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task ProcessFile_FileIsLocked_FailedFileShouldBeCreated()
 		{
 			var configuration = CreateConfigurationMock();
-			var pathBuilder = new PathBuilder(configuration.Object);
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(pathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 
 			using var fs = fileInfo.OpenWrite();
 
@@ -262,8 +255,8 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, new CompressionService(), pathBuilder, new DeltaService(), webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, pathBuilder.BasePath), chunkCreated);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
 
 			Assert.IsTrue(isFailedFileRequestCalled);
 
@@ -276,19 +269,11 @@ namespace Pi.Replicate.Test.Services
 			configurationMock.Setup(x => x[It.IsAny<string>()]).Returns<string>(x =>
 				x switch
 				{
-					Constants.ReplicateBasePath => System.IO.Directory.GetCurrentDirectory(),
 					Constants.FileSplitSizeOfChunksInBytes => minimumAmountOfBytesRentedByArrayPool.ToString(),
 					_ => ""
 				});
 
 			return configurationMock;
-		}
-
-		private Mock<IDeltaService> CreateDeltaServiceMock()
-		{
-			var deltaServiceMock = new Mock<IDeltaService>();
-			deltaServiceMock.Setup(x => x.CreateDelta(It.IsAny<string>(), It.IsAny<ReadOnlyMemory<byte>>())).Returns(() => Helper.GetReadOnlyMemory());
-			return deltaServiceMock;
 		}
 	}
 }

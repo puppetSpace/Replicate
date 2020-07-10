@@ -15,23 +15,16 @@ namespace Pi.Replicate.Test.Shared
 		public void BasePath_IsCorrectlySet()
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
-
-			Assert.AreEqual(rootPath, pathBuilder.BasePath);
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
+			Assert.AreEqual(rootPath, PathBuilder.BasePath);
 		}
 
 		[TestMethod]
 		public void BuildPath_BaseIsEmpty_PathShouldBeRelative()
 		{
-			var rootPath = @"";
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
-
+			PathBuilder.SetBasePath("");
 			File file = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "FileFolder", "test1.txt")), System.Guid.Empty, @"D:\Test");
-			var filePath = pathBuilder.BuildPath(file.Path);
+			var filePath = PathBuilder.BuildPath(file.Path);
 
 			Assert.AreEqual(file.Path, filePath);
 		}
@@ -40,12 +33,10 @@ namespace Pi.Replicate.Test.Shared
 		public void BuildPath_Folder_PathIsBuild()
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
 
 			var folder = new Folder() { Name = "FolderTest" };
-			var folderPath = pathBuilder.BuildPath(folder.Name);
+			var folderPath = PathBuilder.BuildPath(folder.Name);
 
 			Assert.AreEqual(System.IO.Path.Combine(rootPath, folder.Name), folderPath);
 		}
@@ -53,38 +44,31 @@ namespace Pi.Replicate.Test.Shared
 		[TestMethod]
 		public void BuildPath_NullFolder_BuiltPathIsBasePath()
 		{
-			var rootPath = System.IO.Directory.GetCurrentDirectory();
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
-			var folderPath = pathBuilder.BuildPath(null);
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
 
-			Assert.AreEqual(pathBuilder.BasePath, folderPath);
+			var folderPath = PathBuilder.BuildPath(null);
+
+			Assert.AreEqual(PathBuilder.BasePath, folderPath);
 		}
 
 		[TestMethod]
 		public void BuildPath_File_BuiltPathIsBasePath()
 		{
-			var rootPath = System.IO.Directory.GetCurrentDirectory();
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
 
-			var filePath = pathBuilder.BuildPath(null);
+			var filePath = PathBuilder.BuildPath(null);
 
-			Assert.AreEqual(pathBuilder.BasePath, filePath);
+			Assert.AreEqual(PathBuilder.BasePath, filePath);
 		}
 
 		[TestMethod]
 		public void BuildPath_File_PathIsBuild()
 		{
 			var rootPath = System.IO.Directory.GetCurrentDirectory();
-			var configurationMock = new Mock<IConfiguration>();
-			configurationMock.Setup(x => x[Constants.ReplicateBasePath]).Returns(rootPath);
-			var pathBuilder = new PathBuilder(configurationMock.Object);
+			PathBuilder.SetBasePath(System.IO.Directory.GetCurrentDirectory());
 
-			File file = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(rootPath, "FileFolder", "test1.txt")), System.Guid.Empty, pathBuilder.BasePath);
-			var filePath = pathBuilder.BuildPath(file.Path);
+			File file = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(rootPath, "FileFolder", "test1.txt")), System.Guid.Empty, PathBuilder.BasePath);
+			var filePath = PathBuilder.BuildPath(file.Path);
 
 			Assert.AreEqual(System.IO.Path.Combine(rootPath, file.Path), filePath);
 		}

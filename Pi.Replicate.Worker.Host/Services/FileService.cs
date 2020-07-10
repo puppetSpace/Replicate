@@ -10,29 +10,23 @@ namespace Pi.Replicate.Worker.Host.Services
 {
 	public class FileService
 	{
-		private readonly IDeltaService _deltaService;
 		private readonly IFileRepository _fileRespository;
-		private readonly PathBuilder _pathBuilder;
 		private readonly FolderRepository _folderRepository;
 		private readonly RecipientRepository _recipientRepository;
 
-		public FileService(IDeltaService deltaService
-			, IFileRepository fileRespository
-			, PathBuilder pathBuilder
+		public FileService(IFileRepository fileRespository
 			, FolderRepository folderRepository
 			, RecipientRepository recipientRepository)
 		{
-			_deltaService = deltaService;
 			_fileRespository = fileRespository;
-			_pathBuilder = pathBuilder;
 			_folderRepository = folderRepository;
 			_recipientRepository = recipientRepository;
 		}
 
 		public async Task<File> CreateNewFile(Guid folderId, System.IO.FileInfo newFile)
 		{
-			var signature = _deltaService.CreateSignature(newFile.FullName);
-			var file = File.Build(newFile, folderId, _pathBuilder.BasePath);
+			var file = File.Build(newFile, folderId, PathBuilder.BasePath);
+			var signature = file.CreateSignature();
 
 			var result = await _fileRespository.AddNewFile(file, signature.ToArray());
 			return result.WasSuccessful ? file : null;
@@ -40,12 +34,12 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		public async Task<File> CreateUpdateFile(Guid folderId, System.IO.FileInfo changedFile)
 		{
-			var signature = _deltaService.CreateSignature(changedFile.FullName);
-			var relativePath = changedFile.FullName.Replace(_pathBuilder.BasePath + "\\", "");
+			var relativePath = changedFile.FullName.Replace(PathBuilder.BasePath + "\\", "");
 			var queryResult = await _fileRespository.GetLastVersionOfFile(folderId, relativePath);
-			if (queryResult.WasSuccessful && queryResult.Data is object)
+			if (queryResult.WasSuccessful && queryResult.Data is File file)
 			{
-				queryResult.Data.Update(changedFile);
+				file.Update(changedFile);
+				var signature = file.CreateSignature();
 				await _fileRespository.AddNewFile(queryResult.Data, signature.ToArray());
 				return queryResult.Data;
 			}
@@ -84,7 +78,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var folderAddResult = await _folderRepository.AddFolder(folderName);
 			if (folderAddResult.WasSuccessful)
 			{
-				var folderPath = _pathBuilder.BuildPath(folderName);
+				var folderPath = PathBuilder.BuildPath(folderName);
 				if (!System.IO.Directory.Exists(folderPath))
 					System.IO.Directory.CreateDirectory(folderPath);
 

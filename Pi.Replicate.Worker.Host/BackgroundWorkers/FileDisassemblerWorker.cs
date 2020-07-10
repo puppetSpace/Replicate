@@ -9,6 +9,7 @@ using Pi.Replicate.Worker.Host.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 //todo add Conflicts: Double versions of file, version missing of file, ...
@@ -21,60 +22,55 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly TransmissionService _transmissionService;
 		private readonly RecipientRepository _recipientRepository;
-		private readonly PathBuilder _pathBuilder;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService
 			, TransmissionService transmissionService
-			, RecipientRepository recipientRepository
-			, PathBuilder pathBuilder)
+			, RecipientRepository recipientRepository)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueContainer = workerQueueContainer;
 			_fileProcessService = fileProcessService;
 			_transmissionService = transmissionService;
 			_recipientRepository = recipientRepository;
-			_pathBuilder = pathBuilder;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 		{
 			var th = new Thread(async () =>
 			{
-				WorkerLog.Instance.Information($"Starting {nameof(FileDisassemblerWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(Host.BackgroundWorkers.FileDisassemblerWorker)}");
 				var incomingQueue = _workerQueueContainer.ToProcessFiles.Reader;
 				var outgoingQueue = _workerQueueContainer.ToSendChunks.Writer;
 				var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 				while (await incomingQueue.WaitToReadAsync() && !stoppingToken.IsCancellationRequested)
 				{
 					var file = await incomingQueue.ReadAsync(stoppingToken);
-					if (System.IO.File.Exists(_pathBuilder.BuildPath(file.Path)))
-					{
-						taskRunner.Add(async () =>
-						{
-							WorkerLog.Instance.Information($"'{file.Path}' is being processed");
-							var recipients = await GetRecipients(file);
-
-							if (recipients.Any())
-							{
-								var eofMessage = await SplitFile(file, recipients, outgoingQueue);
-								if (eofMessage is object)
-									await FinializeFileProcess(eofMessage, recipients);
-
-								WorkerLog.Instance.Information($"'{file.Path}' is processed");
-							}
-						});
-					}
+					if (System.IO.File.Exists(PathBuilder.BuildPath(file.Path)))
+						taskRunner.Add(() => DissasemblyJob(outgoingQueue, file));
 					else
-					{
 						WorkerLog.Instance.Information($"File '{file.Path}' does not exist");
-					}
 				}
 			});
 
 			th.Start();
 
 			await Task.Delay(Timeout.Infinite);
+		}
+
+		private async Task DissasemblyJob(ChannelWriter<(Recipient recipient, FileChunk filechunk)> outgoingQueue, File file)
+		{
+			WorkerLog.Instance.Information($"'{file.Path}' is being processed");
+			var recipients = await GetRecipients(file);
+
+			if (recipients.Any())
+			{
+				var eofMessage = await _fileProcessService.ProcessFile(file, new ChunkWriter(recipients, outgoingQueue));
+				if (eofMessage is object)
+					await FinializeFileProcess(eofMessage, recipients);
+
+				WorkerLog.Instance.Information($"'{file.Path}' is processed");
+			}
 		}
 
 		private async Task<List<Recipient>> GetRecipients(File file)
@@ -90,20 +86,6 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			}
 
 			return recipients;
-		}
-
-		private async Task<EofMessage> SplitFile(File file, ICollection<Recipient> recipients, System.Threading.Channels.ChannelWriter<(Recipient recipient, FileChunk filechunk)> writer)
-		{
-			async Task ChunkCreatedCallBack(FileChunk fileChunk)
-			{
-				foreach (var recipient in recipients)
-				{
-					if (await writer.WaitToWriteAsync())
-						await writer.WriteAsync((recipient, fileChunk));
-				}
-			}
-
-			return await _fileProcessService.ProcessFile(file, ChunkCreatedCallBack);
 		}
 
 		private async Task FinializeFileProcess(EofMessage eofMessage, ICollection<Recipient> recipients)

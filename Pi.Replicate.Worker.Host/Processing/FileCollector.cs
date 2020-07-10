@@ -9,13 +9,11 @@ namespace Pi.Replicate.Worker.Host.Processing
 {
 	public sealed class FileCollector
 	{
-		private readonly PathBuilder _pathBuilder;
 		private readonly IFileRepository _fileRepository;
 		private readonly CrawledFolder _folder;
 
-		public FileCollector(PathBuilder pathBuilder, IFileRepository fileRepository, CrawledFolder folder)
+		public FileCollector(IFileRepository fileRepository, CrawledFolder folder)
 		{
-			_pathBuilder = pathBuilder;
 			_fileRepository = fileRepository;
 			_folder = folder;
 		}
@@ -32,12 +30,12 @@ namespace Pi.Replicate.Worker.Host.Processing
 				var filesInDb = result.Data;
 				WorkerLog.Instance.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
 
-				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(_pathBuilder.BuildPath(y.Path), x.FullName))).ToList();
+				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(PathBuilder.BuildPath(y.Path), x.FullName))).ToList();
 				WorkerLog.Instance.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
 				ChangedFiles = filesFromSystem
 						.Where(x => filesInDb
-							.Any(y => x.FullName == _pathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
+							.Any(y => x.FullName == PathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
 						.ToList();
 
 				WorkerLog.Instance.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");
@@ -46,7 +44,7 @@ namespace Pi.Replicate.Worker.Host.Processing
 
 		private IList<System.IO.FileInfo> GetFilesFromSystem()
 		{
-			var folderPath = _pathBuilder.BuildPath(_folder.Name);
+			var folderPath = PathBuilder.BuildPath(_folder.Name);
 			var folderCrawler = new FolderCrawler();
 			var files = folderCrawler.GetFiles(folderPath);
 
@@ -57,18 +55,16 @@ namespace Pi.Replicate.Worker.Host.Processing
 
 	public class FileCollectorFactory
 	{
-		private readonly PathBuilder _pathBuilder;
 		private readonly IFileRepository _fileRepository;
 
-		public FileCollectorFactory(PathBuilder pathBuilder, IFileRepository fileRepository)
+		public FileCollectorFactory(IFileRepository fileRepository)
 		{
-			_pathBuilder = pathBuilder;
 			_fileRepository = fileRepository;
 		}
 
 		public FileCollector Get(CrawledFolder folder)
 		{
-			return new FileCollector(_pathBuilder, _fileRepository, folder);
+			return new FileCollector(_fileRepository, folder);
 		}
 	}
 }

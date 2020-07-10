@@ -26,20 +26,17 @@ namespace Pi.Replicate.Worker.Host.Services
 		private const string _typeFileDisassembled = "FileDisassembled";
 		private const string _typeFileFailed = "FileFailed";
 
-		private readonly PathBuilder _pathBuilder;
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly FolderRepository _folderRepository;
 		private readonly WebhookRepository _webhookRepository;
 		private List<Webhook> _webhookCache = new List<Webhook>();
 
-		public WebhookService(PathBuilder pathBuilder
-			, IHttpClientFactory httpClientFactory
+		public WebhookService( IHttpClientFactory httpClientFactory
 			, IBroker broker
 			, FolderRepository folderRepository
 			, WebhookRepository webhookRepository
 			)
 		{
-			_pathBuilder = pathBuilder;
 			_httpClientFactory = httpClientFactory;
 			_folderRepository = folderRepository;
 			_webhookRepository = webhookRepository;
@@ -88,7 +85,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var folderName = foundFolder?.Data;
 			if (foundWebhook is object && !string.IsNullOrWhiteSpace(foundWebhook.CallbackUrl))
 			{
-				var postObject = new { name = file.Name, path = _pathBuilder.BuildPath(file.Path), version = file.Version, folder = folderName };
+				var postObject = new { name = file.Name, path = PathBuilder.BuildPath(file.Path), version = file.Version, folder = folderName };
 
 				WorkerLog.Instance.Debug($"Webhook of type '{type}' for folder '{folderName}' calling '{foundWebhook.CallbackUrl}'");
 				var httpClient = _httpClientFactory.CreateClient("webhook");

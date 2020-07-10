@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Shared
 {
-    public class PathBuilder
+    public static class PathBuilder
     {
-        public PathBuilder(IConfiguration configuration)
-        {
-            BasePath = configuration[Constants.ReplicateBasePath];
-        }
+		public static string BasePath { get; private set; }
 
-		public string BasePath { get; }
+		public static void SetBasePath(string basePath)
+		{
+			BasePath = basePath;
+		}
 
-		public string BuildPath(string relativePath)
+		public static string BuildPath(string relativePath)
         {
             return System.IO.Path.Combine(BasePath, relativePath??"");
         }

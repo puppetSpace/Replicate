@@ -4,6 +4,8 @@ using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Repositories;
 using System;
 using System.Buffers;
+using System.Collections.Generic;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
@@ -11,34 +13,25 @@ namespace Pi.Replicate.Worker.Host.Services
 	public class FileDisassemblerService
 	{
 		private readonly int _sizeofChunkInBytes;
-		private readonly ICompressionService _compressionService;
-		private readonly PathBuilder _pathBuilder;
-		private readonly IDeltaService _deltaService;
 		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IEofMessageRepository _eofMessageRepository;
 
 		public FileDisassemblerService(IConfiguration configuration
-			, ICompressionService compressionService
-			, PathBuilder pathBuilder
-			, IDeltaService deltaService
 			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IEofMessageRepository eofMessageRepository)
 		{
 			_sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
-			_compressionService = compressionService;
-			_pathBuilder = pathBuilder;
-			_deltaService = deltaService;
 			_webhookService = webhookService;
 			_fileRepository = fileRepository;
 			_eofMessageRepository = eofMessageRepository;
 		}
 
 
-		public async Task<EofMessage> ProcessFile(File file, Func<FileChunk, Task> chunkCreatedDelegate)
+		public async Task<EofMessage> ProcessFile(File file,ChunkWriter chunkWriter)
 		{
-			var path = _pathBuilder.BuildPath(file.Path);
+			var path = PathBuilder.BuildPath(file.Path);
 			EofMessage eofMessage = null;
 
 			if (!string.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
@@ -46,9 +39,9 @@ namespace Pi.Replicate.Worker.Host.Services
 				try
 				{
 					if (file.IsNew())
-						eofMessage = await ProcessNewFile(file, path, chunkCreatedDelegate);
+						eofMessage = await ProcessNewFile(file, chunkWriter);
 					else
-						eofMessage = await ProcessChangedFile(file, path, chunkCreatedDelegate);
+						eofMessage = await ProcessChangedFile(file, chunkWriter);
 
 					if (eofMessage is object)
 						_webhookService.NotifyFileDisassembled(file);
@@ -70,14 +63,14 @@ namespace Pi.Replicate.Worker.Host.Services
 			return eofMessage;
 		}
 
-		private async Task<EofMessage> ProcessNewFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
+		private async Task<EofMessage> ProcessNewFile(File file, ChunkWriter chunkWriter)
 		{
 			var sequenceNo = 0;
-			WorkerLog.Instance.Information($"Compressing file '{path}'");
+			WorkerLog.Instance.Information($"Compressing file '{file.Path}'");
 			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
-			await _compressionService.Compress(path, pathOfCompressed);
+			await file.CompressTo(pathOfCompressed);
 
-			WorkerLog.Instance.Information($"Splitting up '{path}'");
+			WorkerLog.Instance.Information($"Splitting up '{file.Path}'");
 
 			var sharedmemory = MemoryPool<byte>.Shared.Rent(_sizeofChunkInBytes);
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
@@ -85,18 +78,18 @@ namespace Pi.Replicate.Worker.Host.Services
 				while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
 				{
 					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory.ToArray());
-					await chunkCreatedDelegate(fileChunk);
+					await chunkWriter.Push(fileChunk);
 				}
 			}
 
-			DeleteTempFile(path, pathOfCompressed);
+			DeleteTempFile(pathOfCompressed);
 
 			return await CreateEofMessage(file, sequenceNo);
 		}
 
-		private static void DeleteTempFile(string path, string pathOfCompressed)
+		private static void DeleteTempFile(string pathOfCompressed)
 		{
-			WorkerLog.Instance.Information($"'compressed file of {path}' is being deleted");
+			WorkerLog.Instance.Information($"'compressed file of {pathOfCompressed}' is being deleted");
 			try
 			{
 				System.IO.File.Delete(pathOfCompressed);
@@ -107,7 +100,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 		}
 
-		private async Task<EofMessage> ProcessChangedFile(File file, string path, Func<FileChunk, Task> chunkCreatedDelegate)
+		private async Task<EofMessage> ProcessChangedFile(File file, ChunkWriter chunkWriter)
 		{
 			var amountOfChunks = 0;
 
@@ -120,7 +113,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			else
 			{
 				WorkerLog.Instance.Information($"Creating delta of changed file '{file.Path}'");
-				var delta = _deltaService.CreateDelta(path, result.Data);
+				var delta = file.CreateDelta(result.Data);
 				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
 
 				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.Path}'");
@@ -129,7 +122,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				while (indexOfSlice < delta.Length)
 				{
 					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks).ToArray());
-					await chunkCreatedDelegate(fileChunk);
+					await chunkWriter.Push(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;
 				}
@@ -153,6 +146,27 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			await _fileRepository.UpdateFileAsFailed(file.Id);
 			_webhookService.NotifyFileFailed(file);
+		}
+	}
+
+	public class ChunkWriter
+	{
+		private readonly ICollection<Recipient> _recipients;
+		private readonly ChannelWriter<(Recipient recipient, FileChunk filechunk)> _writer;
+
+		public ChunkWriter(ICollection<Recipient> recipients, System.Threading.Channels.ChannelWriter<(Recipient recipient, FileChunk filechunk)> writer)
+		{
+			_recipients = recipients;
+			_writer = writer;
+		}
+
+		public async Task Push(FileChunk fileChunk)
+		{
+			foreach (var recipient in _recipients)
+			{
+				if (await _writer.WaitToWriteAsync())
+					await _writer.WriteAsync((recipient, fileChunk));
+			}
 		}
 	}
 }

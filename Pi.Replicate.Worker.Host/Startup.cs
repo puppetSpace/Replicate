@@ -17,6 +17,7 @@ using Polly;
 using System;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata;
 
 namespace Pi.Replicate.Worker.Host
 {
@@ -34,7 +35,6 @@ namespace Pi.Replicate.Worker.Host
 		{
 			services.AddTransient<IDatabase, Database>();
 			services.AddTransient<IDatabaseFactory, DatabaseFactory>();
-			services.AddSingleton<PathBuilder>();
 			services.AddTransient<FileCollectorFactory>();
 			services.AddSingleton<WorkerQueueContainer>();
 			services.AddTransient<TelemetryProxy>();
@@ -65,6 +65,9 @@ namespace Pi.Replicate.Worker.Host
 			{
 				opt.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[] { "application/octet-stream" });
 			});
+
+			//is dirty but only way to set it for a static class
+			PathBuilder.SetBasePath(Configuration.GetValue<string>(Constants.ReplicateBasePath));
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
