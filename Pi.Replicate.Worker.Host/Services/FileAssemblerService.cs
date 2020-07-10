@@ -36,7 +36,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				using (_database)
 				{
-					bool hasConflicts = await HasForConflicts(file);
+					bool hasConflicts = await HasConflicts(file);
 					if (!hasConflicts)
 					{
 						if (file.IsNew())
@@ -52,7 +52,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 		}
 
-		private async Task<bool> HasForConflicts(File file)
+		private async Task<bool> HasConflicts(File file)
 		{
 			var previousVersions = await _fileRepository.GetAllVersionsOfFile(file, _database);
 			if (previousVersions.WasSuccessful && previousVersions.Data.Any())
