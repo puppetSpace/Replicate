@@ -19,8 +19,13 @@ namespace Pi.Replicate.Worker.Host.Repositories
 				IF NOT EXISTS (SELECT 1 FROM dbo.FailedTransmission WHERE EofMessageId = @EofMessageId and RecipientId = @RecipientId)
 					INSERT INTO dbo.FailedTransmission(Id,RecipientId,EofMessageId) VALUES(@Id,@RecipientId,@EofMessageId)";
 		private const string _insertStatementAddFailedFileChunkTransmission = @"
-				IF NOT EXISTS (SELECT 1 FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId)
-					INSERT INTO dbo.FailedTransmission(Id,RecipientId,FileChunkId) VALUES(@Id,@RecipientId,@FileChunkId)";
+				BEGIN
+					IF NOT EXISTS (SELECT 1 FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId)
+						INSERT INTO dbo.FailedTransmission(Id,RecipientId,FileChunkId) VALUES(@Id,@RecipientId,@FileChunkId);
+
+					IF NOT EXISTS(SELECT 1 FROM dbo.FileChunk WHERE Id = @FileChunkId)
+						INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value) VALUES(@FileChunkId,@FileId,@SequenceNo,@Value);
+				END";
 		private const string _selectStatementGetFailedFileTransmission = @"SELECT fi.Id, fi.FolderId, fi.Version, fi.LastModifiedDate, fi.Name, fi.Path, fi.Size, fi.Source 
 												,fo.Id, fo.Name
 												,re.Id, re.Name, re.Address
@@ -43,11 +48,6 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		private const string _deleteStatementDeleteFailedEofMessageTransmission = "DELETE FROM dbo.FailedTransmission WHERE EofMessageId = @EofMessageId and RecipientId = @RecipientId";
 		private const string _deleteStatementDeleteFailedFileChunkTransmission = "DELETE FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId";
 		private const string _deleteFileChunkStatement = "DELETE FROM dbo.FileChunk WHERE Id = @FileChunkId";
-
-		private const string _insertStatementFileChunk = @"IF NOT EXISTS(SELECT 1 FROM dbo.FileChunk WHERE Id = @Id)
-															BEGIN
-																INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value) VALUES(@Id,@FileId,@SequenceNo,@Value)
-															END";
 
 		public TransmissionRepository(IDatabaseFactory database)
 		{
@@ -86,11 +86,9 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			var db = _database.Get();
 			using (db)
 			{
-				//the filechunk must be save so it can be retrieved again for resend
-				var resultFileChunk = await db.Execute(_insertStatementFileChunk, new { Id = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value });
-				var resultFailedFileChunk = await db.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId });
+				var resultFailedFileChunk = await db.Execute(_insertStatementAddFailedFileChunkTransmission, new { Id = Guid.NewGuid(), RecipientId = recipientId, FileChunkId = fileChunkId, FileId = fileId, SequenceNo = sequenceNo, Value = value });
 
-				return resultFailedFileChunk.WasSuccessful && resultFileChunk.WasSuccessful ? Result.Success() : Result.Failure();
+				return resultFailedFileChunk.WasSuccessful ? Result.Success() : Result.Failure();
 			}
 		}
 
