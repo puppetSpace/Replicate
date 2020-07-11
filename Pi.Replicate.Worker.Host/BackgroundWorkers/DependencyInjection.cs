@@ -6,7 +6,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	{
 		public static void AddBackgroundServices(this IServiceCollection services)
 		{
-			services.AddHostedService<FolderWorker>();
+			services.AddHostedService<FileCollectorWorker>();
 			services.AddHostedService<FileExportWorker>();
 			services.AddHostedService<FileDisassemblerWorker>();
 			services.AddHostedService<FileChunkExportWorker>();

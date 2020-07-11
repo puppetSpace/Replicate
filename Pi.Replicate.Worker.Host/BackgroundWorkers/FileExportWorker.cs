@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	//todo retry mechanisme in database
 	public class FileExportWorker : BackgroundService, Observr.IObserver<RecipientsAddedToFolderNotification>
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;

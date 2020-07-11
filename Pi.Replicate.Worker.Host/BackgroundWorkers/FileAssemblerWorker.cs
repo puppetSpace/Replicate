@@ -42,8 +42,9 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					{
 						var newFiles = completedFilesResult.Data.Where(x => x.Item1.IsNew());
 						var changedFiles = completedFilesResult.Data.Where(x => !x.Item1.IsNew()).OrderBy(x => x.Item1.Version);
-						await AssembleNewFiles(newFiles);
-						await ApplyChangedToExistingFiles(changedFiles);
+						//could be that changes to a new file are already present. So process new first and then process changed files
+						await AssembleFiles(newFiles);
+						await AssembleFiles(changedFiles);
 
 						await Task.Delay(TimeSpan.FromMinutes(_triggerInterval));
 					}
@@ -55,25 +56,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			await Task.Delay(Timeout.Infinite);
 		}
 
-		private async Task AssembleNewFiles(IEnumerable<(File file, EofMessage eofMesssage)> newFiles)
+		private async Task AssembleFiles(IEnumerable<(File file, EofMessage eofMesssage)> newFiles)
 		{
 			var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
 			foreach (var (file, eofMesssage) in newFiles)
-			{
-				taskRunner.Add(async () =>
-				{
-					await _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage);
-				});
-			}
+				taskRunner.Add(() => _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage));
+			
 			await taskRunner.WaitTillComplete();
-		}
-
-		private async Task ApplyChangedToExistingFiles(IEnumerable<(File file, EofMessage eofMesssage)> changedFiles)
-		{
-			foreach (var (file, eofMesssage) in changedFiles)
-			{
-				await _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage);
-			}
 		}
 	}
 }

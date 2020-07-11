@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
-	public class FolderWorker : BackgroundService
+	public class FileCollectorWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
 		private readonly FolderRepository _folderRespository;
@@ -20,7 +20,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileService _fileService;
 
-		public FolderWorker(IConfiguration configuration
+		public FileCollectorWorker(IConfiguration configuration
 			, FolderRepository folderRespository
 			, FileCollectorFactory fileCollectorFactory
 			, WorkerQueueContainer workerQueueContainer
@@ -37,7 +37,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		{
 			var th = new System.Threading.Thread(async () =>
 			{
-				WorkerLog.Instance.Information($"Starting {nameof(FolderWorker)}");
+				WorkerLog.Instance.Information($"Starting {nameof(FileCollectorWorker)}");
 				while (!stoppingToken.IsCancellationRequested)
 				{
 					var queryResult = await _folderRespository.GetFoldersToCrawl();

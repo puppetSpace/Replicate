@@ -12,7 +12,6 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-//todo add Conflicts: Double versions of file, version missing of file, ...
 namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 {
 	public class FileDisassemblerWorker : BackgroundService
