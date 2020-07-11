@@ -23,7 +23,7 @@ namespace Pi.Replicate.Worker.Host.Processing
 
 		public async Task CollectFiles()
 		{
-			var filesFromSystem = GetFilesFromSystem();
+			var filesFromSystem = GetFilesFromSystem(PathBuilder.BuildPath(_folder.Name));
 			var result = await _fileRepository.GetFilesForFolder(_folder.Id);
 			if (result.WasSuccessful)
 			{
@@ -42,13 +42,25 @@ namespace Pi.Replicate.Worker.Host.Processing
 			}
 		}
 
-		private IList<System.IO.FileInfo> GetFilesFromSystem()
+		private IList<System.IO.FileInfo> GetFilesFromSystem(string path)
 		{
-			var folderPath = PathBuilder.BuildPath(_folder.Name);
-			var folderCrawler = new FolderCrawler();
-			var files = folderCrawler.GetFiles(folderPath);
+			var files = new List<System.IO.FileInfo>();
+			if (string.IsNullOrWhiteSpace(path) || !System.IO.Directory.Exists(path))
+			{
+				WorkerLog.Instance.Warning($"Given path, '{path}' is not a directory. Returning empty list");
+				return files;
+			}
+
+			WorkerLog.Instance.Debug($"Traversing '{path}'");
+
+			foreach (var file in System.IO.Directory.GetFiles(path))
+				files.Add(new System.IO.FileInfo(file));
+
+			foreach (var dir in System.IO.Directory.GetDirectories(path))
+				files.AddRange(GetFilesFromSystem(dir));
 
 			return files;
+
 		}
 
 	}
