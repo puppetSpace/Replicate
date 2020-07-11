@@ -34,6 +34,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			try
 			{
+				//this class has alot of access to database. Just open 1 connection instead of every call creating its own
 				using (_database)
 				{
 					bool hasConflicts = await HasConflicts(file);
@@ -77,10 +78,6 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 			else
 			{
-				var fileFolder = System.IO.Path.GetDirectoryName(filePath);
-				if (!System.IO.Directory.Exists(fileFolder))
-					System.IO.Directory.CreateDirectory(fileFolder);
-
 				WorkerLog.Instance.Information($"Decompressing file '{tempPath}'");
 				await file.DecompressFrom(tempPath);
 				WorkerLog.Instance.Information($"File decompressed to '{filePath}'");

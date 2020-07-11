@@ -1,5 +1,6 @@
 ﻿using Pi.Replicate.Shared.Models;
 using Pi.Replicate.Worker.Host.Data;
+using Pi.Replicate.Worker.Host.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 {
 	public interface IFileChunkRepository
 	{
+		Task<Result> AddReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress);
 		Task<Result<ICollection<byte[]>>> GetFileChunkData(Guid fileId, int toSkip, int toTake, IDatabase database = null);
 		Task<Result> DeleteChunksForFile(Guid fileId, IDatabase database = null);
 	}
@@ -16,6 +18,30 @@ namespace Pi.Replicate.Worker.Host.Repositories
 	{
 		private readonly IDatabaseFactory _databaseFactory;
 
+		private const string _insertStatementAddReceivedFileChunk = @"
+BEGIN
+			DECLARE @RecipientId uniqueidentifier;
+
+			--add chunk
+			IF NOT EXISTS (SELECT 1 FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo = @SequenceNo)
+				INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,[Value]) VALUES(@Id,@FileId,@SequenceNo,@Value)
+			ELSE
+				UPDATE dbo.FileChunk SET [Value] = @Value WHERE FileId = @FileId and SequenceNo = @SequenceNo
+			
+-			-add recipient
+			SELECT @RecipientId = Id
+			FROM dbo.Recipient
+			WHERE [Name] = @RecipientName;
+
+			IF(@recipientId is null)
+			BEGIN
+				SET @recipientId = NEWID();
+				INSERT INTO dbo.Recipient(Id,[Name],[Address], Verified) VALUES(@RecipientId,@RecipientName,@RecipientAddress,0);
+			END
+			
+			--add transmissionresult
+			INSERT INTO dbo.TransmissionResult(Id,RecipientId, FileId,FileChunkSequenceNo, Source) VALUES(NEWID(),@RecipientId,@FileId, @SequenceNo, @Source)
+END";
 		private const string _selectStatementGetFileChunkData = "SELECT [Value] FROM dbo.FileChunk WHERE FileId = @FileId and SequenceNo between @toSkip and @ToTake ORDER BY SEQUENCENO";
 		private const string _deleteStatementDeleteFileChunksForFile = "DELETE FROM dbo.FileChunk WHERE FileId = @FileId";
 
@@ -50,6 +76,13 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			{
 				return await database.Execute(_deleteStatementDeleteFileChunksForFile, new { FileId = fileId });
 			}
+		}
+
+		public async Task<Result> AddReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress)
+		{
+			var db = _databaseFactory.Get();
+			using (db)
+				return await db.Execute(_insertStatementAddReceivedFileChunk, new { Id = Guid.NewGuid(), FileId = fileId, SequenceNo = sequenceNo, Value = value, RecipientName = sender, RecipientAddress = senderAddress, Source = FileSource.Remote });
 		}
 	}
 }

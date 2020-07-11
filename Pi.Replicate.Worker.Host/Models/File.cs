@@ -46,8 +46,13 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public async Task DecompressFrom(string compressedFilePath)
 		{
+			var path = PathBuilder.BuildPath(Path);
+			var fileFolder = System.IO.Path.GetDirectoryName(path);
+			if (!System.IO.Directory.Exists(fileFolder))
+				System.IO.Directory.CreateDirectory(fileFolder);
+
 			using var stream = System.IO.File.OpenRead(compressedFilePath);
-			using var output = System.IO.File.Create(PathBuilder.BuildPath(Path));
+			using var output = System.IO.File.Create(path);
 			using var gzip = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress);
 
 			await gzip.CopyToAsync(output);

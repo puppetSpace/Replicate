@@ -37,7 +37,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 		{
 			private readonly FileService _fileService;
 			private readonly IEofMessageRepository _eofMessageRepository;
-			private readonly FileChunkService _fileChunkService;
+			private readonly IFileChunkRepository _fileChunkRepository;
 
 			private static readonly FileChunkTransmissionResponse _successFullFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = true };
 			private static readonly FileChunkTransmissionResponse _failedFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = false };
@@ -46,11 +46,11 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			private static readonly FileTransmissionResponse _successFullFileTransmissionResponse = new FileTransmissionResponse { IsSuccessful = true };
 			private static readonly FileTransmissionResponse _failedEFileTransmissionResponse = new FileTransmissionResponse { IsSuccessful = false };
 
-			public TransmissionActions(FileService fileService, IEofMessageRepository eofMessageRepository, FileChunkService fileChunkService)
+			public TransmissionActions(FileService fileService, IEofMessageRepository eofMessageRepository, IFileChunkRepository fileChunkRepository)
 			{
 				_fileService = fileService;
 				_eofMessageRepository = eofMessageRepository;
-				_fileChunkService = fileChunkService;
+				_fileChunkRepository = fileChunkRepository;
 			}
 
 			public async Task<FileTransmissionResponse> SendFile(FileTransmissionRequest request)
@@ -74,7 +74,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			public async Task<FileChunkTransmissionResponse> SendFileChunk(FileChunkTransmissionRequest request)
 			{
 				WorkerLog.Instance.Information($"Filechunk received from {request.Host}");
-				var result = await _fileChunkService.AddReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, Array.Empty<byte>(), request.Host, DummyAdress.Create(request.Host)); ;
+				var result = await _fileChunkRepository.AddReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, Array.Empty<byte>(), request.Host, DummyAdress.Create(request.Host)); ;
 				return result.WasSuccessful
 					? _successFullFileChunkTransmissionResponse
 					: _failedFileChunkTransmissionResponse;
