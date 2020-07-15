@@ -2,7 +2,7 @@ version: '3.4'
 
 services:
   workerhost:
-    image: ${DOCKER_REGISTRY-}pireplicateworkerhost
+    # image: ${DOCKER_REGISTRY-}pireplicateworkerhost
     build:
       context: .
       dockerfile: Pi.Replicate.Worker.Host/Dockerfile
@@ -16,7 +16,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Docker
 
   web:
-    image: ${DOCKER_REGISTRY-}pireplicatewebui
+    # image: ${DOCKER_REGISTRY-}pireplicatewebui
     build:
       context: .
       dockerfile: Pi.Replicate.WebUi/Dockerfile
@@ -38,7 +38,7 @@ services:
       - data:/var/opt/mssql/data
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=password123
+      - SA_PASSWORD=SBB4CPWm6&5R3gshmRz*^B2etPN4&
 
 volumes: 
   data:
