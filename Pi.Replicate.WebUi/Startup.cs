@@ -64,7 +64,7 @@ namespace Pi.Replicate.WebUi
                 app.UseHsts();
             }
             app.UseSerilogRequestLogging();
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

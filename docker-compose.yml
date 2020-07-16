@@ -7,12 +7,16 @@ services:
       context: .
       dockerfile: Pi.Replicate.Worker.Host/Dockerfile
     volumes: 
-      - d:\temp:/home
+      - d:\temp:/home/basefolder
     depends_on: 
       - db
     ports: 
       - "44309:44309"
+      - "44308:44308"
     environment: 
+      - ASPNETCORE_URLS=https://+:44309;http://+:44308
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=Telefoon9008
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/certs/pidev.pfx
       - ASPNETCORE_ENVIRONMENT=Docker
 
   web:
@@ -24,18 +28,24 @@ services:
       - workerhost
       - db
     ports: 
-      - "44309:44309"
       - "443:443"
+    expose: 
+      - "44309"
+      - "44308"
     environment: 
-        - AppSettings__WorkerApiBaseAddress=https://worker:44309
+        - AppSettings__WorkerApiBaseAddress=http://workerhost:44308
+        - ASPNETCORE_URLS=https://+:443
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=Telefoon9008
+        - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/certs/pidev.pfx
         - ASPNETCORE_ENVIRONMENT=Docker
 
   db:
     image: mcr.microsoft.com/mssql/server:2019-CU5-ubuntu-16.04
+    user: root
     ports:
       - "1433:1433"
     volumes: 
-      - data:/var/opt/mssql/data
+      - data:/var/opt/mssql
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=SBB4CPWm6&5R3gshmRz*^B2etPN4&

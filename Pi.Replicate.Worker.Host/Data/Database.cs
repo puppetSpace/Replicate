@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.SqlServer.Management.Common;
 using Microsoft.SqlServer.Management.Smo;
 using Pi.Replicate.Shared.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -117,18 +118,22 @@ namespace Pi.Replicate.Worker.Host.Data
 
 		void IDatabaseInitializer.Initialize()
 		{
+			
 			using (var masterDatabase = new SqlConnection(_configuration.GetConnectionString("MasterDatabase")))
 			{
 				var doesDatabaseExist = masterDatabase.ExecuteScalar<bool>("select 1 from sys.databases where name = 'ReplicateDb';");
 				if (!doesDatabaseExist)
 				{
+					if (!System.IO.File.Exists("Create_Db_Structure.sql"))
+						throw new InvalidOperationException("Database initialization script not found. Unable to continue");
+
 					//todo get password from environment variable
 					masterDatabase.Execute("CREATE DATABASE ReplicateDb");
 					masterDatabase.Execute("USE ReplicateDB; CREATE LOGIN Replicator WITH PASSWORD = 'Y9w@*bdnPhM*6AQXbjdzD^33Z^j8B'; CREATE USER Replicator FOR LOGIN Replicator;");
 					masterDatabase.Execute("alter server role sysadmin add member Replicator;");
 					masterDatabase.Execute("USE ReplicateDB; GRANT ALTER ON SCHEMA::dbo TO Replicator");
 					var server = new Server(new ServerConnection(new Microsoft.Data.SqlClient.SqlConnection(_configuration.GetConnectionString("ReplicateDatabase"))));
-					server.ConnectionContext.ExecuteNonQuery(System.IO.File.ReadAllText(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Create_Db_Structure.sql")));
+					server.ConnectionContext.ExecuteNonQuery(System.IO.File.ReadAllText("Create_Db_Structure.sql"));
 				}
 			}
 		}

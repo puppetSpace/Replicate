@@ -15,6 +15,6 @@ namespace Pi.Replicate.Shared
         public const string FileSplitSizeOfChunksInBytes = "SizeOfChunksInBytes";
         public const string ConcurrentFileDisassemblyJobs = "ConcurrentFileDisassemblyJobs";
         public const string ConcurrentFileAssemblyJobs = "ConcurrentFileAssemblyJobs";
-		public const string WorkerApiBaseAddressSetting = "AppSettings:WorkerApiBaseAdress";
+		public const string WorkerApiBaseAddressSetting = "AppSettings:WorkerApiBaseAddress";
 	}
 }

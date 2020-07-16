@@ -78,7 +78,7 @@ namespace Pi.Replicate.Worker.Host
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
 
 			app.UseRouting();
 

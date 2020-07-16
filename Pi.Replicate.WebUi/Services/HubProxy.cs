@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Configuration;
 using Pi.Replicate.Shared;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,7 @@ namespace Pi.Replicate.WebUi.Services
 		private string GetHubHost()
 		{
 			var workerApiUrl = _configuration[Constants.WorkerApiBaseAddressSetting];
+			Log.Information($"Worker address: {workerApiUrl}");
 			if (string.IsNullOrWhiteSpace(workerApiUrl))
 				workerApiUrl = Environment.MachineName;
 

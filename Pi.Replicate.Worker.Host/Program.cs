@@ -5,7 +5,7 @@ using Serilog;
 
 namespace Pi.Replicate.Worker.Host
 {
-	// todo check for double changes in incomming files
+	// todo check for double changes in incoming files
 	public class Program
 	{
 		public static void Main(string[] args)
@@ -17,10 +17,10 @@ namespace Pi.Replicate.Worker.Host
 			Log.Logger = new LoggerConfiguration()
 			.ReadFrom.Configuration(configuration)
 			.Enrich.FromLogContext()
-#if DEBUG
+//#if DEBUG
 			.WriteTo.Debug()
 			.WriteTo.Console()
-#endif
+//#endif
 			.CreateLogger();
 
 

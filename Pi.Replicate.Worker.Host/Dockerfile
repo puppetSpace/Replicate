@@ -20,4 +20,7 @@ RUN dotnet publish "Pi.Replicate.Worker.Host.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY --from=publish /app/publish/pidev.pfx /home/certs/pidev.pfx
+COPY --from=publish /app/publish/rootca.crt /etc/ssl/certs/pirootca.crt
+RUN update-ca-certificates
 ENTRYPOINT ["dotnet", "Pi.Replicate.Worker.Host.dll"]
