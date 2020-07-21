@@ -8,7 +8,7 @@ namespace Pi.Replicate.Shared
 {
     public static class Constants
     {
-        public const string ReplicateBasePath = "BaseFolder";
+        public const string ReplicateBasePath = "AppSettings:BaseFolder";
         public const string FolderCrawlTriggerInterval = "TriggerIntervalFolderCrawl";
         public const string FileAssemblyTriggerInterval = "TriggerIntervalFileAssembly";
 		public const string RetryTriggerInterval = "TriggerIntervalRetry";

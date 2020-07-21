@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IO;
 using Observr;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.BackgroundWorkers;
@@ -39,6 +40,7 @@ namespace Pi.Replicate.Worker.Host
 			services.AddSingleton<WorkerQueueContainer>();
 			services.AddTransient<TelemetryProxy>();
 			services.AddSingleton<TransmissionHub.TransmissionActions>();
+			services.AddSingleton<RecyclableMemoryStreamManager>(x => new RecyclableMemoryStreamManager());
 			services.AddRepositories();
 			services.AddWorkerServices();
 			services.AddBackgroundServices();

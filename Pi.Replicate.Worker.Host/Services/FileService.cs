@@ -28,7 +28,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var file = File.Build(newFile, folderId, PathBuilder.BasePath);
 			var signature = file.CreateSignature();
 
-			var result = await _fileRespository.AddNewFile(file, signature.ToArray());
+			var result = await _fileRespository.AddNewFile(file, signature);
 			return result.WasSuccessful ? file : null;
 		}
 
@@ -40,7 +40,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				file.Update(changedFile);
 				var signature = file.CreateSignature();
-				await _fileRespository.AddNewFile(queryResult.Data, signature.ToArray());
+				await _fileRespository.AddNewFile(queryResult.Data, signature);
 				return queryResult.Data;
 			}
 

@@ -28,7 +28,7 @@ BEGIN
 			ELSE
 				UPDATE dbo.FileChunk SET [Value] = @Value WHERE FileId = @FileId and SequenceNo = @SequenceNo
 			
--			-add recipient
+			--add recipient
 			SELECT @RecipientId = Id
 			FROM dbo.Recipient
 			WHERE [Name] = @RecipientName;
