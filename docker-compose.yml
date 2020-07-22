@@ -18,6 +18,7 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=Telefoon9008
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/home/certs/pidev.pfx
       - ASPNETCORE_ENVIRONMENT=Docker
+      - AppSettings__BaseFolder=/home/basefolder
 
   web:
     # image: ${DOCKER_REGISTRY-}pireplicatewebui
