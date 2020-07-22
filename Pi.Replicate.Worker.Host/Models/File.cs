@@ -58,7 +58,8 @@ namespace Pi.Replicate.Worker.Host.Models
 			await gzip.CopyToAsync(output);
 		}
 
-		public ReadOnlyMemory<byte> CreateSignature()
+		//todo check to see if you can change Octodiff to use byte[] instead of stream
+		public byte[] CreateSignature()
 		{
 			using (var fs = System.IO.File.OpenRead(PathBuilder.BuildPath(Path)))
 			{
@@ -70,12 +71,13 @@ namespace Pi.Replicate.Worker.Host.Models
 			}
 		}
 
-		public ReadOnlyMemory<byte> CreateDelta(ReadOnlyMemory<byte> signature)
+		//use readonlymemory so .Slice can be used
+		public ReadOnlyMemory<byte> CreateDelta(byte[] signature)
 		{
 			using (var fs = System.IO.File.OpenRead(PathBuilder.BuildPath(Path)))
 			{
 				var deltaStream = new System.IO.MemoryStream();
-				var signatureReader = new Octodiff.Core.SignatureReader(new System.IO.MemoryStream(signature.ToArray()), LogProgressReporter.Get());
+				var signatureReader = new Octodiff.Core.SignatureReader(new System.IO.MemoryStream(signature), LogProgressReporter.Get());
 				var deltaWriter = new Octodiff.Core.AggregateCopyOperationsDecorator(new Octodiff.Core.BinaryDeltaWriter(deltaStream));
 				var deltaBuilder = new Octodiff.Core.DeltaBuilder();
 				deltaBuilder.BuildDelta(fs, signatureReader, deltaWriter);
@@ -85,7 +87,7 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
-		public void ApplyDelta(ReadOnlyMemory<byte> delta)
+		public void ApplyDelta(byte[] delta)
 		{
 			var path = PathBuilder.BuildPath(Path);
 			var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
@@ -93,7 +95,7 @@ namespace Pi.Replicate.Worker.Host.Models
 			{
 				using (var fsout = new FileStream(tempPath, FileMode.Create))
 				{
-					var deltaReader = new Octodiff.Core.BinaryDeltaReader(new MemoryStream(delta.ToArray()), LogProgressReporter.Get());
+					var deltaReader = new Octodiff.Core.BinaryDeltaReader(new MemoryStream(delta), LogProgressReporter.Get());
 					var deltaApplier = new Octodiff.Core.DeltaApplier { SkipHashCheck = true };
 					deltaApplier.Apply(fs, deltaReader, fsout);
 				}

@@ -74,7 +74,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			public async Task<FileChunkTransmissionResponse> SendFileChunk(FileChunkTransmissionRequest request)
 			{
 				WorkerLog.Instance.Information($"Filechunk received from {request.Host}");
-				var result = await _fileChunkRepository.AddReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, Array.Empty<byte>(), request.Host, DummyAdress.Create(request.Host)); ;
+				var result = await _fileChunkRepository.AddReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, request.Value.ToByteArray(), request.Host, DummyAdress.Create(request.Host)); ;
 				return result.WasSuccessful
 					? _successFullFileChunkTransmissionResponse
 					: _failedFileChunkTransmissionResponse;

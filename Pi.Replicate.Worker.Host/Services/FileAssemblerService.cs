@@ -156,7 +156,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var filePath = PathBuilder.BuildPath(file.Path);
 			var signature = file.CreateSignature();
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
-			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature.ToArray(), _database);
+			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature, _database);
 			await _fileChunkRepository.DeleteChunksForFile(file.Id, _database);
 			_webhookService.NotifyFileAssembled(file);
 		}

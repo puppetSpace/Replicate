@@ -72,12 +72,12 @@ namespace Pi.Replicate.Worker.Host.Services
 
 			WorkerLog.Instance.Information($"Splitting up '{file.Path}'");
 
-			var sharedmemory = MemoryPool<byte>.Shared.Rent(_sizeofChunkInBytes);
+			var buffer = new byte[_sizeofChunkInBytes];
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
 			{
-				while ((await stream.ReadAsync(sharedmemory.Memory)) > 0)
+				while ((await stream.ReadAsync(buffer,0,buffer.Length)) > 0)
 				{
-					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, sharedmemory.Memory.ToArray());
+					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, buffer);
 					await chunkWriter.Push(fileChunk);
 				}
 			}
