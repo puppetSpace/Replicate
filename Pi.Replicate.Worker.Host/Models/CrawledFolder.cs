@@ -2,7 +2,7 @@
 
 namespace Pi.Replicate.Worker.Host.Models
 {
-	public class CrawledFolder
+	public struct CrawledFolder
 	{
 		public Guid Id { get; set; }
 

@@ -70,6 +70,10 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 				WorkerLog.Instance.Information($"'{file.Path}' is processed");
 			}
+			else
+			{
+				WorkerLog.Instance.Information($"No recipients found for folder containing '{file.Path}'");
+			}
 		}
 
 		private async Task<List<Recipient>> GetRecipients(File file)
