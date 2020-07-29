@@ -77,7 +77,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			{
 				while ((await stream.ReadAsync(buffer,0,buffer.Length)) > 0)
 				{
-					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, buffer);
+					var fileChunk = new FileChunk(file.Id, ++sequenceNo, buffer);
 					await chunkWriter.Push(fileChunk);
 				}
 			}
@@ -121,7 +121,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
-					var fileChunk = FileChunk.Build(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks).ToArray());
+					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks).ToArray());
 					await chunkWriter.Push(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;

@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Repositories;
 using Pi.Replicate.Worker.Host.Services;
 using System;
@@ -37,7 +38,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 		{
 			private readonly FileService _fileService;
 			private readonly IEofMessageRepository _eofMessageRepository;
-			private readonly IFileChunkRepository _fileChunkRepository;
+			private readonly WorkerQueueContainer _workerQueueContainer;
 
 			private static readonly FileChunkTransmissionResponse _successFullFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = true };
 			private static readonly FileChunkTransmissionResponse _failedFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = false };
@@ -46,11 +47,11 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			private static readonly FileTransmissionResponse _successFullFileTransmissionResponse = new FileTransmissionResponse { IsSuccessful = true };
 			private static readonly FileTransmissionResponse _failedEFileTransmissionResponse = new FileTransmissionResponse { IsSuccessful = false };
 
-			public TransmissionActions(FileService fileService, IEofMessageRepository eofMessageRepository, IFileChunkRepository fileChunkRepository)
+			public TransmissionActions(FileService fileService, IEofMessageRepository eofMessageRepository, WorkerQueueContainer workerQueueContainer)
 			{
 				_fileService = fileService;
 				_eofMessageRepository = eofMessageRepository;
-				_fileChunkRepository = fileChunkRepository;
+				_workerQueueContainer = workerQueueContainer;
 			}
 
 			public async Task<FileTransmissionResponse> SendFile(FileTransmissionRequest request)
@@ -74,10 +75,12 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			public async Task<FileChunkTransmissionResponse> SendFileChunk(FileChunkTransmissionRequest request)
 			{
 				WorkerLog.Instance.Information($"Filechunk received from {request.Host}");
-				var result = await _fileChunkRepository.AddReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, request.Value.ToByteArray(), request.Host, DummyAdress.Create(request.Host)); ;
-				return result.WasSuccessful
-					? _successFullFileChunkTransmissionResponse
-					: _failedFileChunkTransmissionResponse;
+				var outgoingQueue = _workerQueueContainer.ReceivedChunks.Writer;
+				if(await outgoingQueue.WaitToWriteAsync())
+				{
+					await outgoingQueue.WriteAsync(new ReceivedFileChunk(Guid.Parse(request.FileId), request.SequenceNo, request.Value.ToByteArray(), request.Host, DummyAdress.Create(request.Host)));
+				}
+				return _successFullFileChunkTransmissionResponse;
 			}
 		}
 	}

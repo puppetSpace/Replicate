@@ -67,7 +67,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			catch (Exception ex)
 			{
 				WorkerLog.Instance.Error(ex, $"Failed to send chunk to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
-				var result = await _transmissionRepository.AddFailedFileChunkTransmission(fileChunk.Id, fileChunk.FileId, recipient.Id, fileChunk.SequenceNo, fileChunk.Value);
+				var result = await _transmissionRepository.AddFailedFileChunkTransmission(fileChunk.Id, fileChunk.FileId, recipient.Id, fileChunk.SequenceNo, fileChunk.GetValue());
 				canContinue = result.WasSuccessful;
 			}
 			return canContinue;

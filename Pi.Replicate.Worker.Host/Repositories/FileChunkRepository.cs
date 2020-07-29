@@ -9,7 +9,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 {
 	public interface IFileChunkRepository
 	{
-		Task<Result> AddReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress);
+		Task<Result> AddReceivedFileChunk(ReceivedFileChunk receivedFileChunk);
 		Task<Result<ICollection<byte[]>>> GetFileChunkData(Guid fileId, int toSkip, int toTake, IDatabase database = null);
 		Task<Result> DeleteChunksForFile(Guid fileId, IDatabase database = null);
 	}
@@ -78,11 +78,21 @@ END";
 			}
 		}
 
-		public async Task<Result> AddReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress)
+		public async Task<Result> AddReceivedFileChunk(ReceivedFileChunk receivedFileChunk)
 		{
 			var db = _databaseFactory.Get();
 			using (db)
-				return await db.Execute(_insertStatementAddReceivedFileChunk, new { Id = Guid.NewGuid(), FileId = fileId, SequenceNo = sequenceNo, Value = value, RecipientName = sender, RecipientAddress = senderAddress, Source = FileSource.Remote });
+				return await db.Execute(_insertStatementAddReceivedFileChunk, 
+					new 
+					{ 
+						  Id = receivedFileChunk.Id
+						, FileId = receivedFileChunk.FileId
+						, SequenceNo = receivedFileChunk.SequenceNo
+						, Value = receivedFileChunk.GetValue()
+						, RecipientName = receivedFileChunk.Sender
+						, RecipientAddress = receivedFileChunk.SenderAddress
+						, Source = FileSource.Remote 
+					});
 		}
 	}
 }

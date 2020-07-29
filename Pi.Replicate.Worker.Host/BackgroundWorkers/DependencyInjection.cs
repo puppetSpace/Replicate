@@ -11,6 +11,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			services.AddHostedService<FileDisassemblerWorker>();
 			services.AddHostedService<FileChunkExportWorker>();
 			services.AddHostedService<FileAssemblerWorker>();
+			services.AddHostedService<FileChunkReceiverWorker>();
 			services.AddHostedService<SystemOverviewWatcher>();
 			services.AddHostedService<RetryWorker>();
 		}

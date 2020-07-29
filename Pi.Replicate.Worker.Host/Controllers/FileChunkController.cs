@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IO;
 using Pi.Replicate.Worker.Host.Common;
+using Pi.Replicate.Worker.Host.Models;
+using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Repositories;
 using System;
 using System.Threading.Tasks;
@@ -10,13 +12,13 @@ namespace Pi.Replicate.Worker.Host.Controllers
 	[ApiController]
 	public class FileChunkController : ControllerBase
 	{
-		private readonly IFileChunkRepository _fileChunkRepository;
 		private readonly RecyclableMemoryStreamManager _recyclableMemoryStreamManager;
+		private readonly WorkerQueueContainer _workerQueueContainer;
 
-		public FileChunkController(IFileChunkRepository fileChunkRepository, RecyclableMemoryStreamManager recyclableMemoryStreamManager)
+		public FileChunkController(RecyclableMemoryStreamManager recyclableMemoryStreamManager, WorkerQueueContainer workerQueueContainer)
 		{
-			_fileChunkRepository = fileChunkRepository;
 			_recyclableMemoryStreamManager = recyclableMemoryStreamManager;
+			_workerQueueContainer = workerQueueContainer;
 		}
 
 		//todo test
@@ -26,13 +28,12 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			WorkerLog.Instance.Information($"Filechunk received from {host}");
 			using (var ms = _recyclableMemoryStreamManager.GetStream())
 			{
+				var outgoingQueue = _workerQueueContainer.ReceivedChunks.Writer;
 				await Request.Body.CopyToAsync(ms);
-				if (ms.TryGetBuffer(out var buffer))
+				if (ms.TryGetBuffer(out var buffer) && await outgoingQueue.WaitToWriteAsync())
 				{
-					var result = await _fileChunkRepository.AddReceivedFileChunk(fileId, sequenceNo, buffer.Array, host, DummyAdress.Create(host));
-					return result.WasSuccessful
-						? NoContent()
-						: StatusCode(500);
+					await outgoingQueue.WriteAsync(new ReceivedFileChunk(fileId, sequenceNo, buffer.Array, host, DummyAdress.Create(host)));
+					return NoContent();
 				}
 				else
 				{

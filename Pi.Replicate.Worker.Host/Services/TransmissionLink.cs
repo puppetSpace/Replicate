@@ -60,7 +60,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var httpClient = _httpClientFactory.CreateClient("default");
 
 			var address = $"{recipient.Address}/api/file/{fileChunk.FileId}/chunk/{fileChunk.SequenceNo}/{Environment.MachineName}";
-			var content = new ByteArrayContent(fileChunk.Value);
+			var content = new ByteArrayContent(fileChunk.GetValue());
 			content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 			var response = await httpClient.PostAsync(address, content);
 			response.EnsureSuccessStatusCode();
@@ -112,7 +112,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				FileId = fileChunk.FileId.ToString(),
 				SequenceNo = fileChunk.SequenceNo,
 				Host = Environment.MachineName,
-				Value = ByteString.CopyFrom(fileChunk.Value)
+				Value = ByteString.CopyFrom(fileChunk.GetValue())
 			});
 
 			if (!result.IsSuccessful)

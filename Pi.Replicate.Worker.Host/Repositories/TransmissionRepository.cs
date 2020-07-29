@@ -20,11 +20,10 @@ namespace Pi.Replicate.Worker.Host.Repositories
 					INSERT INTO dbo.FailedTransmission(Id,RecipientId,EofMessageId) VALUES(@Id,@RecipientId,@EofMessageId)";
 		private const string _insertStatementAddFailedFileChunkTransmission = @"
 				BEGIN
-					IF NOT EXISTS (SELECT 1 FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId)
-						INSERT INTO dbo.FailedTransmission(Id,RecipientId,FileChunkId) VALUES(@Id,@RecipientId,@FileChunkId);
-
 					IF NOT EXISTS(SELECT 1 FROM dbo.FileChunk WHERE Id = @FileChunkId)
 						INSERT INTO dbo.FileChunk(Id,FileId,SequenceNo,Value) VALUES(@FileChunkId,@FileId,@SequenceNo,@Value);
+					IF NOT EXISTS (SELECT 1 FROM dbo.FailedTransmission WHERE FileChunkId = @FileChunkId and RecipientId = @RecipientId)
+						INSERT INTO dbo.FailedTransmission(Id,RecipientId,FileChunkId) VALUES(@Id,@RecipientId,@FileChunkId);
 				END";
 		private const string _selectStatementGetFailedFileTransmission = @"SELECT fi.Id, fi.FolderId, fi.Version, fi.LastModifiedDate, fi.Name, fi.Path, fi.Size, fi.Source 
 												,fo.Id, fo.Name
