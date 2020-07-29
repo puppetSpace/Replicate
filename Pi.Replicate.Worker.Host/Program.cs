@@ -17,10 +17,10 @@ namespace Pi.Replicate.Worker.Host
 			Log.Logger = new LoggerConfiguration()
 			.ReadFrom.Configuration(configuration)
 			.Enrich.FromLogContext()
-//#if DEBUG
+#if DEBUG
 			.WriteTo.Debug()
 			.WriteTo.Console()
-//#endif
+#endif
 			.CreateLogger();
 
 

@@ -11,7 +11,7 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
-		public FileChunk(Guid fileId, int sequenceNo, byte[] value):base()
+		public FileChunk(Guid fileId, int sequenceNo, byte[] value):this()
 		{
 			Id = Guid.NewGuid();
 			FileId = fileId;

@@ -31,7 +31,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (otherVersions.Count(x => x.Version == currentFile.Version) > 1)
 			{
 				WorkerLog.Instance.Information($"Conflict found while assembling file '{currentFile.Path}': There is already version {currentFile.Version} for this file.");
-				var conflict = FileConflict.Create(currentFile.Id, FileConflictType.SameVersion);
+				var conflict = new FileConflict(currentFile.Id, FileConflictType.SameVersion);
 				await _conflictRepository.AddConflict(conflict);
 				hasConflicts = true;
 			}

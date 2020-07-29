@@ -4,18 +4,21 @@ namespace Pi.Replicate.Worker.Host.Models
 {
 	public class FileConflict
 	{
+		public FileConflict()
+		{
+
+		}
+
+		public FileConflict(Guid fileId, FileConflictType type)
+		{
+			FileId = fileId;
+			Type = type;
+		}
+
 		public Guid FileId { get; private set; }
 
 		public FileConflictType Type { get; private set; }
-
-		public static FileConflict Create(Guid fileId, FileConflictType type)
-		{
-			return new FileConflict
-			{
-				FileId = fileId,
-				Type = type
-			};
-		}
+		
 	}
 
 	public enum FileConflictType

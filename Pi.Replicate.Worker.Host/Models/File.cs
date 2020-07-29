@@ -8,21 +8,56 @@ namespace Pi.Replicate.Worker.Host.Models
 {
 	public class File
 	{
-		public Guid Id { get; set; }
 
-		public Guid FolderId { get; set; }
+		public File()
+		{
 
-		public string Name { get; set; }
+		}
 
-		public int Version { get; set; }
+		public File(Guid id, Guid folderId, string name, string path, DateTime lastModifiedDate, long size, FileSource source, int version)
+		{
+			Id = id;
+			FolderId = folderId;
+			Name = name;
+			Path = path;
+			LastModifiedDate = lastModifiedDate;
+			Size = size;
+			Source = source;
+			Version = version;
+		}
 
-		public long Size { get; set; }
+		public File(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null):this()
+		{
+			if (file is null || !file.Exists)
+				throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
 
-		public FileSource Source { get; set; }
+			Id = Guid.NewGuid();
+			FolderId = folderId;
+			LastModifiedDate = customLastModified ?? file.LastWriteTimeUtc;
+			Name = file.Name;
+			Path = file.FullName.Replace(basePath + "\\", ""); //must be relative to base
+			Size = file.Length;
+			Source = FileSource.Local;
+			Version = 1;
+		}
 
-		public DateTime LastModifiedDate { get; set; }
 
-		public string Path { get; set; }
+
+		public Guid Id { get; protected set; }
+
+		public Guid FolderId { get; protected set; }
+
+		public string Name { get; protected set; }
+
+		public int Version { get; protected set; }
+
+		public long Size { get; protected set; }
+
+		public FileSource Source { get; protected set; }
+
+		public DateTime LastModifiedDate { get; protected set; }
+
+		public string Path { get; protected set; }
 
 		public bool IsNew() => Version == 1;
 
@@ -89,6 +124,9 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public void ApplyDelta(byte[] delta)
 		{
+			if (delta.Length == 0)
+				return;
+
 			var path = PathBuilder.BuildPath(Path);
 			var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 			using (var fs = System.IO.File.OpenRead(path))
@@ -105,25 +143,6 @@ namespace Pi.Replicate.Worker.Host.Models
 			System.IO.File.Copy(tempPath, path, overwrite: true);
 		}
 
-		public static File Build(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null)
-		{
-			if (file is null || !file.Exists)
-				throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
-
-			return new File
-			{
-				Id = Guid.NewGuid(),
-				FolderId = folderId,
-				LastModifiedDate = customLastModified ?? file.LastWriteTimeUtc,
-				Name = file.Name,
-				Path = file.FullName.Replace(basePath + "\\", ""), //must be relative to base
-				Size = file.Length,
-				Source = FileSource.Local,
-				Version = 1
-
-			};
-		}
-
 		private class LogProgressReporter : Octodiff.Diagnostics.IProgressReporter
 		{
 			public void ReportProgress(string operation, long currentPosition, long total)
@@ -138,6 +157,17 @@ namespace Pi.Replicate.Worker.Host.Models
 
 	public class RequestFile : File
 	{
+		public RequestFile() : base()
+		{
+
+		}
+
+		public RequestFile(Guid id, Guid folderId, string name, string path, DateTime lastModifiedDate, long size, FileSource source, int version, List<Recipient> neededRecipients) 
+			: base(id,folderId,name,path,lastModifiedDate,size,source,version)
+		{
+			Recipients = neededRecipients;
+		}
+
 		public ICollection<Recipient> Recipients { get; set; }
 	}
 

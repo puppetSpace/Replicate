@@ -29,7 +29,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		}
 
 
-		public async Task<EofMessage> ProcessFile(File file,ChunkWriter chunkWriter)
+		public async Task<EofMessage> ProcessFile(File file, IChunkWriter chunkWriter)
 		{
 			var path = PathBuilder.BuildPath(file.Path);
 			EofMessage eofMessage = null;
@@ -63,7 +63,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			return eofMessage;
 		}
 
-		private async Task<EofMessage> ProcessNewFile(File file, ChunkWriter chunkWriter)
+		private async Task<EofMessage> ProcessNewFile(File file, IChunkWriter chunkWriter)
 		{
 			var sequenceNo = 0;
 			WorkerLog.Instance.Information($"Compressing file '{file.Path}'");
@@ -100,7 +100,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 		}
 
-		private async Task<EofMessage> ProcessChangedFile(File file, ChunkWriter chunkWriter)
+		private async Task<EofMessage> ProcessChangedFile(File file, IChunkWriter chunkWriter)
 		{
 			var amountOfChunks = 0;
 
@@ -134,7 +134,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		private async Task<EofMessage> CreateEofMessage(File file, int amountOfChunks)
 		{
 			WorkerLog.Instance.Information($"Creating eof message for '{file.Path}'");
-			var eofMessage = EofMessage.Build(file.Id, amountOfChunks);
+			var eofMessage = new EofMessage(file.Id, amountOfChunks);
 			var eofResult = await _eofMessageRepository.AddEofMessage(eofMessage);
 			if (eofResult.WasSuccessful)
 				return eofMessage;
@@ -149,7 +149,12 @@ namespace Pi.Replicate.Worker.Host.Services
 		}
 	}
 
-	public class ChunkWriter
+	public interface IChunkWriter
+	{
+		Task Push(FileChunk fileChunk);
+	}
+
+	public class ChunkWriter : IChunkWriter
 	{
 		private readonly ICollection<Recipient> _recipients;
 		private readonly ChannelWriter<(Recipient recipient, FileChunk filechunk)> _writer;

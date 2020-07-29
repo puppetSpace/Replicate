@@ -30,7 +30,6 @@ namespace Pi.Replicate.Test.Services
 			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var calculatedAmountOfChunks = Math.Ceiling((double)compressedFile.Length / int.Parse(configuration.Object[Constants.FileSplitSizeOfChunksInBytes]));
 			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
@@ -39,8 +38,11 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
+
 			var processService = new FileDisassemblerService(configuration.Object,webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
+			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
 
@@ -51,23 +53,23 @@ namespace Pi.Replicate.Test.Services
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
-			var eofMessageAmountOfChunks = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
-				.ReturnsAsync(() => Result.Success())
-				.Callback<EofMessage>(x => eofMessageAmountOfChunks = x.AmountOfChunks);
+				.ReturnsAsync(() => Result.Success());
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			Assert.AreEqual(eofMessageAmountOfChunks, amountOfCalls);
+			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
+
+			Assert.IsNotNull(eofMessage);
+			Assert.AreEqual(eofMessage.AmountOfChunks, amountOfCalls);
 
 		}
 
@@ -76,10 +78,8 @@ namespace Pi.Replicate.Test.Services
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
 			var amountOfCalls = 0;
 			var getPreviousSignatureOfFileQueryCalled = false;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
@@ -92,25 +92,27 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
+
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel(fileInfo);
 			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
+			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
 
 			Assert.IsTrue(getPreviousSignatureOfFileQueryCalled);
 		}
 		[TestMethod]
-		public async Task ProcessFile_Changed_EofMessageShouldbeMade()
+		public async Task ProcessFile_Changed_EofMessageShouldbeCreated()
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
+			var domainFile = Helper.GetFileModel(fileInfo);
 			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
-				.ReturnsAsync(() => Result<byte[]>.Success(Helper.GetByteArray()));
+				.ReturnsAsync(() => Result<byte[]>.Success(domainFile.CreateSignature()));
 
 			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
@@ -118,12 +120,16 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
+
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
+			
 			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
+			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
 
 			Assert.IsNotNull(eofFile);
+			Assert.AreEqual(eofFile.AmountOfChunks,amountOfCalls);
 		}
 
 		[TestMethod]
@@ -131,13 +137,12 @@ namespace Pi.Replicate.Test.Services
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
+			var domainFile = Helper.GetFileModel(fileInfo);
 			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			fileRepositoryMock.Setup(x => x.GetSignatureOfPreviousFile(It.IsAny<Guid>()))
-				.ReturnsAsync(() => Result<byte[]>.Success(Helper.GetByteArray()));
+				.ReturnsAsync(() => Result<byte[]>.Success(domainFile.CreateSignature()));
 
 			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
@@ -145,10 +150,12 @@ namespace Pi.Replicate.Test.Services
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
+
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath);
 			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, chunkCreated);
+			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
 
 			Assert.AreEqual(1, amountOfCalls);
 
@@ -163,7 +170,6 @@ namespace Pi.Replicate.Test.Services
 			using var fs = fileInfo.OpenWrite();
 
 			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 
@@ -172,23 +178,22 @@ namespace Pi.Replicate.Test.Services
 				.ReturnsAsync(() => Result.Success());
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
+			var mockChunkWriter = new Mock<IChunkWriter>();
+			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
-
+			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.AreEqual(0, amountOfCalls);
+			Assert.IsNull(eofMessage);
 
 		}
 
 		[TestMethod]
-		public async Task ProcessFile_WebhookFileDissambledShouldBeCalled()
+		public async Task ProcessFile_WebhookFileDissasembledShouldBeCalled()
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-			var compressedFile = await Helper.CompressFile(fileInfo.FullName);
-			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
 
@@ -199,8 +204,10 @@ namespace Pi.Replicate.Test.Services
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { webhookCalled = true; }, x => { });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
+			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.IsTrue(webhookCalled);
 		}
@@ -213,9 +220,6 @@ namespace Pi.Replicate.Test.Services
 
 			using var fs = fileInfo.OpenWrite();
 
-			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
-
 			var fileRepositoryMock = new Mock<IFileRepository>();
 			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
@@ -224,8 +228,10 @@ namespace Pi.Replicate.Test.Services
 			var webhookCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { webhookCalled = true; });
 
+			var mockChunkWriter = new Mock<IChunkWriter>();
+
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
+			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 
 			Assert.IsTrue(webhookCalled);
@@ -240,8 +246,6 @@ namespace Pi.Replicate.Test.Services
 
 			using var fs = fileInfo.OpenWrite();
 
-			var amountOfCalls = 0;
-			var chunkCreated = new Func<FileChunk, Task>(x => { amountOfCalls++; return Task.CompletedTask; });
 			var isFailedFileRequestCalled = false;
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
@@ -254,9 +258,10 @@ namespace Pi.Replicate.Test.Services
 				.ReturnsAsync(() => Result.Success());
 
 			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
+			var mockChunkWriter = new Mock<IChunkWriter>();
 
 			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(File.Build(fileInfo, System.Guid.Empty, PathBuilder.BasePath), chunkCreated);
+			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.IsTrue(isFailedFileRequestCalled);
 

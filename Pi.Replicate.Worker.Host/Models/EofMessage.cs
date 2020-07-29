@@ -4,6 +4,20 @@ namespace Pi.Replicate.Worker.Host.Models
 {
 	public class EofMessage
 	{
+
+		public EofMessage()
+		{
+
+		}
+
+		public EofMessage(Guid fileId, int amountOfChunks) : this()
+		{
+			Id = Guid.NewGuid();
+			FileId = fileId;
+			AmountOfChunks = amountOfChunks;
+			CreationTime = DateTime.UtcNow;
+		}
+
 		public Guid Id { get; private set; }
 
 		public Guid FileId { get; private set; }
@@ -11,15 +25,5 @@ namespace Pi.Replicate.Worker.Host.Models
 		public int AmountOfChunks { get; private set; }
 
 		public DateTime CreationTime { get; private set; }
-
-		public static EofMessage Build(Guid fileId, int amountOfChunksCreated)
-		{
-			return new EofMessage
-			{
-				Id = Guid.NewGuid(),
-				FileId = fileId,
-				AmountOfChunks = amountOfChunksCreated
-			};
-		}
 	}
 }

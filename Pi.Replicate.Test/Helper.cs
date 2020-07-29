@@ -1,4 +1,5 @@
 ﻿using Moq;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host;
 using Pi.Replicate.Worker.Host.Services;
 using System;
@@ -40,6 +41,16 @@ namespace Pi.Replicate.Test
 		public static ReadOnlyMemory<byte> GetReadOnlyMemory()
 		{
 			return Encoding.UTF8.GetBytes("thisISTest").AsMemory();
+		}
+
+		public static Worker.Host.Models.File GetFileModel(string directory = "DropLocation",string filename="dummy.txt", DateTime? lastModifiedDate = null)
+		{
+			return new Worker.Host.Models.File(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), directory, filename)), Guid.Empty, PathBuilder.BasePath,lastModifiedDate);
+		}
+
+		public static Worker.Host.Models.File GetFileModel(FileInfo fileInfo)
+		{
+			return new Worker.Host.Models.File(fileInfo, Guid.Empty, PathBuilder.BasePath);
 		}
 
 		public static Mock<IWebhookService> GetWebhookServiceMock(Action<Worker.Host.Models.File> notifyFileAssembled

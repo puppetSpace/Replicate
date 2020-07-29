@@ -1,17 +1,14 @@
-using MediatR;
-using Microsoft.Extensions.Configuration;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Shared.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Pi.Replicate.Worker.Host.Models;
 using Pi.Replicate.Worker.Host.Processing;
 using Pi.Replicate.Worker.Host.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Pi.Replicate.Test.Services
 {
@@ -52,8 +49,8 @@ namespace Pi.Replicate.Test.Services
 			var folder = new CrawledFolder { Name = "FileFolder" };
 			ICollection<File> existingFiles = new List<File>
 			{
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,PathBuilder.BasePath),
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,PathBuilder.BasePath)
+				Helper.GetFileModel("FileFolder","test1.txt"),
+				Helper.GetFileModel("FileFolder","test2.txt")
 			};
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
@@ -75,8 +72,8 @@ namespace Pi.Replicate.Test.Services
 			var folder = new CrawledFolder { Name = "FileFolder" };
 			ICollection<File> existingFiles = new List<File>
 			{
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,PathBuilder.BasePath,DateTime.Now),
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,PathBuilder.BasePath,DateTime.Now)
+				Helper.GetFileModel("FileFolder","test1.txt",DateTime.Now),
+				Helper.GetFileModel("FileFolder","test2.txt",DateTime.Now)
 			};
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
@@ -97,8 +94,8 @@ namespace Pi.Replicate.Test.Services
 			var folder = new CrawledFolder { Name = "FileFolder" };
 			ICollection<File> existingFiles = new List<File>
 			{
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test1.txt")),System.Guid.Empty,PathBuilder.BasePath),
-				File.Build(new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath,"FileFolder","test2.txt")),System.Guid.Empty,PathBuilder.BasePath,DateTime.Now)
+				Helper.GetFileModel("FileFolder","test1.txt"),
+				Helper.GetFileModel("FileFolder","test2.txt",DateTime.Now)
 			};
 
 			var fileRepositoryMock = new Mock<IFileRepository>();

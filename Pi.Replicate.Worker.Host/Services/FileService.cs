@@ -25,7 +25,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		public async Task<File> CreateNewFile(Guid folderId, System.IO.FileInfo newFile)
 		{
-			var file = File.Build(newFile, folderId, PathBuilder.BasePath);
+			var file = new File(newFile, folderId, PathBuilder.BasePath);
 			var signature = file.CreateSignature();
 
 			var result = await _fileRespository.AddNewFile(file, signature);
@@ -53,16 +53,16 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (folderCreation.WasSuccessful)
 			{
 				var fileResult = await _fileRespository.AddNewFile(new File
-				{
-					Id = fileId,
-					FolderId = folderCreation.Data,
-					Name = name,
-					Size = size,
-					Version = version,
-					LastModifiedDate = lastModifiedDate,
-					Path = path,
-					Source = FileSource.Remote
-				});
+				(
+					fileId,
+					folderCreation.Data,
+					name,
+					path,
+					lastModifiedDate,
+					size,
+					FileSource.Remote,
+					version
+				));
 				var recipientResult = await _recipientRepository.AddRecipientToFolder(host, DummyAdress.Create(host), folderCreation.Data);
 
 				return fileResult.WasSuccessful && recipientResult.WasSuccessful

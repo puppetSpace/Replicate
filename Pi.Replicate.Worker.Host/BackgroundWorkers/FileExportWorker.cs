@@ -44,17 +44,17 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				foreach (var file in filesResult.Data)
 				{
 					var requestFile = new RequestFile
-					{
-						Id = file.Id,
-						FolderId = file.FolderId,
-						LastModifiedDate = file.LastModifiedDate,
-						Name = file.Name,
-						Path = file.Path,
-						Size = file.Size,
-						Source = file.Source,
-						Version = file.Version,
-						Recipients = neededRecipients
-					};
+					(
+						file.Id,
+						file.FolderId,
+						file.Name,
+						file.Path,
+						file.LastModifiedDate,
+						file.Size,
+						file.Source,
+						file.Version,
+						neededRecipients
+					);
 
 					await _workerQueueContainer.ToSendFiles.Writer.WriteAsync(requestFile, cancellationToken);
 				}

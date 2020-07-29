@@ -29,8 +29,8 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_NewFile_QueryToGetChunkShouldGetCalledTwice()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var domainFile = Helper.GetFileModel();
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var amountofTimesQueryCalled = 0;
 			var databaseMock = new Mock<IDatabase>();
 
@@ -66,8 +66,8 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_NewFile_QueryToGetChunkShouldGetCorrectParameters()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var domainFile = Helper.GetFileModel(); 
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
 			var toSkipSum = 0;
 			var toTakeSum = 0;
@@ -105,9 +105,8 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_NewFile_FinializationShouldBeCalled()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
-			var executedStatements = new List<string>();
+			var domainFile = Helper.GetFileModel();
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
 
 			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
@@ -137,18 +136,15 @@ namespace Pi.Replicate.Test.Processors
 
 			Assert.IsTrue(updateFileCalled);
 			Assert.IsTrue(fileChunkDeleteCalled);
-
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("UPDATE DBO.[File]", StringComparison.OrdinalIgnoreCase)));
-			Assert.IsTrue(executedStatements.Any(x => x.Contains("DELETE FROM dbo.FileChunk", StringComparison.OrdinalIgnoreCase)));
 		}
 
 		[TestMethod]
 		public async Task ProcessFile_ChangedFile_QueryToGetChunkShouldGetCalledTwice()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel();
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var amountofTimesQueryCalled = 0;
 			var databaseMock = new Mock<IDatabase>();
 
@@ -185,9 +181,9 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_ChangedFile_QueryToGetChunkShouldGetCorrectParameters()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel();
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var toSkipSum = 0;
 			var toTakeSum = 0;
 			var databaseMock = new Mock<IDatabase>();
@@ -227,9 +223,9 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_ChangedFile_ApplyDeltaChouldBeCalled()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel();
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
 
 			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
@@ -260,9 +256,9 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_ChangedFile_FinializationShouldBeCalled()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel();
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var eofMessage = new EofMessage(Guid.Empty, 15);
 			var executedStatements = new List<string>();
 			var databaseMock = new Mock<IDatabase>();
 
@@ -300,9 +296,9 @@ namespace Pi.Replicate.Test.Processors
 		public async Task ProcessFile_ChangedFile_CallToWebhookShouldBeMade()
 		{
 			var configMock = CreateConfigurationMock();
-			var domainFile = File.Build(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")), Guid.Empty, PathBuilder.BasePath);
+			var domainFile = Helper.GetFileModel();
 			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage = EofMessage.Build(Guid.Empty, 15);
+			var eofMessage =new EofMessage(Guid.Empty, 15);
 			var databaseMock = new Mock<IDatabase>();
 
 			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
@@ -318,6 +314,8 @@ namespace Pi.Replicate.Test.Processors
 
 			var webhookIsCalled = false;
 			var webhookMock = Helper.GetWebhookServiceMock(x => { webhookIsCalled = true; }, x => { }, x => { });
+
+
 			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 

@@ -66,7 +66,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			public async Task<EofMessageTransmissionResponse> SendEofMessage(EofMessageTransmissionRequest request)
 			{
 				WorkerLog.Instance.Information($"Eof message received from {request.Host}");
-				var result = await _eofMessageRepository.AddReceivedEofMessage(EofMessage.Build(Guid.Parse(request.FileId), request.AmountOfChunks));
+				var result = await _eofMessageRepository.AddReceivedEofMessage(new EofMessage(Guid.Parse(request.FileId), request.AmountOfChunks));
 				return result.WasSuccessful
 					? _successFullEofMessageTransmissionResponse
 					: _failedEofMessageTransmissionResponse;
