@@ -1,8 +1,10 @@
 ﻿using Moq;
 using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host;
+using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Security.Cryptography;
@@ -52,6 +54,16 @@ namespace Pi.Replicate.Test
 		{
 			return new Worker.Host.Models.File(fileInfo, Guid.Empty, PathBuilder.BasePath);
 		}
+
+		public static Worker.Host.Models.Folder GetFolderModel(string name)
+			=> new Worker.Host.Models.Folder(name, new List<Worker.Host.Models.Recipient>());
+
+		public static Worker.Host.Models.Recipient GetRecipientModel(string name) 
+			=> new Worker.Host.Models.Recipient(name, DummyAdress.Create(name), false);
+
+		public static Worker.Host.Models.EofMessage GetEofMessageModel()
+			=> new Worker.Host.Models.EofMessage(Guid.NewGuid(), 1);
+
 
 		public static Mock<IWebhookService> GetWebhookServiceMock(Action<Worker.Host.Models.File> notifyFileAssembled
 			, Action<Worker.Host.Models.File> notifyFileDisassembled

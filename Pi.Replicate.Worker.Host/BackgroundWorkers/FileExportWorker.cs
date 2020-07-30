@@ -77,7 +77,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					{
 						var recipients = file is RequestFile rf ? rf.Recipients : folderResult.Data.Recipients;
 						foreach (var recipient in recipients)
-							await _communicationService.SendFile(folderResult.Data, file, recipient);
+							await _communicationService.SendFile(recipient, folderResult.Data, file);
 
 						if (await outgoingQueue.WaitToWriteAsync())
 							await outgoingQueue.WriteAsync(file);

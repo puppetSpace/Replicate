@@ -94,7 +94,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private async Task FinializeFileProcess(EofMessage eofMessage, ICollection<Recipient> recipients)
 		{
 			foreach (var recipient in recipients)
-				await _transmissionService.SendEofMessage(eofMessage, recipient);
+				await _transmissionService.SendEofMessage(recipient,eofMessage);
 		}
 
 

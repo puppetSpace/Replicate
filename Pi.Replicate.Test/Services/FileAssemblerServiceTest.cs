@@ -102,7 +102,7 @@ namespace Pi.Replicate.Test.Processors
 		}
 
 		[TestMethod]
-		public async Task ProcessFile_NewFile_FinializationShouldBeCalled()
+		public async Task ProcessFile_NewFile_FinalizationShouldBeCalled()
 		{
 			var configMock = CreateConfigurationMock();
 			var domainFile = Helper.GetFileModel();
@@ -253,7 +253,7 @@ namespace Pi.Replicate.Test.Processors
 		}
 
 		[TestMethod]
-		public async Task ProcessFile_ChangedFile_FinializationShouldBeCalled()
+		public async Task ProcessFile_ChangedFile_FinalizationShouldBeCalled()
 		{
 			var configMock = CreateConfigurationMock();
 			var domainFile = Helper.GetFileModel();

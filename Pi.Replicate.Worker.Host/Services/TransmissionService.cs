@@ -19,7 +19,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			_transmissionRepository = transmissionRepository;
 		}
 
-		public async Task<bool> SendFile(Folder folder, File file, Recipient recipient)
+		public async Task<bool> SendFile(Recipient recipient, Folder folder, File file)
 		{
 			var canContinue = true;
 			try
@@ -37,7 +37,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			return canContinue;
 		}
 
-		public async Task<bool> SendEofMessage(EofMessage message, Recipient recipient)
+		public async Task<bool> SendEofMessage(Recipient recipient,EofMessage message)
 		{
 			var canContinue = true;
 			try

@@ -72,7 +72,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			{
 				foreach (var ff in failedFilesResult.Data)
 				{
-					var wasSucessful = await _transmissionService.SendFile(ff.Item2, ff.Item1, ff.Item3);
+					var wasSucessful = await _transmissionService.SendFile(ff.Item3, ff.Item2, ff.Item1);
 					if (wasSucessful)
 						await _transmissionRepository.DeleteFailedFileTransmission(ff.Item1.Id, ff.Item3.Id);
 				}
@@ -87,7 +87,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			{
 				foreach (var fem in failedEofMessagesResult.Data)
 				{
-					var wasSuccessful = await _transmissionService.SendEofMessage(fem.Item1, fem.Item2);
+					var wasSuccessful = await _transmissionService.SendEofMessage(fem.Item2, fem.Item1);
 					if (wasSuccessful)
 						await _transmissionRepository.DeleteFailedEofMessageTransmission(fem.Item1.Id, fem.Item2.Id);
 				}
