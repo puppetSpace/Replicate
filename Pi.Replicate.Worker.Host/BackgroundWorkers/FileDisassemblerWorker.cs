@@ -20,12 +20,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly TransmissionService _transmissionService;
-		private readonly RecipientRepository _recipientRepository;
+		private readonly IRecipientRepository _recipientRepository;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService
 			, TransmissionService transmissionService
-			, RecipientRepository recipientRepository)
+			, IRecipientRepository recipientRepository)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueContainer = workerQueueContainer;

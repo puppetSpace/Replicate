@@ -7,7 +7,15 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-	public class FolderRepository
+	public interface IFolderRepository
+	{
+		Task<Result<Guid>> AddFolder(string name);
+		Task<Result<Folder>> GetFolder(Guid folderId);
+		Task<Result<string>> GetFolderName(Guid folderId);
+		Task<Result<ICollection<CrawledFolder>>> GetFoldersToCrawl();
+	}
+
+	public class FolderRepository : IFolderRepository
 	{
 		private readonly IDatabaseFactory _database;
 

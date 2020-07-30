@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-	public class RecipientRepository
+	public interface IRecipientRepository
+	{
+		Task<Result> AddRecipientToFolder(string recipientName, string recipientAddress, Guid folderId);
+		Task<Result<ICollection<Recipient>>> GetRecipientsForFolder(Guid folderId);
+	}
+
+	public class RecipientRepository : IRecipientRepository
 	{
 		private readonly IDatabaseFactory _database;
 

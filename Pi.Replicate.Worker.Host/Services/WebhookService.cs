@@ -27,13 +27,13 @@ namespace Pi.Replicate.Worker.Host.Services
 		private const string _typeFileFailed = "FileFailed";
 
 		private readonly IHttpClientFactory _httpClientFactory;
-		private readonly FolderRepository _folderRepository;
+		private readonly IFolderRepository _folderRepository;
 		private readonly WebhookRepository _webhookRepository;
 		private List<Webhook> _webhookCache = new List<Webhook>();
 
 		public WebhookService( IHttpClientFactory httpClientFactory
 			, IBroker broker
-			, FolderRepository folderRepository
+			, IFolderRepository folderRepository
 			, WebhookRepository webhookRepository
 			)
 		{

@@ -14,12 +14,12 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class FileExportWorker : BackgroundService, Observr.IObserver<RecipientsAddedToFolderNotification>
 	{
 		private readonly WorkerQueueContainer _workerQueueContainer;
-		private readonly FolderRepository _folderRepository;
+		private readonly IFolderRepository _folderRepository;
 		private readonly IFileRepository _fileRepository;
 		private readonly TransmissionService _communicationService;
 		private readonly IDisposable _recipientsAddedNotificationSubscription;
 
-		public FileExportWorker(FolderRepository folderRepository
+		public FileExportWorker(IFolderRepository folderRepository
 			, IFileRepository fileRepository
 			, TransmissionService communicationService
 			, WorkerQueueContainer workerQueueContainer

@@ -15,13 +15,13 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	public class FileCollectorWorker : BackgroundService
 	{
 		private readonly int _triggerInterval;
-		private readonly FolderRepository _folderRespository;
+		private readonly IFolderRepository _folderRespository;
 		private readonly FileCollectorFactory _fileCollectorFactory;
 		private readonly WorkerQueueContainer _workerQueueContainer;
 		private readonly FileService _fileService;
 
 		public FileCollectorWorker(IConfiguration configuration
-			, FolderRepository folderRespository
+			, IFolderRepository folderRespository
 			, FileCollectorFactory fileCollectorFactory
 			, WorkerQueueContainer workerQueueContainer
 			, FileService fileService)

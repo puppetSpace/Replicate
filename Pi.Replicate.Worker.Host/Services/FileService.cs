@@ -10,15 +10,15 @@ namespace Pi.Replicate.Worker.Host.Services
 {
 	public class FileService
 	{
-		private readonly IFileRepository _fileRespository;
-		private readonly FolderRepository _folderRepository;
-		private readonly RecipientRepository _recipientRepository;
+		private readonly IFileRepository _fileRepository;
+		private readonly IFolderRepository _folderRepository;
+		private readonly IRecipientRepository _recipientRepository;
 
-		public FileService(IFileRepository fileRespository
-			, FolderRepository folderRepository
-			, RecipientRepository recipientRepository)
+		public FileService(IFileRepository fileRepository
+			, IFolderRepository folderRepository
+			, IRecipientRepository recipientRepository)
 		{
-			_fileRespository = fileRespository;
+			_fileRepository = fileRepository;
 			_folderRepository = folderRepository;
 			_recipientRepository = recipientRepository;
 		}
@@ -28,19 +28,19 @@ namespace Pi.Replicate.Worker.Host.Services
 			var file = new File(newFile, folderId, PathBuilder.BasePath);
 			var signature = file.CreateSignature();
 
-			var result = await _fileRespository.AddNewFile(file, signature);
+			var result = await _fileRepository.AddNewFile(file, signature);
 			return result.WasSuccessful ? file : null;
 		}
 
 		public async Task<File> CreateUpdateFile(Guid folderId, System.IO.FileInfo changedFile)
 		{
 			var relativePath = changedFile.FullName.Replace(PathBuilder.BasePath + "\\", "");
-			var queryResult = await _fileRespository.GetLastVersionOfFile(folderId, relativePath);
+			var queryResult = await _fileRepository.GetLastVersionOfFile(folderId, relativePath);
 			if (queryResult.WasSuccessful && queryResult.Data is File file)
 			{
 				file.Update(changedFile);
 				var signature = file.CreateSignature();
-				await _fileRespository.AddNewFile(queryResult.Data, signature);
+				await _fileRepository.AddNewFile(queryResult.Data, signature);
 				return queryResult.Data;
 			}
 
@@ -52,7 +52,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var folderCreation = await AddFolder(folderName);
 			if (folderCreation.WasSuccessful)
 			{
-				var fileResult = await _fileRespository.AddNewFile(new File
+				var fileResult = await _fileRepository.AddNewFile(new File
 				(
 					fileId,
 					folderCreation.Data,
