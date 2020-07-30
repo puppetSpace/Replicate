@@ -28,13 +28,13 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private readonly IHttpClientFactory _httpClientFactory;
 		private readonly IFolderRepository _folderRepository;
-		private readonly WebhookRepository _webhookRepository;
+		private readonly IWebhookRepository _webhookRepository;
 		private List<Webhook> _webhookCache = new List<Webhook>();
 
 		public WebhookService( IHttpClientFactory httpClientFactory
 			, IBroker broker
 			, IFolderRepository folderRepository
-			, WebhookRepository webhookRepository
+			, IWebhookRepository webhookRepository
 			)
 		{
 			_httpClientFactory = httpClientFactory;
@@ -85,7 +85,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var folderName = foundFolder?.Data;
 			if (foundWebhook is object && !string.IsNullOrWhiteSpace(foundWebhook.CallbackUrl))
 			{
-				var postObject = new { name = file.Name, path = PathBuilder.BuildPath(file.Path), version = file.Version, folder = folderName };
+				var postObject = new { name = file.Name, path = file.GetFullPath(), version = file.Version, folder = folderName };
 
 				WorkerLog.Instance.Debug($"Webhook of type '{type}' for folder '{folderName}' calling '{foundWebhook.CallbackUrl}'");
 				var httpClient = _httpClientFactory.CreateClient("webhook");

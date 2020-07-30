@@ -70,7 +70,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (tempPath is null)
 				return;
 
-			var filePath = PathBuilder.BuildPath(file.Path);
+			var filePath = file.GetFullPath();
 
 			if (System.IO.File.Exists(filePath) && FileLock.IsLocked(filePath, checkWriteAccess: true))
 			{
@@ -93,7 +93,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (tempPath is null)
 				return;
 
-			var filePath = PathBuilder.BuildPath(file.Path);
+			var filePath = file.GetFullPath();
 			if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
 			{
 				WorkerLog.Instance.Information($"Applying delta to {filePath}");
@@ -152,8 +152,8 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private async Task MarkFileAsCompleted(File file)
 		{
-			WorkerLog.Instance.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
-			var filePath = PathBuilder.BuildPath(file.Path);
+			WorkerLog.Instance.Information($"Mark '{file.RelativePath}' as completed, set signature and deleting chunks");
+			var filePath = file.GetFullPath();
 			var signature = file.CreateSignature();
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
 			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature, _database);

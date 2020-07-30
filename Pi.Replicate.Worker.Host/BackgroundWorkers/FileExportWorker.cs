@@ -48,7 +48,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 						file.Id,
 						file.FolderId,
 						file.Name,
-						file.Path,
+						file.RelativePath,
 						file.LastModifiedDate,
 						file.Size,
 						file.Source,

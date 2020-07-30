@@ -76,7 +76,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				var createdFile = await _fileService.CreateNewFile(folder.Id, newFile);
 				if (createdFile is object)
 				{
-					WorkerLog.Instance.Debug($"Adding '{createdFile.Path}' to queue");
+					WorkerLog.Instance.Debug($"Adding '{createdFile.RelativePath}' to queue");
 					if (await queue.WaitToWriteAsync())
 						await queue.WriteAsync(createdFile);
 				}

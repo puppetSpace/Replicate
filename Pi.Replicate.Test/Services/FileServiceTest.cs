@@ -231,7 +231,7 @@ namespace Pi.Replicate.Test.Services
 			Assert.AreEqual(1, addedFile.Size);
 			Assert.AreEqual(2, addedFile.Version);
 			Assert.AreEqual(currentTimeStamp, addedFile.LastModifiedDate);
-			Assert.AreEqual("TestPath", addedFile.Path);
+			Assert.AreEqual("TestPath", addedFile.RelativePath);
 		}
 
 		[TestMethod]

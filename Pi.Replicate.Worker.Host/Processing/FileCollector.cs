@@ -30,12 +30,12 @@ namespace Pi.Replicate.Worker.Host.Processing
 				var filesInDb = result.Data;
 				WorkerLog.Instance.Information($"{filesInDb?.Count} file(s) already processed for folder '{_folder.Name}'.");
 
-				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(PathBuilder.BuildPath(y.Path), x.FullName))).ToList();
+				NewFiles = filesFromSystem.Where(x => !filesInDb.Any(y => string.Equals(y.GetFullPath(), x.FullName))).ToList();
 				WorkerLog.Instance.Information($"{NewFiles.Count} new file(s) found in folder '{_folder.Name}'");
 
 				ChangedFiles = filesFromSystem
 						.Where(x => filesInDb
-							.Any(y => x.FullName == PathBuilder.BuildPath(y.Path) && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
+							.Any(y => x.FullName == y.GetFullPath() && x.LastWriteTimeUtc.TruncateMilliseconds() != y.LastModifiedDate.TruncateMilliseconds()))
 						.ToList();
 
 				WorkerLog.Instance.Information($"{ChangedFiles.Count} changed file(s) found in folder '{_folder.Name}'");

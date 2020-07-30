@@ -6,7 +6,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-	public class WebhookRepository
+	public interface IWebhookRepository
+	{
+		Task<Result<ICollection<Webhook>>> GetWebhooks();
+	}
+
+	public class WebhookRepository : IWebhookRepository
 	{
 		private readonly IDatabase _database;
 		private const string _selectStatementGetWebhooks = @"

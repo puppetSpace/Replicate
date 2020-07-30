@@ -5,7 +5,12 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-	public class ConflictRepository
+	public interface IConflictRepository
+	{
+		Task<Result> AddConflict(FileConflict fileConflict);
+	}
+
+	public class ConflictRepository : IConflictRepository
 	{
 		private readonly IDatabaseFactory _databaseFactory;
 		private const string _insertStatementAddConflict = "INSERT INTO dbo.FileConflict(Id,FileId,Type) VALUES(NEWID(),@FileId,@Type)";

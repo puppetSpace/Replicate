@@ -14,12 +14,12 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
-		public File(Guid id, Guid folderId, string name, string path, DateTime lastModifiedDate, long size, FileSource source, int version)
+		public File(Guid id, Guid folderId, string name, string relativePath, DateTime lastModifiedDate, long size, FileSource source, int version)
 		{
 			Id = id;
 			FolderId = folderId;
 			Name = name;
-			Path = path;
+			RelativePath = relativePath;
 			LastModifiedDate = lastModifiedDate;
 			Size = size;
 			Source = source;
@@ -35,13 +35,11 @@ namespace Pi.Replicate.Worker.Host.Models
 			FolderId = folderId;
 			LastModifiedDate = customLastModified ?? file.LastWriteTimeUtc;
 			Name = file.Name;
-			Path = file.FullName.Replace(basePath + "\\", ""); //must be relative to base
+			RelativePath = file.FullName.Replace(basePath + "\\", ""); //must be relative to base
 			Size = file.Length;
 			Source = FileSource.Local;
 			Version = 1;
 		}
-
-
 
 		public Guid Id { get; protected set; }
 
@@ -57,12 +55,16 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public DateTime LastModifiedDate { get; protected set; }
 
-		public string Path { get; protected set; }
+		public string RelativePath { get; protected set; }
 
 		public bool IsNew() => Version == 1;
 
 		public void Update(System.IO.FileInfo file)
 		{
+			if (!file.Exists)
+				throw new FileNotFoundException("File does not exist. Can only use existing files to update");
+			if (!string.Equals(file.Name, Name, StringComparison.OrdinalIgnoreCase))
+				throw new InvalidOperationException("Cannot use file to update current file because the names differ");
 			Id = Guid.NewGuid();
 			LastModifiedDate = file.LastWriteTimeUtc;
 			Size = file.Length;
@@ -70,9 +72,14 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
+		public string GetFullPath()
+		{
+			return System.IO.Path.Combine(PathBuilder.BasePath, RelativePath??"");
+		}
+
 		public async Task CompressTo(string path)
 		{
-			using var stream = System.IO.File.OpenRead(PathBuilder.BuildPath(Path));
+			using var stream = System.IO.File.OpenRead(GetFullPath());
 			using var output = System.IO.File.OpenWrite(path);
 			using var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionMode.Compress);
 
@@ -81,7 +88,7 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public async Task DecompressFrom(string compressedFilePath)
 		{
-			var path = PathBuilder.BuildPath(Path);
+			var path = GetFullPath();
 			var fileFolder = System.IO.Path.GetDirectoryName(path);
 			if (!System.IO.Directory.Exists(fileFolder))
 				System.IO.Directory.CreateDirectory(fileFolder);
@@ -96,7 +103,7 @@ namespace Pi.Replicate.Worker.Host.Models
 		//todo check to see if you can change Octodiff to use byte[] instead of stream
 		public byte[] CreateSignature()
 		{
-			using (var fs = System.IO.File.OpenRead(PathBuilder.BuildPath(Path)))
+			using (var fs = System.IO.File.OpenRead(GetFullPath()))
 			{
 				var signatureBuilder = new Octodiff.Core.SignatureBuilder();
 				var memoryStream = new System.IO.MemoryStream();
@@ -106,10 +113,9 @@ namespace Pi.Replicate.Worker.Host.Models
 			}
 		}
 
-		//use readonlymemory so .Slice can be used
-		public ReadOnlyMemory<byte> CreateDelta(byte[] signature)
+		public byte[] CreateDelta(byte[] signature)
 		{
-			using (var fs = System.IO.File.OpenRead(PathBuilder.BuildPath(Path)))
+			using (var fs = System.IO.File.OpenRead(GetFullPath()))
 			{
 				var deltaStream = new System.IO.MemoryStream();
 				var signatureReader = new Octodiff.Core.SignatureReader(new System.IO.MemoryStream(signature), LogProgressReporter.Get());
@@ -127,7 +133,7 @@ namespace Pi.Replicate.Worker.Host.Models
 			if (delta.Length == 0)
 				return;
 
-			var path = PathBuilder.BuildPath(Path);
+			var path = GetFullPath();
 			var tempPath = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 			using (var fs = System.IO.File.OpenRead(path))
 			{
@@ -162,8 +168,8 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
-		public RequestFile(Guid id, Guid folderId, string name, string path, DateTime lastModifiedDate, long size, FileSource source, int version, List<Recipient> neededRecipients) 
-			: base(id,folderId,name,path,lastModifiedDate,size,source,version)
+		public RequestFile(Guid id, Guid folderId, string name, string relativePath, DateTime lastModifiedDate, long size, FileSource source, int version, List<Recipient> neededRecipients) 
+			: base(id,folderId,name,relativePath,lastModifiedDate,size,source,version)
 		{
 			Recipients = neededRecipients;
 		}

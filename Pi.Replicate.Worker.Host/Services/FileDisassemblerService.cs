@@ -31,7 +31,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		public async Task<EofMessage> ProcessFile(File file, IChunkWriter chunkWriter)
 		{
-			var path = PathBuilder.BuildPath(file.Path);
+			var path = file.GetFullPath();
 			EofMessage eofMessage = null;
 
 			if (!string.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
@@ -49,7 +49,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				}
 				catch (Exception ex)
 				{
-					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
+					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{file.RelativePath}'");
 					await HandleFailed(file);
 				}
 			}
@@ -66,11 +66,11 @@ namespace Pi.Replicate.Worker.Host.Services
 		private async Task<EofMessage> ProcessNewFile(File file, IChunkWriter chunkWriter)
 		{
 			var sequenceNo = 0;
-			WorkerLog.Instance.Information($"Compressing file '{file.Path}'");
+			WorkerLog.Instance.Information($"Compressing file '{file.RelativePath}'");
 			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
 			await file.CompressTo(pathOfCompressed);
 
-			WorkerLog.Instance.Information($"Splitting up '{file.Path}'");
+			WorkerLog.Instance.Information($"Splitting up '{file.RelativePath}'");
 
 			var buffer = new byte[_sizeofChunkInBytes];
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
@@ -107,16 +107,16 @@ namespace Pi.Replicate.Worker.Host.Services
 			var result = await _fileRepository.GetSignatureOfPreviousFile(file.Id);
 			if (!result.WasSuccessful || result.Data.Length == 0)
 			{
-				WorkerLog.Instance.Information($"Unable to process changed file '{file.Path}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
+				WorkerLog.Instance.Information($"Unable to process changed file '{file.RelativePath}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
 				return null;
 			}
 			else
 			{
-				WorkerLog.Instance.Information($"Creating delta of changed file '{file.Path}'");
-				var delta = file.CreateDelta(result.Data);
+				WorkerLog.Instance.Information($"Creating delta of changed file '{file.RelativePath}'");
+				var delta = new ReadOnlyMemory<byte>(file.CreateDelta(result.Data));
 				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
 
-				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.Path}'");
+				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.RelativePath}'");
 				var indexOfSlice = 0;
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
@@ -133,7 +133,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private async Task<EofMessage> CreateEofMessage(File file, int amountOfChunks)
 		{
-			WorkerLog.Instance.Information($"Creating eof message for '{file.Path}'");
+			WorkerLog.Instance.Information($"Creating eof message for '{file.RelativePath}'");
 			var eofMessage = new EofMessage(file.Id, amountOfChunks);
 			var eofResult = await _eofMessageRepository.AddEofMessage(eofMessage);
 			if (eofResult.WasSuccessful)

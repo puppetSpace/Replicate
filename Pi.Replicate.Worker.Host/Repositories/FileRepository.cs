@@ -69,7 +69,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		{
 			var db = _database.Get();
 			using (db)
-				return await db.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, Signature = signature, file.Source });
+				return await db.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, Path=file.RelativePath, Signature = signature, file.Source });
 		}
 
 		public async Task<Result> AddNewFile(File file)
@@ -129,11 +129,11 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			{
 				var db = _database.Get();
 				using (db)
-					return await db.Query<File>(_selectStatementGetOtherVersionsOfFile, new { file.Path, file.Version });
+					return await db.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.RelativePath, file.Version });
 			}
 			else
 			{
-				return await database.Query<File>(_selectStatementGetOtherVersionsOfFile, new { file.Path, file.Version });
+				return await database.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.RelativePath, file.Version });
 			}
 		}
 

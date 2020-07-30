@@ -17,8 +17,8 @@ namespace Pi.Replicate.Shared
 		}
 
 		public static string BuildPath(string relativePath)
-        {
-            return System.IO.Path.Combine(BasePath, relativePath??"");
-        }
-    }
+		{
+			return System.IO.Path.Combine(BasePath, relativePath ?? "");
+		}
+	}
 }

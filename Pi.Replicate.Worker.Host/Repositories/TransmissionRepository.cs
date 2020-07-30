@@ -7,7 +7,21 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Repositories
 {
-	public class TransmissionRepository
+	public interface ITransmissionRepository
+	{
+		Task<Result> AddFailedEofMessageTransmission(Guid eofMessageId, Guid recipientId);
+		Task<Result> AddFailedFileChunkTransmission(Guid fileChunkId, Guid fileId, Guid recipientId, int sequenceNo, byte[] value);
+		Task<Result> AddFailedFileTransmission(Guid fileId, Guid recipientId);
+		Task<Result> AddTransmissionResult(Guid fileId, Guid recipientId, int fileChunkSequenceNo, FileSource fileSource);
+		Task<Result> DeleteFailedEofMessageTransmission(Guid eofMessageId, Guid recipientId);
+		Task<Result> DeleteFailedFileChunkTransmission(Guid fileChunkId, Guid recipientId);
+		Task<Result> DeleteFailedFileTransmission(Guid fileId, Guid recipientId);
+		Task<Result<ICollection<(EofMessage, Recipient)>>> GetFailedEofMessageTransmission();
+		Task<Result<ICollection<(FileChunk, Recipient)>>> GetFailedFileChunkTransmission();
+		Task<Result<ICollection<(File, Folder, Recipient)>>> GetFailedFileTransmission();
+	}
+
+	public class TransmissionRepository : ITransmissionRepository
 	{
 		private readonly IDatabaseFactory _database;
 

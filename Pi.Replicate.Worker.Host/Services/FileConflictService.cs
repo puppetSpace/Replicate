@@ -13,9 +13,9 @@ namespace Pi.Replicate.Worker.Host.Services
 
 	public class FileConflictService : IFileConflictService
 	{
-		private readonly ConflictRepository _conflictRepository;
+		private readonly IConflictRepository _conflictRepository;
 
-		public FileConflictService(ConflictRepository conflictRepository)
+		public FileConflictService(IConflictRepository conflictRepository)
 		{
 			_conflictRepository = conflictRepository;
 		}
@@ -30,7 +30,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var sumOfVersions = otherVersions.Sum(x => x.Version);
 			if (otherVersions.Count(x => x.Version == currentFile.Version) > 1)
 			{
-				WorkerLog.Instance.Information($"Conflict found while assembling file '{currentFile.Path}': There is already version {currentFile.Version} for this file.");
+				WorkerLog.Instance.Information($"Conflict found while assembling file '{currentFile.RelativePath}': There is already version {currentFile.Version} for this file.");
 				var conflict = new FileConflict(currentFile.Id, FileConflictType.SameVersion);
 				await _conflictRepository.AddConflict(conflict);
 				hasConflicts = true;

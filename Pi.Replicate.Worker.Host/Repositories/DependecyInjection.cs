@@ -8,12 +8,12 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		{
 			services.AddTransient<IFolderRepository,FolderRepository>();
 			services.AddTransient<IFileRepository, FileRepository>();
-			services.AddTransient<TransmissionRepository>();
+			services.AddTransient<ITransmissionRepository,TransmissionRepository>();
 			services.AddTransient<IRecipientRepository,RecipientRepository>();
 			services.AddTransient<IEofMessageRepository, EofMessageRepository>();
-			services.AddTransient<WebhookRepository>();
+			services.AddTransient<IWebhookRepository,WebhookRepository>();
 			services.AddTransient<IFileChunkRepository, FileChunkRepository>();
-			services.AddTransient<ConflictRepository>();
+			services.AddTransient<IConflictRepository,ConflictRepository>();
 		}
 	}
 }

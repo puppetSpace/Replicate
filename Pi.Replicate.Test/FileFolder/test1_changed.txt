@@ -1,0 +1,1010 @@
+﻿STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+STANDSTILL_TYPE -> parameter -> unit -> 1000000000034 -> parameterdatatype -> 1000000000508
+STANDSTILL_TYPE_COMMENT -> parameter -> datatype -> 1000000000506
+STANDSTILL_TYPE_OTHER_EQUIPMENT -> parameter -> datatype -> 1000000000506
+
+STANDSTILL_TYPE_REASON -> activity
+
+
+delete from epos.parametercategory
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.constraintvalue
+where constraintdefinitionvalueid in
+(
+select constraintdefinitionvalueid from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+)
+);
+
+delete from epos.constraintdefinitionvalue
+where constraintdefinitionid in
+(
+select constraintdefinitionid from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+)
+);
+
+delete from epos.constraintdefinition
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+DELETE FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%';
+
+delete from epos.conversionmatrix
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+delete from epos.marker
+where parameterid in
+(
+SELECT parameterid FROM "ePos"."Parameter"
+where code like '%STANDSTILL[_]TYPE%'
+);
+
+This is some added text to make a change to this file
