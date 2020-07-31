@@ -19,14 +19,14 @@ namespace Pi.Replicate.Worker.Host.Models
 			Id = id;
 			FolderId = folderId;
 			Name = name;
-			RelativePath = relativePath;
+			Path = relativePath;
 			LastModifiedDate = lastModifiedDate;
 			Size = size;
 			Source = source;
 			Version = version;
 		}
 
-		public File(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null):this()
+		public File(System.IO.FileInfo file, Guid folderId, string basePath, DateTime? customLastModified = null) : this()
 		{
 			if (file is null || !file.Exists)
 				throw new InvalidOperationException($"Cannot created a File object for a file that does not exists: '{file?.FullName}'");
@@ -35,7 +35,7 @@ namespace Pi.Replicate.Worker.Host.Models
 			FolderId = folderId;
 			LastModifiedDate = customLastModified ?? file.LastWriteTimeUtc;
 			Name = file.Name;
-			RelativePath = file.FullName.Replace(basePath + "\\", ""); //must be relative to base
+			Path = file.FullName.Replace(basePath + "\\", ""); //must be relative to base
 			Size = file.Length;
 			Source = FileSource.Local;
 			Version = 1;
@@ -55,7 +55,7 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public DateTime LastModifiedDate { get; protected set; }
 
-		public string RelativePath { get; protected set; }
+		public string Path { get; protected set; }
 
 		public bool IsNew() => Version == 1;
 
@@ -74,16 +74,22 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public string GetFullPath()
 		{
-			return System.IO.Path.Combine(PathBuilder.BasePath, RelativePath??"");
+			return System.IO.Path.Combine(PathBuilder.BasePath, Path ?? "");
 		}
 
 		public async Task CompressTo(string path)
 		{
-			using var stream = System.IO.File.OpenRead(GetFullPath());
-			using var output = System.IO.File.OpenWrite(path);
-			using var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionMode.Compress);
+			using (var stream = System.IO.File.OpenRead(GetFullPath()))
+			{
+				using (var output = System.IO.File.OpenWrite(path))
+				{
+					using (var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionMode.Compress))
+					{
 
-			await stream.CopyToAsync(gzip);
+						await stream.CopyToAsync(gzip);
+					}
+				}
+			}
 		}
 
 		public async Task DecompressFrom(string compressedFilePath)
@@ -93,11 +99,17 @@ namespace Pi.Replicate.Worker.Host.Models
 			if (!System.IO.Directory.Exists(fileFolder))
 				System.IO.Directory.CreateDirectory(fileFolder);
 
-			using var stream = System.IO.File.OpenRead(compressedFilePath);
-			using var output = System.IO.File.Create(path);
-			using var gzip = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress);
+			using (var stream = System.IO.File.OpenRead(compressedFilePath))
+			{
+				using (var output = System.IO.File.Create(path))
+				{
+					using (var gzip = new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress))
+					{
 
-			await gzip.CopyToAsync(output);
+						await gzip.CopyToAsync(output);
+					}
+				}
+			}
 		}
 
 		//todo check to see if you can change Octodiff to use byte[] instead of stream
@@ -106,10 +118,12 @@ namespace Pi.Replicate.Worker.Host.Models
 			using (var fs = System.IO.File.OpenRead(GetFullPath()))
 			{
 				var signatureBuilder = new Octodiff.Core.SignatureBuilder();
-				var memoryStream = new System.IO.MemoryStream();
-				var signatureWriter = new Octodiff.Core.SignatureWriter(memoryStream);
-				signatureBuilder.Build(fs, signatureWriter);
-				return memoryStream.ToArray();
+				using (var memoryStream = new System.IO.MemoryStream())
+				{
+					var signatureWriter = new Octodiff.Core.SignatureWriter(memoryStream);
+					signatureBuilder.Build(fs, signatureWriter);
+					return memoryStream.ToArray();
+				}
 			}
 		}
 
@@ -117,13 +131,17 @@ namespace Pi.Replicate.Worker.Host.Models
 		{
 			using (var fs = System.IO.File.OpenRead(GetFullPath()))
 			{
-				var deltaStream = new System.IO.MemoryStream();
-				var signatureReader = new Octodiff.Core.SignatureReader(new System.IO.MemoryStream(signature), LogProgressReporter.Get());
-				var deltaWriter = new Octodiff.Core.AggregateCopyOperationsDecorator(new Octodiff.Core.BinaryDeltaWriter(deltaStream));
-				var deltaBuilder = new Octodiff.Core.DeltaBuilder();
-				deltaBuilder.BuildDelta(fs, signatureReader, deltaWriter);
+				using (var deltaStream = new System.IO.MemoryStream())
+				{
+					using (var signatureStream = new System.IO.MemoryStream(signature)) {
+						var signatureReader = new Octodiff.Core.SignatureReader(signatureStream, LogProgressReporter.Get());
+						var deltaWriter = new Octodiff.Core.AggregateCopyOperationsDecorator(new Octodiff.Core.BinaryDeltaWriter(deltaStream));
+						var deltaBuilder = new Octodiff.Core.DeltaBuilder();
+						deltaBuilder.BuildDelta(fs, signatureReader, deltaWriter);
 
-				return deltaStream.ToArray();
+						return deltaStream.ToArray();
+					}
+				}
 			}
 
 		}
@@ -139,9 +157,12 @@ namespace Pi.Replicate.Worker.Host.Models
 			{
 				using (var fsout = new FileStream(tempPath, FileMode.Create))
 				{
-					var deltaReader = new Octodiff.Core.BinaryDeltaReader(new MemoryStream(delta), LogProgressReporter.Get());
-					var deltaApplier = new Octodiff.Core.DeltaApplier { SkipHashCheck = true };
-					deltaApplier.Apply(fs, deltaReader, fsout);
+					using (var deltaStream = new MemoryStream(delta))
+					{
+						var deltaReader = new Octodiff.Core.BinaryDeltaReader(new MemoryStream(delta), LogProgressReporter.Get());
+						var deltaApplier = new Octodiff.Core.DeltaApplier { SkipHashCheck = true };
+						deltaApplier.Apply(fs, deltaReader, fsout);
+					}
 				}
 			}
 
@@ -168,8 +189,8 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		}
 
-		public RequestFile(Guid id, Guid folderId, string name, string relativePath, DateTime lastModifiedDate, long size, FileSource source, int version, List<Recipient> neededRecipients) 
-			: base(id,folderId,name,relativePath,lastModifiedDate,size,source,version)
+		public RequestFile(Guid id, Guid folderId, string name, string relativePath, DateTime lastModifiedDate, long size, FileSource source, int version, List<Recipient> neededRecipients)
+			: base(id, folderId, name, relativePath, lastModifiedDate, size, source, version)
 		{
 			Recipients = neededRecipients;
 		}

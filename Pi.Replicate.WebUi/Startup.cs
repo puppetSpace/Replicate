@@ -45,9 +45,6 @@ namespace Pi.Replicate.WebUi
 			services.AddTransient<OverviewService>();
 			services.AddTransient<HubProxy>();
 			services.AddBlazoredToast();
-
-			//is dirty but only way to set it for a static class
-			PathBuilder.SetBasePath(Configuration.GetValue<string>(Constants.ReplicateBasePath));
 		}
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,6 +11,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 	{
 		Task<Result> AddNewFile(File file);
 		Task<Result> AddNewFile(File file, byte[] signature);
+		Task<Result> AddReceivedFile(File file);
 		Task<Result<ICollection<(File, EofMessage)>>> GetCompletedFiles();
 		Task<Result<ICollection<File>>> GetFailedFiles();
 		Task<Result<ICollection<File>>> GetFilesForFolder(Guid folderId);
@@ -28,6 +29,9 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		private const string _insertStatementFile = @"
 				IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
 					INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path,Signature, Source) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Signature, @Source)";
+		private const string _insertReceivedStatementFile = @"
+				IF NOT EXISTS (SELECT 1 FROM dbo.[File] WHERE Id = @Id)
+					INSERT INTO dbo.[File](Id,FolderId, Name, Size,Version,LastModifiedDate,Path, Source,Status) VALUES(@Id,@FolderId,@Name,@Size, @Version, @LastModifiedDate,@Path, @Source,3)";
 		private const string _selectStatementGetLastVersionOfFile = "SELECT TOP 1 Id, FolderId,Version, LastModifiedDate, Name,Path,Size,Source FROM dbo.[File] WHERE FolderId = @FolderId and Path = @Path order by Version desc";
 		private const string _selectStatementGetFilesForFolder = @"
 			select Id,FolderId,Name,Version,Size,LastModifiedDate,Path,Source
@@ -35,6 +39,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 				select *,ROW_NUMBER() over(partition by Name order by Version desc)  rnk
 				from dbo.[File]
 				where folderId = @FolderId
+				and status != 3
 			) a
 			where rnk = 1";
 		private const string _selectStatementGetSignatureOfPreviousFile = @"
@@ -42,7 +47,7 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			AS (SELECT [path],[version] FROM dbo.[File] WHERE Id = @FileId)
 			SELECT [signature] 
 			FROM dbo.[File] fi
-			INENR JOIN file_cte fic ON fic.[path] = fi.[Path] AND fi.[Version] = fic.[version] - 1 ";
+			INNER JOIN file_cte fic ON fic.[path] = fi.[Path] AND fi.[Version] = fic.[version] - 1 ";
 		private const string _updateStatementUpdateFileAsFailed = @"UPDATE dbo.[File] SET [Status] = 1 WHERE Id = @Id";
 		private const string _updateStatementUpdateFileAssAssembled = "UPDATE dbo.[File] SET [Status] = 2, Signature = @Signature, LastModifiedDate = @LastModifiedDate WHERE Id = @FileId";
 		private const string _selectStatementGetCompletedFiles = @"
@@ -69,12 +74,19 @@ namespace Pi.Replicate.Worker.Host.Repositories
 		{
 			var db = _database.Get();
 			using (db)
-				return await db.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, Path=file.RelativePath, Signature = signature, file.Source });
+				return await db.Execute(_insertStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, Signature = signature, file.Source, Status = 0 });
 		}
 
 		public async Task<Result> AddNewFile(File file)
 		{
 			return await AddNewFile(file, null);
+		}
+
+		public async Task<Result> AddReceivedFile(File file)
+		{
+			var db = _database.Get();
+			using (db)
+				return await db.Execute(_insertReceivedStatementFile, new { file.Id, file.FolderId, file.Name, file.Size, file.Version, file.LastModifiedDate, file.Path, file.Source });
 		}
 
 		public async Task<Result<File>> GetLastVersionOfFile(Guid folderId, string relativePath)
@@ -129,11 +141,11 @@ namespace Pi.Replicate.Worker.Host.Repositories
 			{
 				var db = _database.Get();
 				using (db)
-					return await db.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.RelativePath, file.Version });
+					return await db.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.Path, file.Version });
 			}
 			else
 			{
-				return await database.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.RelativePath, file.Version });
+				return await database.Query<File>(_selectStatementGetOtherVersionsOfFile, new { Path = file.Path, file.Version });
 			}
 		}
 

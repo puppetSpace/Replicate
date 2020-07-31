@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using Observr;
+using Pi.Replicate.Shared;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +32,11 @@ namespace Pi.Replicate.Worker.Host.Services
 		{
 			WorkerLog.Instance.Information($"Someone is trying to verify this point");
 			return Task.FromResult(new ProbeResponse { MachineName = Environment.MachineName });
+		}
+
+		public override Task<BaseFolderResponse> GetBaseFolder(BaseFolderRequest request, ServerCallContext context)
+		{
+			return Task.FromResult(new BaseFolderResponse { Path = PathBuilder.BasePath });
 		}
 	}
 }

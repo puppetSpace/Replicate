@@ -69,5 +69,20 @@ namespace Pi.Replicate.Application.Services
 				return (null,ex.Message);
 			}
 		}
+
+		public async Task<string> GetBaseFolder()
+		{
+			try
+			{
+				var client = new Communicator.CommunicatorClient(_channel);
+				var response = await client.GetBaseFolderAsync(new BaseFolderRequest());
+				return response?.Path;
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "Failed to retrieve BaseFolderPath");
+				return null;
+			}
+		}
 	}
 }

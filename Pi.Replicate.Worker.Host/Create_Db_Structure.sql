@@ -44,7 +44,8 @@ GO
 
 EXEC sys.sp_addextendedproperty @name=N'Comment', @value=N'0=Normal,
 1=Failed,
-2=Assembled' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'File', @level2type=N'COLUMN',@level2name=N'Status'
+2=Assembled,
+3=Received' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'File', @level2type=N'COLUMN',@level2name=N'Status'
 GO
 
 create table dbo.EofMessage(

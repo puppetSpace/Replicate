@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pi.Replicate.Application.Common.Interfaces;
+using Pi.Replicate.WebUi.Common;
 using Serilog;
 using System;
 
@@ -26,6 +27,7 @@ namespace Pi.Replicate.WebUi
 			CreateHostBuilder(args)
 				.Build()
 				.AddSystemSettingsFromDatabase()
+				.SetWorkerBaseFolder()
 				.Run();
 		}
 

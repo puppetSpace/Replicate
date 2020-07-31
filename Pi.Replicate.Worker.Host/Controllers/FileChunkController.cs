@@ -30,9 +30,9 @@ namespace Pi.Replicate.Worker.Host.Controllers
 			{
 				var outgoingQueue = _workerQueueContainer.ReceivedChunks.Writer;
 				await Request.Body.CopyToAsync(ms);
-				if (ms.TryGetBuffer(out var buffer) && await outgoingQueue.WaitToWriteAsync())
+				if (await outgoingQueue.WaitToWriteAsync())
 				{
-					await outgoingQueue.WriteAsync(new ReceivedFileChunk(fileId, sequenceNo, buffer.Array, host, DummyAdress.Create(host)));
+					await outgoingQueue.WriteAsync(new ReceivedFileChunk(fileId, sequenceNo, ms.ToArray(), host, DummyAdress.Create(host)));
 					return NoContent();
 				}
 				else

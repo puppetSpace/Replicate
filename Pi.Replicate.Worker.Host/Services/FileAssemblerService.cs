@@ -152,7 +152,7 @@ namespace Pi.Replicate.Worker.Host.Services
 
 		private async Task MarkFileAsCompleted(File file)
 		{
-			WorkerLog.Instance.Information($"Mark '{file.RelativePath}' as completed, set signature and deleting chunks");
+			WorkerLog.Instance.Information($"Mark '{file.Path}' as completed, set signature and deleting chunks");
 			var filePath = file.GetFullPath();
 			var signature = file.CreateSignature();
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);

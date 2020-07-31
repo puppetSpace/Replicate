@@ -19,8 +19,8 @@ namespace Pi.Replicate.Worker.Host
 			.Enrich.FromLogContext()
 #if DEBUG
 			.WriteTo.Debug()
-			.WriteTo.Console()
 #endif
+			.WriteTo.Console()
 			.CreateLogger();
 
 
@@ -28,6 +28,7 @@ namespace Pi.Replicate.Worker.Host
 				.Build()
 				.InitializeDatabase()
 				.AddSystemSettingsFromDatabase()
+				.SetWorkerBaseFolder()
 				.AttachLogSinks()
 				.InitializeWorker()
 				.Run();

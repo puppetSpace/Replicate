@@ -24,12 +24,12 @@ namespace Pi.Replicate.Worker.Host.Services
 			var canContinue = true;
 			try
 			{
-				WorkerLog.Instance.Information($"Sending '{file.RelativePath}' metadata to {recipient.Name}");
+				WorkerLog.Instance.Information($"Sending '{file.Path}' metadata to {recipient.Name}");
 				await _transmissionLink.SendFile(recipient, folder, file);
 			}
 			catch (System.Exception ex)
 			{
-				WorkerLog.Instance.Error(ex, $"Failed to send file metadata of '{file.RelativePath}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
+				WorkerLog.Instance.Error(ex, $"Failed to send file metadata of '{file.Path}' to '{recipient.Name}'. Adding file to failed transmissions and retrying later");
 				var result = await _transmissionRepository.AddFailedFileTransmission(file.Id, recipient.Id);
 				canContinue = result.WasSuccessful;
 			}

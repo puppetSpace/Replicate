@@ -52,7 +52,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			var folderCreation = await AddFolder(folderName);
 			if (folderCreation.WasSuccessful)
 			{
-				var fileResult = await _fileRepository.AddNewFile(new File
+				var fileResult = await _fileRepository.AddReceivedFile(new File
 				(
 					fileId,
 					folderCreation.Data,

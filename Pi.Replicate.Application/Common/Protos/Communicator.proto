@@ -5,6 +5,7 @@ service Communicator{
 	rpc FolderWebhookChanged (FolderWebhookRequest) returns (FolderWebhookResponse);
 	rpc RecipientAddedToFolder (RecipientAddedRequest) returns (RecipientAddedResponse);
 	rpc ProbeRecipient (ProbeRequest) returns (ProbeResponse);
+	rpc GetBaseFolder (BaseFolderRequest) returns (BaseFolderResponse);
 }
 
 message FolderWebhookRequest{
@@ -32,4 +33,12 @@ message ProbeRequest{
 
 message ProbeResponse{
 	string machineName = 1;
+}
+
+message BaseFolderRequest{
+
+}
+
+message BaseFolderResponse{
+	string path = 1;
 }

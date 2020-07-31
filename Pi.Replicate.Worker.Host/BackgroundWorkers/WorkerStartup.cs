@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pi.Replicate.Shared;
 using Pi.Replicate.Worker.Host.Common;
 using Pi.Replicate.Worker.Host.Data;
 using Pi.Replicate.Worker.Host.Services;
@@ -69,6 +70,13 @@ namespace Pi.Replicate.Worker.Host
 			var database = host.Services.GetService<IDatabase>();
 			((IDatabaseInitializer)database).Initialize();
 #endif
+			return host;
+		}
+
+		public static IHost SetWorkerBaseFolder(this IHost host)
+		{
+			var configuration = host.Services.GetService<IConfiguration>();
+			PathBuilder.SetBasePath(configuration.GetValue<string>(Shared.Constants.ReplicateBasePath));
 			return host;
 		}
 

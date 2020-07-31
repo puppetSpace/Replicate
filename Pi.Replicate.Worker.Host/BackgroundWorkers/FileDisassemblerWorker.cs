@@ -48,7 +48,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 					if (System.IO.File.Exists(file.GetFullPath()))
 						taskRunner.Add(() => DissasemblyJob(outgoingQueue, file));
 					else
-						WorkerLog.Instance.Information($"File '{file.RelativePath}' does not exist");
+						WorkerLog.Instance.Information($"File '{file.Path}' does not exist");
 				}
 			});
 
@@ -59,7 +59,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 		private async Task DissasemblyJob(ChannelWriter<(Recipient recipient, FileChunk filechunk)> outgoingQueue, File file)
 		{
-			WorkerLog.Instance.Information($"'{file.RelativePath}' is being processed");
+			WorkerLog.Instance.Information($"'{file.Path}' is being processed");
 			var recipients = await GetRecipients(file);
 
 			if (recipients.Any())
@@ -68,11 +68,11 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 				if (eofMessage is object)
 					await FinializeFileProcess(eofMessage, recipients);
 
-				WorkerLog.Instance.Information($"'{file.RelativePath}' is processed");
+				WorkerLog.Instance.Information($"'{file.Path}' is processed");
 			}
 			else
 			{
-				WorkerLog.Instance.Information($"No recipients found for folder containing '{file.RelativePath}'");
+				WorkerLog.Instance.Information($"No recipients found for folder containing '{file.Path}'");
 			}
 		}
 
