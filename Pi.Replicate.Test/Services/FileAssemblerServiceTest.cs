@@ -14,6 +14,7 @@ using Pi.Replicate.Shared.Models;
 
 namespace Pi.Replicate.Test.Processors
 {
+	//todo test if delta is being applied correctly
 	[TestClass]
 	public class FileAssemblerServiceTest
 	{

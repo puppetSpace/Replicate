@@ -97,7 +97,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			if (System.IO.File.Exists(filePath) && !FileLock.IsLocked(filePath, checkWriteAccess: true))
 			{
 				WorkerLog.Instance.Information($"Applying delta to {filePath}");
-				file.ApplyDelta(System.IO.File.ReadAllBytes(filePath));
+				file.ApplyDelta(System.IO.File.ReadAllBytes(tempPath));
 				await MarkFileAsCompleted(file);
 
 			}

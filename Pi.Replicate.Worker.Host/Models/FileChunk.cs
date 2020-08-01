@@ -4,14 +4,14 @@ namespace Pi.Replicate.Worker.Host.Models
 {
 	public class FileChunk
 	{
-		private readonly byte[] _value;
+		private byte[] _value;
 
 		public FileChunk()
 		{
 
 		}
 
-		public FileChunk(Guid fileId, int sequenceNo, byte[] value):this()
+		public FileChunk(Guid fileId, int sequenceNo, byte[] value) : this()
 		{
 			Id = Guid.NewGuid();
 			FileId = fileId;
@@ -25,6 +25,14 @@ namespace Pi.Replicate.Worker.Host.Models
 
 		public int SequenceNo { get; private set; }
 
+		public byte[] Value
+		{
+			set
+			{
+				_value = value;
+			}
+		}
+
 		public byte[] GetValue()
 		{
 			return _value;
@@ -33,7 +41,7 @@ namespace Pi.Replicate.Worker.Host.Models
 
 	public class ReceivedFileChunk : FileChunk
 	{
-		public ReceivedFileChunk(Guid fileId, int sequenceNo,byte[] value,string sender, string senderAddress):base(fileId,sequenceNo,value)
+		public ReceivedFileChunk(Guid fileId, int sequenceNo, byte[] value, string sender, string senderAddress) : base(fileId, sequenceNo, value)
 		{
 			Sender = sender;
 			SenderAddress = senderAddress;

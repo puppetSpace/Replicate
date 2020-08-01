@@ -114,7 +114,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			else
 			{
 				WorkerLog.Instance.Information($"Creating delta of changed file '{file.Path}'");
-				var delta = new ReadOnlyMemory<byte>(file.CreateDelta(result.Data));
+				var delta = file.CreateDelta(result.Data);
 				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
 
 				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.Path}'");
@@ -122,7 +122,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
-					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta.Slice(indexOfSlice, deltaSizeOfChunks).ToArray());
+					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta[indexOfSlice .. deltaSizeOfChunks]);
 					await chunkWriter.Push(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;
