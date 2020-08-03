@@ -21,17 +21,23 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly FileDisassemblerService _fileProcessService;
 		private readonly TransmissionService _transmissionService;
 		private readonly IRecipientRepository _recipientRepository;
+		private readonly IWebhookService _webhookService;
+		private readonly IFileRepository _fileRepository;
 
 		public FileDisassemblerWorker(IConfiguration configuration, WorkerQueueContainer workerQueueContainer
 			, FileDisassemblerService fileProcessService
 			, TransmissionService transmissionService
-			, IRecipientRepository recipientRepository)
+			, IRecipientRepository recipientRepository
+			, IWebhookService webhookService
+			, IFileRepository fileRepository)
 		{
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileDisassemblyJobs]);
 			_workerQueueContainer = workerQueueContainer;
 			_fileProcessService = fileProcessService;
 			_transmissionService = transmissionService;
 			_recipientRepository = recipientRepository;
+			_webhookService = webhookService;
+			_fileRepository = fileRepository;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -64,7 +70,19 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 			if (recipients.Any())
 			{
-				await _fileProcessService.ProcessFile(file, new ChunkWriter(recipients, outgoingQueue), new EofTransmitter(recipients, _transmissionService));
+				var eofMessage = await _fileProcessService.ProcessFile(file, new ChunkWriter(recipients, outgoingQueue));
+				if (eofMessage is object)
+				{
+					_webhookService.NotifyFileDisassembled(file);
+					foreach (var recipient in recipients)
+						await _transmissionService.SendEofMessage(recipient, eofMessage);
+				}
+				else
+				{
+					await _fileRepository.UpdateFileAsFailed(file.Id);
+					_webhookService.NotifyFileFailed(file);
+				}
+
 				WorkerLog.Instance.Information($"'{file.Path}' is processed");
 			}
 			else

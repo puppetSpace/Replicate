@@ -10,63 +10,46 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {
-	//not sure about this class. It seems to do too much
 	public class FileDisassemblerService
 	{
 		private readonly int _sizeofChunkInBytes;
-		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IEofMessageRepository _eofMessageRepository;
 
 		public FileDisassemblerService(IConfiguration configuration
-			, IWebhookService webhookService
 			, IFileRepository fileRepository
 			, IEofMessageRepository eofMessageRepository)
 		{
 			_sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
-			_webhookService = webhookService;
 			_fileRepository = fileRepository;
 			_eofMessageRepository = eofMessageRepository;
 		}
 
 
-		public async Task ProcessFile(File file, IChunkWriter chunkWriter, IEofTransmitter eofTransmitter)
+		public async Task<EofMessage> ProcessFile(File file, IChunkWriter chunkWriter)
 		{
 			var path = file.GetFullPath();
 
+			EofMessage eofMessage = null;
 			if (!string.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
 				try
 				{
-					EofMessage eofMessage = null;
 					if (file.IsNew())
 						eofMessage = await ProcessNewFile(file, chunkWriter);
 					else
 						eofMessage = await ProcessChangedFile(file, chunkWriter);
-
-					if (eofMessage is object)
-					{
-						_webhookService.NotifyFileDisassembled(file);
-						await eofTransmitter.Send(eofMessage);
-					}
-					else
-					{
-						await HandleFailed(file);
-					}
-
 				}
 				catch (Exception ex)
 				{
 					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
-					await HandleFailed(file);
 				}
 			}
 			else
 			{
 				WorkerLog.Instance.Warning($"File '{path}' does not exist or is locked. File will not be processed");
-				await HandleFailed(file);
-
 			}
+			return eofMessage;
 		}
 
 		private async Task<EofMessage> ProcessNewFile(File file, IChunkWriter chunkWriter)
@@ -149,11 +132,6 @@ namespace Pi.Replicate.Worker.Host.Services
 				return null;
 		}
 
-		private async Task HandleFailed(File file)
-		{
-			await _fileRepository.UpdateFileAsFailed(file.Id);
-			_webhookService.NotifyFileFailed(file);
-		}
 	}
 
 	public interface IChunkWriter
@@ -179,28 +157,6 @@ namespace Pi.Replicate.Worker.Host.Services
 				if (await _writer.WaitToWriteAsync())
 					await _writer.WriteAsync((recipient, fileChunk));
 			}
-		}
-	}
-
-	public interface IEofTransmitter
-	{
-		Task Send(EofMessage eofMessage);
-	}
-
-	public class EofTransmitter : IEofTransmitter
-	{
-		private readonly ICollection<Recipient> _recipients;
-		private readonly TransmissionService _transmissionService;
-
-		public EofTransmitter(ICollection<Recipient> recipients, TransmissionService transmissionService)
-		{
-			_recipients = recipients;
-			_transmissionService = transmissionService;
-		}
-		public async Task Send(EofMessage eofMessage)
-		{
-			foreach (var recipient in _recipients)
-				await _transmissionService.SendEofMessage(recipient, eofMessage);
 		}
 	}
 }
