@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Services
 {
+	//not sure about this class. It seems to do too much
 	public class FileDisassemblerService
 	{
 		private readonly int _sizeofChunkInBytes;
@@ -29,22 +30,29 @@ namespace Pi.Replicate.Worker.Host.Services
 		}
 
 
-		public async Task<EofMessage> ProcessFile(File file, IChunkWriter chunkWriter)
+		public async Task ProcessFile(File file, IChunkWriter chunkWriter, IEofTransmitter eofTransmitter)
 		{
 			var path = file.GetFullPath();
-			EofMessage eofMessage = null;
 
 			if (!string.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
 				try
 				{
+					EofMessage eofMessage = null;
 					if (file.IsNew())
 						eofMessage = await ProcessNewFile(file, chunkWriter);
 					else
 						eofMessage = await ProcessChangedFile(file, chunkWriter);
 
 					if (eofMessage is object)
+					{
 						_webhookService.NotifyFileDisassembled(file);
+						await eofTransmitter.Send(eofMessage);
+					}
+					else
+					{
+						await HandleFailed(file);
+					}
 
 				}
 				catch (Exception ex)
@@ -59,8 +67,6 @@ namespace Pi.Replicate.Worker.Host.Services
 				await HandleFailed(file);
 
 			}
-
-			return eofMessage;
 		}
 
 		private async Task<EofMessage> ProcessNewFile(File file, IChunkWriter chunkWriter)
@@ -76,7 +82,7 @@ namespace Pi.Replicate.Worker.Host.Services
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
 			{
 				int bytesRead = 0;
-				while ((bytesRead = await stream.ReadAsync(buffer,0,buffer.Length)) > 0)
+				while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
 					var fileChunk = new FileChunk(file.Id, ++sequenceNo, buffer[0..bytesRead]);
 					await chunkWriter.Push(fileChunk);
@@ -122,7 +128,7 @@ namespace Pi.Replicate.Worker.Host.Services
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
-					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta[indexOfSlice .. deltaSizeOfChunks]);
+					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta[indexOfSlice..deltaSizeOfChunks]);
 					await chunkWriter.Push(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;
@@ -173,6 +179,28 @@ namespace Pi.Replicate.Worker.Host.Services
 				if (await _writer.WaitToWriteAsync())
 					await _writer.WriteAsync((recipient, fileChunk));
 			}
+		}
+	}
+
+	public interface IEofTransmitter
+	{
+		Task Send(EofMessage eofMessage);
+	}
+
+	public class EofTransmitter : IEofTransmitter
+	{
+		private readonly ICollection<Recipient> _recipients;
+		private readonly TransmissionService _transmissionService;
+
+		public EofTransmitter(ICollection<Recipient> recipients, TransmissionService transmissionService)
+		{
+			_recipients = recipients;
+			_transmissionService = transmissionService;
+		}
+		public async Task Send(EofMessage eofMessage)
+		{
+			foreach (var recipient in _recipients)
+				await _transmissionService.SendEofMessage(recipient, eofMessage);
 		}
 	}
 }

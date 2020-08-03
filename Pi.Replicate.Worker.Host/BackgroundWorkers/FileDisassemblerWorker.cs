@@ -64,10 +64,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 
 			if (recipients.Any())
 			{
-				var eofMessage = await _fileProcessService.ProcessFile(file, new ChunkWriter(recipients, outgoingQueue));
-				if (eofMessage is object)
-					await FinializeFileProcess(eofMessage, recipients);
-
+				await _fileProcessService.ProcessFile(file, new ChunkWriter(recipients, outgoingQueue), new EofTransmitter(recipients, _transmissionService));
 				WorkerLog.Instance.Information($"'{file.Path}' is processed");
 			}
 			else
@@ -91,11 +88,7 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			return recipients;
 		}
 
-		private async Task FinializeFileProcess(EofMessage eofMessage, ICollection<Recipient> recipients)
-		{
-			foreach (var recipient in recipients)
-				await _transmissionService.SendEofMessage(recipient,eofMessage);
-		}
+
 
 
 	}
