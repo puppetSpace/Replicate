@@ -41,7 +41,6 @@ namespace Pi.Replicate.Worker.Host.Hubs
 			private readonly WorkerQueueContainer _workerQueueContainer;
 
 			private static readonly FileChunkTransmissionResponse _successFullFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = true };
-			private static readonly FileChunkTransmissionResponse _failedFileChunkTransmissionResponse = new FileChunkTransmissionResponse { IsSuccessful = false };
 			private static readonly EofMessageTransmissionResponse _successFullEofMessageTransmissionResponse = new EofMessageTransmissionResponse { IsSuccessful = true };
 			private static readonly EofMessageTransmissionResponse _failedEofMessageTransmissionResponse = new EofMessageTransmissionResponse { IsSuccessful = false };
 			private static readonly FileTransmissionResponse _successFullFileTransmissionResponse = new FileTransmissionResponse { IsSuccessful = true };
