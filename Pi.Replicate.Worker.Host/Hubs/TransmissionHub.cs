@@ -71,6 +71,8 @@ namespace Pi.Replicate.Worker.Host.Hubs
 					: _failedEofMessageTransmissionResponse;
 			}
 
+			//todo check to use streaming
+			// server can use while loop to keep sending as long as there are items and the client is not disconnected (u can use the context callecation token)
 			public async Task<FileChunkTransmissionResponse> SendFileChunk(FileChunkTransmissionRequest request)
 			{
 				WorkerLog.Instance.Information($"Filechunk received from {request.Host}");

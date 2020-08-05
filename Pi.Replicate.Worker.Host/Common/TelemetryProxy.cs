@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Pi.Replicate.Worker.Host.Common
 {
+	//maybe use grpc here to stream the data to the client
 	public class TelemetryProxy
 	{
 		private readonly IHubContext<SystemHub> _hubContext;
