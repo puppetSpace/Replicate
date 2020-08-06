@@ -9,7 +9,8 @@ namespace Pi.Replicate.Worker.Host.Services
 			services.AddTransient<FileService>();
 			services.AddTransient<FileDisassemblerServiceFactory>();
 			services.AddTransient<FileAssemblerServiceFactory>();
-			services.AddTransient<ITransmissionLink, RestTransmissionLink>();
+			//services.AddTransient<ITransmissionLink, RestTransmissionLink>();
+			services.AddTransient<ITransmissionLink, GrpcTransmissionLink>();
 			services.AddTransient<TransmissionService>();
 			services.AddSingleton<IWebhookService, WebhookService>();
 			services.AddSingleton<IFileConflictService, FileConflictService>();

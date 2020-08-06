@@ -30,8 +30,7 @@ namespace Pi.Replicate.Worker.Host.Hubs
 
 		public override async Task<FileChunkTransmissionResponse> SendFileChunk(FileChunkTransmissionRequest request, ServerCallContext context)
 		{
-			await _transmissionActions.SendFileChunk(request);
-			return new FileChunkTransmissionResponse();
+			return await _transmissionActions.SendFileChunk(request);
 		}
 
 		internal class TransmissionActions

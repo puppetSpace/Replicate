@@ -6,14 +6,14 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 	{
 		public static void AddBackgroundServices(this IServiceCollection services)
 		{
-			//services.AddHostedService<FileCollectorWorker>();
-			//services.AddHostedService<FileExportWorker>();
-			//services.AddHostedService<FileDisassemblerWorker>();
-			//services.AddHostedService<FileChunkExportWorker>();
+			services.AddHostedService<FileCollectorWorker>();
+			services.AddHostedService<FileExportWorker>();
+			services.AddHostedService<FileDisassemblerWorker>();
+			services.AddHostedService<FileChunkExportWorker>();
 			services.AddHostedService<FileAssemblerWorker>();
-			//services.AddHostedService<FileChunkReceiverWorker>();
-			//services.AddHostedService<SystemOverviewWatcher>();
-			//services.AddHostedService<RetryWorker>();
+			services.AddHostedService<FileChunkReceiverWorker>();
+			services.AddHostedService<SystemOverviewWatcher>();
+			services.AddHostedService<RetryWorker>();
 		}
 	}
 }
