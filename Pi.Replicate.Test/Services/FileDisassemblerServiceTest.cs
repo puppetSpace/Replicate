@@ -39,8 +39,8 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await fileDisassemblerServiceFactory.Get(Helper.GetFileModel(fileInfo), mockChunkWriter.Object).ProcessFile();
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
 
@@ -61,8 +61,8 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var eofMessage = await fileDisassemblerServiceFactory.Get(Helper.GetFileModel(fileInfo), mockChunkWriter.Object).ProcessFile();
 
 			Assert.IsNotNull(eofMessage);
 			Assert.AreEqual(eofMessage.AmountOfChunks, amountOfCalls);
@@ -74,6 +74,8 @@ namespace Pi.Replicate.Test.Services
 		{
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
+			var domainFile = Helper.GetFileModel(fileInfo);
+			domainFile.Update(fileInfo);
 			var amountOfCalls = 0;
 			var getPreviousSignatureOfFileQueryCalled = false;
 
@@ -89,10 +91,8 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var domainFile = Helper.GetFileModel(fileInfo);
-			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var eofFile = await fileDisassemblerServiceFactory.Get(domainFile, mockChunkWriter.Object).ProcessFile();
 
 			Assert.IsTrue(getPreviousSignatureOfFileQueryCalled);
 		}
@@ -115,10 +115,10 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+
 			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
+			var eofFile = await fileDisassemblerServiceFactory.Get(Helper.GetFileModel(fileInfo), mockChunkWriter.Object).ProcessFile();
 
 			Assert.IsNotNull(eofFile);
 			Assert.AreEqual(eofFile.AmountOfChunks,amountOfCalls);
@@ -130,6 +130,7 @@ namespace Pi.Replicate.Test.Services
 			var configuration = CreateConfigurationMock();
 			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
 			var domainFile = Helper.GetFileModel(fileInfo);
+			domainFile.Update(fileInfo);
 			var amountOfCalls = 0;
 
 			var fileRepositoryMock = new Mock<IFileRepository>();
@@ -143,9 +144,8 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			domainFile.Update(fileInfo);
-			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var eofFile = await fileDisassemblerServiceFactory.Get(domainFile, mockChunkWriter.Object).ProcessFile();
 
 			Assert.AreEqual(1, amountOfCalls);
 
@@ -170,8 +170,8 @@ namespace Pi.Replicate.Test.Services
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var eofMessage = await fileDisassemblerServiceFactory.Get(Helper.GetFileModel(fileInfo), mockChunkWriter.Object).ProcessFile();
 
 			Assert.AreEqual(0, amountOfCalls);
 			Assert.IsNull(eofMessage);
@@ -199,8 +199,8 @@ namespace Pi.Replicate.Test.Services
 
 			var mockChunkWriter = new Mock<IChunkWriter>();
 
-			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
+			var fileDisassemblerServiceFactory = new FileDisassemblerServiceFactory(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			await fileDisassemblerServiceFactory.Get(Helper.GetFileModel(fileInfo), mockChunkWriter.Object).ProcessFile();
 
 			Assert.IsTrue(isFailedFileRequestCalled);
 

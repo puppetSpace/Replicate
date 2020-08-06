@@ -23,7 +23,7 @@ namespace Pi.Replicate.Test.Services
 		}
 
 		[TestMethod]
-		public async Task GetNewFiles_ShouldFind5NewFiles()
+		public async Task GetNewFiles_ShouldFind8NewFiles()
 		{
 			var folder = new CrawledFolder { Name = "FileFolder" };
 			var fileRepositoryMock = new Mock<IFileRepository>();
@@ -34,8 +34,11 @@ namespace Pi.Replicate.Test.Services
 			await fileCollector.CollectFiles();
 
 
-			Assert.AreEqual(5, fileCollector.NewFiles.Count);
+			Assert.AreEqual(8, fileCollector.NewFiles.Count);
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1.txt"));
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_changed.txt"));
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_compressed.txt"));
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_copy.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test2.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test3.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test4.txt"));
@@ -44,7 +47,7 @@ namespace Pi.Replicate.Test.Services
 
 
 		[TestMethod]
-		public async Task GetNewFiles_2Changed_ShouldFind3NewFiles()
+		public async Task GetNewFiles_2Changed_ShouldFind6NewFiles()
 		{
 			var folder = new CrawledFolder { Name = "FileFolder" };
 			ICollection<File> existingFiles = new List<File>
@@ -60,7 +63,10 @@ namespace Pi.Replicate.Test.Services
 			var fileCollector = new FileCollector(fileRepositoryMock.Object, folder);
 			await fileCollector.CollectFiles();
 
-			Assert.AreEqual(3, fileCollector.NewFiles.Count);
+			Assert.AreEqual(6, fileCollector.NewFiles.Count);
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_changed.txt"));
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_compressed.txt"));
+			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test1_copy.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test3.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test4.txt"));
 			Assert.IsTrue(fileCollector.NewFiles.Any(x => x.Name == "test5.txt"));

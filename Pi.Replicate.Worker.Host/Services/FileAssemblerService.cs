@@ -12,56 +12,38 @@ namespace Pi.Replicate.Worker.Host.Services
 	public class FileAssemblerService
 	{
 		private readonly IDatabase _database;
-		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
-		private readonly IFileConflictService _fileConflictService;
+
 
 		public FileAssemblerService(IDatabase database
-			, IWebhookService webhookService
 			, IFileRepository fileRepository
-			, IFileChunkRepository fileChunkRepository
-			, IFileConflictService fileConflictService)
+			, IFileChunkRepository fileChunkRepository)
 		{
 			_database = database;
-			_webhookService = webhookService;
 			_fileRepository = fileRepository;
 			_fileChunkRepository = fileChunkRepository;
-			_fileConflictService = fileConflictService;
 		}
 
-		public async Task ProcessFile(File file, EofMessage eofMessage)
+		public async Task<bool> ProcessFile(File file, EofMessage eofMessage)
 		{
 			try
 			{
 				//this class has alot of access to database. Just open 1 connection instead of every call creating its own
 				using (_database)
 				{
-					bool hasConflicts = await HasConflicts(file);
-					if (!hasConflicts)
-					{
-						if (file.IsNew())
-							await ProcessNew(file, eofMessage);
-						else
-							await ProcessChange(file, eofMessage);
-					}
+					if (file.IsNew())
+						await ProcessNew(file, eofMessage);
+					else
+						await ProcessChange(file, eofMessage);
 				}
+				return true;
 			}
 			catch (Exception ex)
 			{
 				WorkerLog.Instance.Error(ex, $"Unexpected error occured while assembling the file '{file.Name}'");
+				return false;
 			}
-		}
-
-		private async Task<bool> HasConflicts(File file)
-		{
-			var previousVersions = await _fileRepository.GetAllVersionsOfFile(file, _database);
-			if (previousVersions.WasSuccessful && previousVersions.Data.Any())
-			{
-				var hasConflicts = await _fileConflictService.Check(file, previousVersions.Data);
-				return hasConflicts;
-			}
-			return false;
 		}
 
 		private async Task ProcessNew(File file, EofMessage eofMessage)
@@ -158,35 +140,28 @@ namespace Pi.Replicate.Worker.Host.Services
 			var newCreationDate = System.IO.File.GetLastWriteTimeUtc(filePath);
 			await _fileRepository.UpdateFileAsAssembled(file.Id, newCreationDate, signature, _database);
 			await _fileChunkRepository.DeleteChunksForFile(file.Id, _database);
-			_webhookService.NotifyFileAssembled(file);
 		}
 	}
 
 	public class FileAssemblerServiceFactory
 	{
 		private readonly IDatabaseFactory _databaseFactory;
-		private readonly IWebhookService _webhookService;
 		private readonly IFileRepository _fileRepository;
 		private readonly IFileChunkRepository _fileChunkRepository;
-		private readonly IFileConflictService _fileConflictService;
 
 		public FileAssemblerServiceFactory(IDatabaseFactory databaseFactory
-			, IWebhookService webhookService
 			, IFileRepository fileRepository
-			, IFileChunkRepository fileChunkRepository
-			, IFileConflictService fileConflictService)
+			, IFileChunkRepository fileChunkRepository)
 		{
 			_databaseFactory = databaseFactory;
-			_webhookService = webhookService;
 			_fileRepository = fileRepository;
 			_fileChunkRepository = fileChunkRepository;
-			_fileConflictService = fileConflictService;
 		}
 
 		//to make sure that every thread get's its own instance of IDatabase
 		public FileAssemblerService Get()
 		{
-			return new FileAssemblerService(_databaseFactory.Get(), _webhookService, _fileRepository, _fileChunkRepository, _fileConflictService);
+			return new FileAssemblerService(_databaseFactory.Get(), _fileRepository, _fileChunkRepository);
 		}
 	}
 }

@@ -19,15 +19,21 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 		private readonly int _amountOfConcurrentJobs;
 		private readonly FileAssemblerServiceFactory _fileAssemblerServiceFactory;
 		private readonly IFileRepository _fileRepository;
+		private readonly IWebhookService _webhookService;
+		private readonly IFileConflictService _fileConflictService;
 
 		public FileAssemblerWorker(IConfiguration configuration
 			, FileAssemblerServiceFactory fileAssemblerServiceFactory
-			, IFileRepository fileRepository)
+			, IFileRepository fileRepository
+			, IWebhookService webhookService
+			, IFileConflictService fileConflictService)
 		{
 			_fileAssemblerServiceFactory = fileAssemblerServiceFactory;
 			_fileRepository = fileRepository;
+			_webhookService = webhookService;
 			_triggerInterval = int.Parse(configuration[Constants.FileAssemblyTriggerInterval]);
 			_amountOfConcurrentJobs = int.Parse(configuration[Constants.ConcurrentFileAssemblyJobs]);
+			_fileConflictService = fileConflictService;
 		}
 
 		protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -56,13 +62,35 @@ namespace Pi.Replicate.Worker.Host.BackgroundWorkers
 			await Task.Delay(Timeout.Infinite);
 		}
 
-		private async Task AssembleFiles(IEnumerable<(File file, EofMessage eofMesssage)> newFiles)
+		private async Task AssembleFiles(IEnumerable<(File file, EofMessage eofMesssage)> toProcessFiles)
 		{
 			var taskRunner = new TaskRunner(_amountOfConcurrentJobs);
-			foreach (var (file, eofMesssage) in newFiles)
-				taskRunner.Add(() => _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage));
-			
+			foreach (var (file, eofMesssage) in toProcessFiles)
+			{
+				var hasConflicts = await HasConflicts(file);
+				if (!hasConflicts)
+				{
+					taskRunner.Add(async () =>
+					{
+						var wasSuccesful = await _fileAssemblerServiceFactory.Get().ProcessFile(file, eofMesssage);
+						if (wasSuccesful)
+							_webhookService.NotifyFileAssembled(file);
+					});
+				}
+			}
+
 			await taskRunner.WaitTillComplete();
+		}
+
+		private async Task<bool> HasConflicts(File file)
+		{
+			var previousVersions = await _fileRepository.GetAllVersionsOfFile(file);
+			if (previousVersions.WasSuccessful && previousVersions.Data.Any())
+			{
+				var hasConflicts = await _fileConflictService.Check(file, previousVersions.Data);
+				return hasConflicts;
+			}
+			return false;
 		}
 	}
 }

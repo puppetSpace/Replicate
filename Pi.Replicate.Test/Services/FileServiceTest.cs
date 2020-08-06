@@ -153,7 +153,7 @@ namespace Pi.Replicate.Test.Services
 		{
 			var folderName = "TestFileService";
 			var fileRepositoryMock = new Mock<IFileRepository>();
-			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>()))
+			fileRepositoryMock.Setup(x => x.AddReceivedFile(It.IsAny<File>()))
 				.ReturnsAsync(() => Result.Success());
 
 			var recipientRepositoryMock = new Mock<IRecipientRepository>();
@@ -181,7 +181,7 @@ namespace Pi.Replicate.Test.Services
 		{
 			var folderName = "TestFileService";
 			var fileRepositoryMock = new Mock<IFileRepository>();
-			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>()))
+			fileRepositoryMock.Setup(x => x.AddReceivedFile(It.IsAny<File>()))
 				.ReturnsAsync(() => Result.Success());
 
 			var recipientRepositoryMock = new Mock<IRecipientRepository>();
@@ -208,8 +208,8 @@ namespace Pi.Replicate.Test.Services
 		{
 			File addedFile = null;
 			var fileRepositoryMock = new Mock<IFileRepository>();
-			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>()))
-				.Callback<File>(x=> addedFile = x)
+			fileRepositoryMock.Setup(x => x.AddReceivedFile(It.IsAny<File>()))
+				.Callback<File>(x => addedFile = x)
 				.ReturnsAsync(() => Result.Success());
 
 			var recipientRepositoryMock = new Mock<IRecipientRepository>();
@@ -238,7 +238,7 @@ namespace Pi.Replicate.Test.Services
 		public async Task AddReceivedFile_RecipientShouldBeLinkedToFolder()
 		{
 			var fileRepositoryMock = new Mock<IFileRepository>();
-			fileRepositoryMock.Setup(x => x.AddNewFile(It.IsAny<File>()))
+			fileRepositoryMock.Setup(x => x.AddReceivedFile(It.IsAny<File>()))
 				.ReturnsAsync(() => Result.Success());
 
 			string addedHost = null;

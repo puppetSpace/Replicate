@@ -53,11 +53,7 @@ namespace Pi.Replicate.Test.Processors
 			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(2, amountofTimesQueryCalled);
@@ -92,11 +88,7 @@ namespace Pi.Replicate.Test.Processors
 			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(11, toSkipSum);
@@ -128,11 +120,7 @@ namespace Pi.Replicate.Test.Processors
 				.Callback(() => updateFileCalled = true)
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(updateFileCalled);
@@ -167,11 +155,7 @@ namespace Pi.Replicate.Test.Processors
 			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(2, amountofTimesQueryCalled);
@@ -208,11 +192,7 @@ namespace Pi.Replicate.Test.Processors
 			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.AreEqual(11, toSkipSum);
@@ -243,11 +223,7 @@ namespace Pi.Replicate.Test.Processors
 			fileRepositoryMock.Setup(x => x.UpdateFileAsAssembled(It.IsAny<Guid>(), It.IsAny<DateTime>(), It.IsAny<byte[]>(), It.IsAny<IDatabase>()))
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService( databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService( databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsFalse(domainFile.IsNew());
@@ -281,46 +257,12 @@ namespace Pi.Replicate.Test.Processors
 				.Callback(() => updateFileCalled = true)
 				.Returns(() => Task.FromResult(Result.Success()));
 
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
+			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object);
 			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
 
 			Assert.IsTrue(updateFileCalled);
 			Assert.IsTrue(fileChunkDeleteCalled);
 			Assert.IsFalse(domainFile.IsNew());
-		}
-
-		[TestMethod]
-		public async Task ProcessFile_ChangedFile_CallToWebhookShouldBeMade()
-		{
-			var configMock = CreateConfigurationMock();
-			var domainFile = Helper.GetFileModel();
-			domainFile.Update(new System.IO.FileInfo(System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "DropLocation", "dummy.txt")));
-			var eofMessage =new EofMessage(Guid.Empty, 15);
-			var databaseMock = new Mock<IDatabase>();
-
-			var fileChunkRepositoryMock = new Mock<IFileChunkRepository>();
-			fileChunkRepositoryMock.Setup(x => x.GetFileChunkData(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<IDatabase>()))
-				.Returns(() => Task.FromResult(Result<ICollection<byte[]>>.Success(new List<byte[]>())));
-
-			var fileRepositoryMock = new Mock<IFileRepository>();
-			fileRepositoryMock.Setup(x => x.GetAllVersionsOfFile(It.IsAny<File>(), It.IsAny<IDatabase>()))
-				.Returns(() => Task.FromResult(Result<ICollection<File>>.Success(new List<File>())));
-
-			var fileConflictServiceMock = new Mock<IFileConflictService>();
-			fileConflictServiceMock.Setup(x => x.Check(It.IsAny<File>(), It.IsAny<ICollection<File>>())).ReturnsAsync(true);
-
-			var webhookIsCalled = false;
-			var webhookMock = Helper.GetWebhookServiceMock(x => { webhookIsCalled = true; }, x => { }, x => { });
-
-
-			var fileAssemblerService = new FileAssemblerService(databaseMock.Object, webhookMock.Object, fileRepositoryMock.Object, fileChunkRepositoryMock.Object, fileConflictServiceMock.Object);
-			await fileAssemblerService.ProcessFile(domainFile, eofMessage);
-
-			Assert.IsTrue(webhookIsCalled);
 		}
 
 		private Mock<IConfiguration> CreateConfigurationMock()

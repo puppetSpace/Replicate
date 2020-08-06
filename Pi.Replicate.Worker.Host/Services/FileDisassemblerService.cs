@@ -15,51 +15,63 @@ namespace Pi.Replicate.Worker.Host.Services
 		private readonly int _sizeofChunkInBytes;
 		private readonly IFileRepository _fileRepository;
 		private readonly IEofMessageRepository _eofMessageRepository;
+		private readonly File _file;
+		private readonly IChunkWriter _chunkWriter;
 
-		public FileDisassemblerService(IConfiguration configuration
+		public FileDisassemblerService(int sizeofChunksInBytes
 			, IFileRepository fileRepository
-			, IEofMessageRepository eofMessageRepository)
+			, IEofMessageRepository eofMessageRepository
+			, File file
+			, IChunkWriter chunkWriter)
 		{
-			_sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
+			_sizeofChunkInBytes = sizeofChunksInBytes;
 			_fileRepository = fileRepository;
 			_eofMessageRepository = eofMessageRepository;
+			_file = file;
+			_chunkWriter = chunkWriter;
 		}
 
 
-		public async Task<EofMessage> ProcessFile(File file, IChunkWriter chunkWriter)
+		public async Task<EofMessage> ProcessFile()
 		{
-			var path = file.GetFullPath();
+			var path = _file.GetFullPath();
 
 			EofMessage eofMessage = null;
 			if (!string.IsNullOrWhiteSpace(path) && System.IO.File.Exists(path) && !FileLock.IsLocked(path))
 			{
 				try
 				{
-					if (file.IsNew())
-						eofMessage = await ProcessNewFile(file, chunkWriter);
+					if (_file.IsNew())
+						eofMessage = await ProcessNewFile();
 					else
-						eofMessage = await ProcessChangedFile(file, chunkWriter);
+						eofMessage = await ProcessChangedFile();
 				}
 				catch (Exception ex)
 				{
-					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{file.Path}'");
+					WorkerLog.Instance.Error(ex, $"Unexpected error occured while disassembling file '{_file.Path}'");
 				}
 			}
 			else
 			{
 				WorkerLog.Instance.Warning($"File '{path}' does not exist or is locked. File will not be processed");
 			}
+
+			if(eofMessage is null)
+			{
+				await _fileRepository.UpdateFileAsFailed(_file.Id);
+			}
+
 			return eofMessage;
 		}
 
-		private async Task<EofMessage> ProcessNewFile(File file, IChunkWriter chunkWriter)
+		private async Task<EofMessage> ProcessNewFile()
 		{
 			var sequenceNo = 0;
-			WorkerLog.Instance.Information($"Compressing file '{file.Path}'");
+			WorkerLog.Instance.Information($"Compressing file '{_file.Path}'");
 			var pathOfCompressed = System.IO.Path.Combine(System.IO.Path.GetTempPath(), System.IO.Path.GetTempFileName());
-			await file.CompressTo(pathOfCompressed);
+			await _file.CompressTo(pathOfCompressed);
 
-			WorkerLog.Instance.Information($"Splitting up '{file.Path}'");
+			WorkerLog.Instance.Information($"Splitting up '{_file.Path}'");
 
 			var buffer = new byte[_sizeofChunkInBytes];
 			using (var stream = System.IO.File.OpenRead(pathOfCompressed))
@@ -67,14 +79,14 @@ namespace Pi.Replicate.Worker.Host.Services
 				int bytesRead = 0;
 				while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
 				{
-					var fileChunk = new FileChunk(file.Id, ++sequenceNo, buffer[0..bytesRead]);
-					await chunkWriter.Push(fileChunk);
+					var fileChunk = new FileChunk(_file.Id, ++sequenceNo, buffer[0..bytesRead]);
+					await _chunkWriter.Push(fileChunk);
 				}
 			}
 
 			DeleteTempFile(pathOfCompressed);
 
-			return await CreateEofMessage(file, sequenceNo);
+			return await CreateEofMessage(sequenceNo);
 		}
 
 		private static void DeleteTempFile(string pathOfCompressed)
@@ -90,41 +102,41 @@ namespace Pi.Replicate.Worker.Host.Services
 			}
 		}
 
-		private async Task<EofMessage> ProcessChangedFile(File file, IChunkWriter chunkWriter)
+		private async Task<EofMessage> ProcessChangedFile()
 		{
 			var amountOfChunks = 0;
 
-			var result = await _fileRepository.GetSignatureOfPreviousFile(file.Id);
+			var result = await _fileRepository.GetSignatureOfPreviousFile(_file.Id);
 			if (!result.WasSuccessful || result.Data.Length == 0)
 			{
-				WorkerLog.Instance.Information($"Unable to process changed file '{file.Path}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
+				WorkerLog.Instance.Information($"Unable to process changed file '{_file.Path}' due to {(result.WasSuccessful ? "no previous signature found" : "an error while querying the previous signature")}");
 				return null;
 			}
 			else
 			{
-				WorkerLog.Instance.Information($"Creating delta of changed file '{file.Path}'");
-				var delta = file.CreateDelta(result.Data);
+				WorkerLog.Instance.Information($"Creating delta of changed file '{_file.Path}'");
+				var delta = _file.CreateDelta(result.Data);
 				var deltaSizeOfChunks = delta.Length > _sizeofChunkInBytes ? _sizeofChunkInBytes : delta.Length;
 
-				WorkerLog.Instance.Information($"Splitting up delta of changed file '{file.Path}'");
+				WorkerLog.Instance.Information($"Splitting up delta of changed file '{_file.Path}'");
 				var indexOfSlice = 0;
 				var sequenceNo = 0;
 				while (indexOfSlice < delta.Length)
 				{
-					var fileChunk = new FileChunk(file.Id, ++sequenceNo, delta[indexOfSlice..deltaSizeOfChunks]);
-					await chunkWriter.Push(fileChunk);
+					var fileChunk = new FileChunk(_file.Id, ++sequenceNo, delta[indexOfSlice..deltaSizeOfChunks]);
+					await _chunkWriter.Push(fileChunk);
 					indexOfSlice += deltaSizeOfChunks;
 					amountOfChunks++;
 				}
 
-				return await CreateEofMessage(file, amountOfChunks);
+				return await CreateEofMessage(amountOfChunks);
 			}
 		}
 
-		private async Task<EofMessage> CreateEofMessage(File file, int amountOfChunks)
+		private async Task<EofMessage> CreateEofMessage(int amountOfChunks)
 		{
-			WorkerLog.Instance.Information($"Creating eof message for '{file.Path}'");
-			var eofMessage = new EofMessage(file.Id, amountOfChunks);
+			WorkerLog.Instance.Information($"Creating eof message for '{_file.Path}'");
+			var eofMessage = new EofMessage(_file.Id, amountOfChunks);
 			var eofResult = await _eofMessageRepository.AddEofMessage(eofMessage);
 			if (eofResult.WasSuccessful)
 				return eofMessage;
@@ -132,6 +144,26 @@ namespace Pi.Replicate.Worker.Host.Services
 				return null;
 		}
 
+	}
+
+	public class FileDisassemblerServiceFactory
+	{
+		private readonly IFileRepository _fileRepository;
+		private readonly IEofMessageRepository _eofMessageRepository;
+		private readonly int _sizeofChunkInBytes;
+		public FileDisassemblerServiceFactory(IConfiguration configuration
+			, IFileRepository fileRepository
+			, IEofMessageRepository eofMessageRepository)
+		{
+			_sizeofChunkInBytes = int.Parse(configuration[Constants.FileSplitSizeOfChunksInBytes]);
+			_fileRepository = fileRepository;
+			_eofMessageRepository = eofMessageRepository;
+		}
+
+		public FileDisassemblerService Get(File file, IChunkWriter chunkWriter)
+		{
+			return new FileDisassemblerService(_sizeofChunkInBytes, _fileRepository, _eofMessageRepository, file, chunkWriter);
+		}
 	}
 
 	public interface IChunkWriter

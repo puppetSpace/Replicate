@@ -7,7 +7,7 @@ namespace Pi.Replicate.Worker.Host.Services
 		public static void AddWorkerServices(this IServiceCollection services)
 		{
 			services.AddTransient<FileService>();
-			services.AddTransient<FileDisassemblerService>();
+			services.AddTransient<FileDisassemblerServiceFactory>();
 			services.AddTransient<FileAssemblerServiceFactory>();
 			services.AddTransient<ITransmissionLink, RestTransmissionLink>();
 			services.AddTransient<TransmissionService>();
