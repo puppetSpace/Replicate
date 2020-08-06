@@ -36,12 +36,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object,webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.AreEqual(calculatedAmountOfChunks, amountOfCalls);
@@ -60,12 +58,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.IsNotNull(eofMessage);
@@ -90,12 +86,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var domainFile = Helper.GetFileModel(fileInfo);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
@@ -118,12 +112,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
@@ -148,12 +140,10 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
-
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			domainFile.Update(fileInfo);
 			var eofFile = await processService.ProcessFile(domainFile, mockChunkWriter.Object);
 
@@ -177,64 +167,14 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 			var mockChunkWriter = new Mock<IChunkWriter>();
 			mockChunkWriter.Setup(x => x.Push(It.IsAny<FileChunk>())).Callback(() => amountOfCalls++);
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object,fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			var eofMessage = await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.AreEqual(0, amountOfCalls);
 			Assert.IsNull(eofMessage);
-
-		}
-
-		[TestMethod]
-		public async Task ProcessFile_WebhookFileDissasembledShouldBeCalled()
-		{
-			var configuration = CreateConfigurationMock();
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-
-			var fileRepositoryMock = new Mock<IFileRepository>();
-
-			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
-			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
-				.ReturnsAsync(() => Result.Success());
-
-			var webhookCalled = false;
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { webhookCalled = true; }, x => { });
-
-			var mockChunkWriter = new Mock<IChunkWriter>();
-
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
-
-			Assert.IsTrue(webhookCalled);
-		}
-
-		[TestMethod]
-		public async Task ProcessFile_FileIsLocked_WebhookFailedFileShouldBeCalled()
-		{
-			var configuration = CreateConfigurationMock();
-			var fileInfo = new System.IO.FileInfo(System.IO.Path.Combine(PathBuilder.BasePath, "FileFolder", "test1.txt"));
-
-			using var fs = fileInfo.OpenWrite();
-
-			var fileRepositoryMock = new Mock<IFileRepository>();
-			var eofMessageRepositoryMock = new Mock<IEofMessageRepository>();
-			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
-				.ReturnsAsync(() => Result.Success());
-
-			var webhookCalled = false;
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { webhookCalled = true; });
-
-			var mockChunkWriter = new Mock<IChunkWriter>();
-
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
-			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
-
-
-			Assert.IsTrue(webhookCalled);
 
 		}
 
@@ -257,10 +197,9 @@ namespace Pi.Replicate.Test.Services
 			eofMessageRepositoryMock.Setup(x => x.AddEofMessage(It.IsAny<EofMessage>()))
 				.ReturnsAsync(() => Result.Success());
 
-			var webhookMock = Helper.GetWebhookServiceMock(x => { }, x => { }, x => { });
 			var mockChunkWriter = new Mock<IChunkWriter>();
 
-			var processService = new FileDisassemblerService(configuration.Object, webhookMock.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
+			var processService = new FileDisassemblerService(configuration.Object, fileRepositoryMock.Object, eofMessageRepositoryMock.Object);
 			await processService.ProcessFile(Helper.GetFileModel(fileInfo), mockChunkWriter.Object);
 
 			Assert.IsTrue(isFailedFileRequestCalled);
